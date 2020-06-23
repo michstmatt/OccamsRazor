@@ -1,0 +1,115 @@
+﻿@{
+    ViewData["Title"] = "Host Page";
+}
+
+
+
+<script src="~/js/angular.min.js"></script>
+<script src="~/js/site.js"></script>
+
+<div ng-app="hostApp" ng-controller="indexController" ng-init="state='home'">
+
+    <div ng-show="state=='home'" class="host-join-container">
+
+    <h3 class="host-join-label">Edit Game</h3>
+    <select name="selectedGameId" id="selectedGame" ng-model="selectedGame.gameId" class="host-join-input">
+        <option ng-repeat="game in games" value="{{game.gameId}}">{{game.name}}</option>
+    </select>
+    <br/>
+    <button ng-click="loadGame()" class="host-join-submit">Edit</button>
+
+    <br/> <br/>
+    <hr/>
+    <br/><br/>
+
+    <h3 class="host-join-label">Create Game</h3>
+    <input ng-model="selectedGame.name" class="host-join-input"/>
+    <button ng-click="createGame()" class="host-join-submit">Create</button>
+    </div>
+
+<div ng-show="game!=null">
+    <h1>{{game.metadata.name}}</h1>
+    <p>
+        <h2>
+            <a class="text-dark" ng-click="state='questions'" href="#">Edit Questions</a> | 
+            <a class="text-dark" ng-click="state='score'" href="#">Score Questions</a></p>
+        </h2>
+        <hr/>
+</div>
+
+
+<div style="width: 75%;" ng-controller="questionController" ng-show="$parent.state=='questions'">
+    {{$parent.game.rounds}}
+
+
+    <form method="POST">
+    <h2>Game Name </h2>
+    <input ng-model="$parent.game.metadata.name" />
+    <hr/>
+    <br/>
+
+    <div ng-repeat="round in $parent.game.rounds">
+        <h3>Round {{round.Round}}</h4>
+        <div style="margin-left:20px; width: 75%;" ng-repeat="question in round.questions">
+            <h4>Question {{question.number}}</h4>
+            <input ng-model="question.text"/>
+        </div>
+        <hr/>
+        <br/>
+
+    </div>
+    <input type="button" value="Save" ng-click="submit($parent.game)" /> <br/><br/>
+    <label style="width: 100%; background: green; color:white" ng-show="saved">Saved</label>
+    </form>
+</div>
+
+
+ <div ng-controller="scoreController" ng-show="$parent.state=='score'">
+        <div>
+            <h4> Current Round: {{roundNames[game.metadata.currentRound]}}</h4>            
+            <h4> Current Question: {{game.metadata.currentQuestion}}</h4>
+            <h4> Question Text: {{game.rounds[1].questions[2].text}}</h4>
+
+            <label>Current Round</label>
+            <select ng-model="selectedRound">
+                <option ng-repeat="round in  game.rounds" value="{{round.Round}}">{{roundNames[round.Round]}}</option>
+            </select>
+            <label>Current Question</label>
+            <select ng-model="selectedQuestion">
+                <option ng-repeat="question in game.rounds[1].questions" value="{{question.number}}">{{question.number}}</option>
+            </select>
+            <button ng-click="setCurrentQuestion(selectedQuestion)">Update</button>
+        </div>
+        <button ng-click="reload(game)">Refresh</button> <button ng-click="updateScores(playerAnswers)">UpdateScores</button>
+    <table>
+        <tr>
+            <th class="score">Round Number</th>
+            <th class="score">Question Number</th>
+            <th class="score">Player Name</th>
+            <th class="score">Answer</th>
+            <th class="score">Wager</th>
+            <th class="score">Correct?</th>
+            <th class="score">Points Awarded</th>
+        </tr>
+
+        <tr ng-repeat="answer in playerAnswers" ng-class="answer.questionNumber % 2 == 0 ? 'score-row':''" >
+                <td>{{answer.round}}</td>
+                <td>{{answer.questionNumber}}</td>
+                <td>{{answer.player.name}}</td>
+                <td>{{answer.answerText}}</td>
+                <td>{{answer.wager}}</td>
+                <td>
+                    <select name="Wager" ng-model="answer.correct" ng-change="playerScoreChanged(answer)" 
+                        ng-options="val for val in ['Correct', 'Incorrect', 'Partial']">
+                    </select> 
+                </td>
+                <td>
+                    <input ng-disabled="answer.correct != 'Partial'" ng-model="answer.pointsAwarded" />
+                    
+                </td>
+        </tr>
+
+    </table>
+ </div>
+
+</div>

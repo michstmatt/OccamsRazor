@@ -1,0 +1,47 @@
+<script src="~/js/angular.min.js"></script>
+<script src="~/js/site.js"></script>
+<div>
+
+<div ng-app="playApp" ng-controller="myCtrl" ng-init="state='Join'">
+        <h2>{{player.name}}</h2>
+
+        <div ng-controller="setupController" ng-show="$parent.state=='Join'" class="answer-container">
+                <form method="POST" class="answer-container">
+                        <label for="games">Choose a Game:</label>
+                        <br/>
+
+                        <select ng-model="selectedGame" class="answer-input">
+                                <option ng-repeat="game in games" value="{{game.gameId}}">{{game.name}}</option>
+                        </select>
+                        <br/>
+
+                        <label for="name">Name: </label>
+                        <br/>
+                        <input ng-model="player.name" class="answer-input"/>
+
+                        <br/>
+                        <input type="submit" value="Join" ng-click="join(selectedGame, player)" class="answer-submit"/>
+                </form>
+        </div>
+
+     <div ng-controller="questionController" ng-show="$parent.state=='Answer'" class="answer-container">
+
+
+    <h3>Round {{question.round}} Question {{question.number}} </h3>
+    <h2>Question: {{question.text}}</h2>
+
+    <form method="POST" class="answer-container">
+        <label>Answer</label>
+        <br/>
+        <input name="AnswerText" ng-model="answer.answerText" class="answer-input"/>
+        <br/><br/>
+
+        <label>Wager</label>
+        <br/>
+        <select name="Wager" ng-model="answer.wager" ng-options="val*1 for val in [1,2,3,4,5,6]" class="answer-input"></select>
+        <br/><br/>
+        <input type="submit" ng-click="submitAnswer(answer)" class="answer-submit"/>
+    </form>
+    </div>
+</div>
+</div>
