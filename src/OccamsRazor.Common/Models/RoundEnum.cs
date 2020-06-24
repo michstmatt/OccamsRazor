@@ -10,7 +10,9 @@ namespace OccamsRazor.Common.Models
         Four = 4,
         Five = 5,
         Six = 6,
-        Final = 8
+        Final = 8,
+        Scores = 9
+
     }
 
 }

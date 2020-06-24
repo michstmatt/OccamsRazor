@@ -10,8 +10,8 @@ namespace OccamsRazor.Common.Models
         [JsonPropertyName("id")]
         public string Id { get => this.Metadata.GameId.ToString(); set { } }
 
-        [JsonPropertyName("rounds")]
-        public List<GameRound> Rounds { get; set; }
+        [JsonPropertyName("questions")]
+        public List<Question> Questions { get; set; }
 
         [JsonPropertyName("metadata")]
         public GameMetadata Metadata { get; set; }
@@ -29,19 +29,19 @@ namespace OccamsRazor.Common.Models
                 {RoundEnum.Five, 3},
                 {RoundEnum.Six, 3},
                 {RoundEnum.Final, 1},
+                {RoundEnum.Scores, 1}
             };
 
-            Rounds = new List<GameRound>();
+            Questions = new List<Question>();
 
             foreach (var pair in format)
             {
-                var round = new GameRound { Round = pair.Key };
-                round.Questions = new List<Question>();
+                var round = pair.Key;
                 for (int i = 0; i < pair.Value; i++)
                 {
-                    round.Questions.Add(new Question { Round = pair.Key, Number = i + 1, Text = "" });
+                    Questions.Add(new Question { Round = pair.Key, Number = i + 1, Text = "" });
                 }
-                Rounds.Add(round);
+                
             }
         }
     }

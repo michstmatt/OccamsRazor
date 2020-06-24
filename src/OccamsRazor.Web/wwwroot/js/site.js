@@ -48,7 +48,7 @@ hostApp.controller('indexController', ['$scope', '$http', function ($scope, $htt
 
 }]);
 
-hostApp.controller('scoreController', ['$scope', '$http', function ($scope, $http) {
+hostApp.controller('scoreController', ['$scope', '$http', '$interval', function ($scope, $http, $interval) {
     $scope.game = {};
     $scope.roundNames = {
         "1": "One",
@@ -64,6 +64,9 @@ hostApp.controller('scoreController', ['$scope', '$http', function ($scope, $htt
     $scope.$on("Joined", function (events, args) {
         $scope.game = args.game;
         $scope.reload(args.game);
+        /*$interval(function () {
+            $scope.reload($scope.game);
+        }, 1000);*/
     })
 
     $scope.reload = function (game) {
@@ -81,10 +84,11 @@ hostApp.controller('scoreController', ['$scope', '$http', function ($scope, $htt
     //$scope.selectedRound = $scope.$parent.rounds[0];
 
 
-    $scope.setCurrentQuestion = function (question) {
+    $scope.setCurrentQuestion = function (questionStr) {
         var game = $scope.$parent.game.metadata;
-        game.currentRound = $scope.selectedRound * 1;
-        game.currentQuestion = $scope.selectedQuestion * 1;
+        var question = JSON.parse(questionStr);
+        game.currentRound = question.round;
+        game.currentQuestion = question.number;
         $http({
             method: "POST",
             url: "/api/Host/SetCurrentQuestion",
@@ -94,11 +98,11 @@ hostApp.controller('scoreController', ['$scope', '$http', function ($scope, $htt
         });
     }
 
-    $scope.playerScoreChanged = function (playerAnswer) {
-        if (playerAnswer.correct == "Correct") {
+    $scope.playerScoreChanged = function (playerAnswer, score) {
+        if (score == "Correct") {
             playerAnswer.pointsAwarded = playerAnswer.wager;
         }
-        else if (playerAnswer.correct == "Incorrect") {
+        else if (score == "Incorrect") {
             playerAnswer.pointsAwarded = 0;
         }
     }
@@ -109,7 +113,7 @@ hostApp.controller('scoreController', ['$scope', '$http', function ($scope, $htt
             url: "/api/Host/updatePlayerScores",
             data: playerAnswers
         }).then(function mySuccess(response) {
-            
+
         });
     }
 }]);
@@ -167,7 +171,7 @@ playApp.controller('setupController', ['$scope', '$http', function ($scope, $htt
         $scope.$parent.selectedGame = game;
         $scope.$parent.player = player;
         $scope.$parent.state = "Answer";
-        $scope.$parent.$broadcast('joined', {game: game * 1, player: player});
+        $scope.$parent.$broadcast('joined', { game: game * 1, player: player });
     }
 
 
@@ -175,7 +179,7 @@ playApp.controller('setupController', ['$scope', '$http', function ($scope, $htt
 }]);
 
 
-playApp.controller('questionController', ['$scope', '$http', function ($scope, $http) {
+playApp.controller('questionController', ['$scope', '$http', '$interval', function ($scope, $http, $interval) {
     $scope.answer = {
         player:
         {
@@ -187,12 +191,19 @@ playApp.controller('questionController', ['$scope', '$http', function ($scope, $
         round: 0,
         gameId: 0
     };
+
     $scope.$on('joined', function (event, args) {
 
 
         $scope.answer.gameId = args.game;
         $scope.answer.player = args.player;
+        $scope.getCurrentQuestion();
+        $interval(function () {
+            $scope.getCurrentQuestion();
+        }, 1000);
+    });
 
+    $scope.getCurrentQuestion = function () {
         $http({
             method: "GET",
             url: "/api/Play/GetCurrentQuestion",
@@ -202,7 +213,7 @@ playApp.controller('questionController', ['$scope', '$http', function ($scope, $
         }, function myError(response) {
             console.log("error");
         });
-    });
+    }
 
     $scope.submitAnswer = function (answer) {
         //answer.gameId = $scope.$parent.selectedGame.gameId;
@@ -216,20 +227,37 @@ playApp.controller('questionController', ['$scope', '$http', function ($scope, $
         }).then(function mySuccess(response) {
             $scope.saved = response.data;
 
-            $scope.$parent.$broadcast('showMessage', {text: "Your answer was received: " + answer.answerText + " for " + answer.wager + " points", error: false})
+            $scope.$parent.$broadcast('showMessage', { text: "Your answer was received: " + answer.answerText + " for " + answer.wager + " points", error: false })
         }, function myError(response) {
             console.log("error");
         });
     }
 }]);
 
-playApp.controller('modal', ['$scope', '$http', function ($scope, $http){
+playApp.controller('modal', ['$scope', '$http', function ($scope, $http) {
     $scope.show = false;
-    $scope.$on('showMessage', function(event, args)
-    {
-        alert("showMessage");
+    $scope.$on('showMessage', function (event, args) {
         $scope.text = args.text;
         $scope.show = true;
+    });
+
+}])
+
+playApp.controller('playerResults', ['$scope', '$http', function ($scope, $http) {
+    $scope.show = false;
+
+    $scope.$on('joined', function(event, args)
+    {
+        alert(JSON.stringify(args));
+        $http({
+            method: "GET",
+            url: "/api/Play/GetScoredResponses",
+            params: { "gameId": args.game, "name": args.player.name }
+        }).then(function mySuccess(response) {
+            alert(response.data);
+        }, function myError(response) {
+            console.log("error");
+        });
     });
 
 }])

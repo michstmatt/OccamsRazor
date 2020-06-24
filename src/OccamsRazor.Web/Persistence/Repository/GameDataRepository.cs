@@ -249,18 +249,12 @@ namespace OccamsRazor.Web.Persistence.Repository
             if (existing.Where(g => g.GameId == game.Metadata.GameId).Any())
             {
                 await UpdateExistingGameMetadataAsync(game.Metadata);
-                foreach (var round in game.Rounds)
-                {
-                    await UpdateExistingQuestionsAsync(game.Metadata.GameId, round.Questions);
-                }
+                await UpdateExistingQuestionsAsync(game.Metadata.GameId, game.Questions);
             }
             else
             {
                 await InsertGameMetadataAsync(game.Metadata);
-                foreach (var round in game.Rounds)
-                {
-                    await InsertQuestionsAsync(game.Metadata.GameId, round.Questions);
-                }
+                await InsertQuestionsAsync(game.Metadata.GameId, game.Questions);
             }
             return game.Metadata;
         }
@@ -298,11 +292,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             var game = new Game();
             game.Metadata = await GetGameMetadataAsync(gId);
             var questions = await GetQuestionsForGameAsync(gId);
-            game.Rounds = questions.GroupBy(g => g.Round).Select(group => new GameRound()
-            {
-                Round = group.Key,
-                Questions = group.ToList<Question>()
-            }).ToList();
+            game.Questions = questions.ToList();
             return game;
         }
 

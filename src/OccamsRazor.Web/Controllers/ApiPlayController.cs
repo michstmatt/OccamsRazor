@@ -66,6 +66,14 @@ namespace OccamsRazor.Web.Controllers
             return Ok(result);
         }
 
+        [Route("/api/Play/GetScoredResponses")]
+        [HttpGet]
+        public async Task<IActionResult> GetScoredAnswers(int gameId, string name)
+        {
+            var answers = await _playerAnswerService.GetScoresForPlayer(gameId, name);
+            return Ok(answers);
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

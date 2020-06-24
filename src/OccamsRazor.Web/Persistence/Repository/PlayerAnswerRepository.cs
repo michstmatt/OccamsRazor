@@ -20,14 +20,15 @@ namespace OccamsRazor.Web.Persistence.Repository
         {
             var answer = new PlayerAnswer();
 
-            answer.Id = System.Convert.ToInt32(reader[0]);
-            answer.GameId = System.Convert.ToInt32(reader[1]);
-            answer.Round = (RoundEnum)System.Convert.ToInt32(reader[2]);
-            answer.QuestionNumber = System.Convert.ToInt32(reader[3]);
-            answer.Player = new Player() { Name = System.Convert.ToString(reader[4]) };
-            answer.AnswerText = System.Convert.ToString(reader[5]);
-            answer.Wager = System.Convert.ToInt32(reader[6]);
-            answer.PointsAwarded = System.Convert.ToInt32(reader[7]);
+            answer.Id = reader.GetInt32(0);
+            answer.GameId = reader.GetInt32(1);
+            answer.Round = (RoundEnum)reader.GetInt32(2);
+            answer.QuestionNumber = reader.GetInt32(3);
+            answer.Player = new Player() { Name = reader.GetString(4)};
+            answer.AnswerText = reader.GetString(5);
+            answer.Wager = reader.GetInt32(6);
+            answer.PointsAwarded = reader.GetInt32(7);
+
             return answer;
         }
 
@@ -164,6 +165,39 @@ namespace OccamsRazor.Web.Persistence.Repository
             }
 
         }
+
+        public async Task<IEnumerable<PlayerAnswer>> GetScoredAnswersForPlayerAsync(int gameId, string name)
+        {
+            var answers = new List<PlayerAnswer>();
+            using (var conn = Context.GetSqlConnection())
+            {
+
+                var command = new SqlCommand(
+                    @"SELECT a.*, g.* FROM [dbo].[PlayerAnswers] a, [dbo].[GameMetadata] g
+                    WHERE a.PlayerName=@Name AND (a.GameId=@ID AND g.GameId=@ID AND a.RoundNum<g.CurrentRoundNum OR ( a.roundNum = g.CurrentRoundNum AND a.QuestionNum<g.CurrentQuestionNum))",
+                    conn);
+                command.Parameters.AddWithValue("@Id", gameId);
+                command.Parameters.AddWithValue("@Name", name);
+
+
+                await conn.OpenAsync();
+                var reader = await command.ExecuteReaderAsync();
+
+
+                while (await reader.ReadAsync())
+                {
+                    answers.Add(ReaderToAnswer(reader));
+                }
+                await reader.CloseAsync();
+            }
+            return answers;
+        }
+
+        public async Task<IEnumerable<PlayerAnswer>> GetScoresForPlayer(int gameId, string name)
+        {
+            return await GetScoredAnswersForPlayerAsync(gameId, name);
+        }
+
 
         public async Task<bool> SubmitAnswer(PlayerAnswer answer)
         {

@@ -48,12 +48,8 @@
     <hr/>
     <br/>
 
-    <div ng-repeat="round in $parent.game.rounds">
-        <h3>Round {{round.Round}}</h4>
-        <div style="margin-left:20px; width: 75%;" ng-repeat="question in round.questions">
-            <h4>Question {{question.number}}</h4>
-            <input ng-model="question.text"/>
-        </div>
+        <div style="margin-left:20px; width: 75%;" ng-repeat="question in $parent.game.questions">
+            <h4>Round {{question.round}} | Question {{question.number}}</h4><input ng-model="question.text"/>
         <hr/>
         <br/>
 
@@ -66,17 +62,24 @@
 
  <div ng-controller="scoreController" ng-show="$parent.state=='score'">
         <div>
+            
             <h4> Current Round: {{roundNames[game.metadata.currentRound]}}</h4>            
             <h4> Current Question: {{game.metadata.currentQuestion}}</h4>
-            <h4> Question Text: {{game.rounds[1].questions[2].text}}</h4>
+            <!--<h4> Question Text: {{game.rounds[1].questions[2].text}}</h4>-->
 
+           <!-- 
             <label>Current Round</label>
             <select ng-model="selectedRound">
-                <option ng-repeat="round in  game.rounds" value="{{round.Round}}">{{roundNames[round.Round]}}</option>
+                <option ng-repeat="(round, questions) in game.questions | groupBy: 'round'" value="">{{roundNames[round]}}</option>
             </select>
+            
             <label>Current Question</label>
             <select ng-model="selectedQuestion">
                 <option ng-repeat="question in game.rounds[1].questions" value="{{question.number}}">{{question.number}}</option>
+            </select>
+            -->
+            <select ng-model="selectedQuestion">
+                <option ng-repeat="question in game.questions" value="{{question}}">{{roundNames[question.round]}} Question {{question.number}}</option>
             </select>
             <button ng-click="setCurrentQuestion(selectedQuestion)">Update</button>
         </div>
@@ -99,13 +102,13 @@
                 <td>{{answer.answerText}}</td>
                 <td>{{answer.wager}}</td>
                 <td>
-                    <select name="Wager" ng-model="answer.correct" ng-change="playerScoreChanged(answer)" 
+                    <select name="Wager" ng-model="correct" ng-change="playerScoreChanged(answer, correct)" 
             
                         ng-options="val for val in ['Correct', 'Incorrect', 'Partial']">
                     </select> 
                 </td>
                 <td>
-                    <input ng-disabled="answer.correct != 'Partial'" ng-model="answer.pointsAwarded" />
+                    <input ng-disabled="correct != 'Partial'" ng-model="answer.pointsAwarded" />
                     
                 </td>
         </tr>
