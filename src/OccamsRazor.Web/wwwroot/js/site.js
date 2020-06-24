@@ -45,21 +45,22 @@ hostApp.controller('indexController', ['$scope', '$http', function ($scope, $htt
     $scope.updateView = function (state, game) {
         $scope.$broadcast('Joined', { state: state, game: game });
     }
+    $scope.roundNames = {
+        "1": "One",
+        "2": "Two",
+        "3": "Three",
+        "4": "Half Time",
+        "5": "Four",
+        "6": "Five",
+        "7": "Six",
+        "8": "Final"
+    };
 
 }]);
 
 hostApp.controller('scoreController', ['$scope', '$http', '$interval', function ($scope, $http, $interval) {
     $scope.game = {};
-    $scope.roundNames = {
-        "1": "One",
-        "2": "Two",
-        "3": "Three",
-        "7": "Half Time",
-        "4": "Four",
-        "5": "Five",
-        "6": "Six",
-        "8": "Final"
-    };
+
 
     $scope.$on("Joined", function (events, args) {
         $scope.game = args.game;
@@ -129,13 +130,21 @@ hostApp.controller('questionController', ['$scope', '$http', function ($scope, $
             url: "/api/Host/SaveQuestions",
             data: game
         }).then(function mySuccess(response) {
-            $scope.saved = true;
+            $scope.$parent.$broadcast('showMessage', {text: "Questions have been saved."})
         });
     }
 
 
 }]);
 
+hostApp.controller('modal', ['$scope', '$http', function ($scope, $http) {
+    $scope.show = false;
+    $scope.$on('showMessage', function (event, args) {
+        $scope.text = args.text;
+        $scope.show = true;
+    });
+
+}])
 
 
 

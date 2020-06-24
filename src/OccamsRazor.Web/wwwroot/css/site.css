@@ -56,12 +56,36 @@ button.accept-policy {
 html {
   position: relative;
   min-height: 100%;
+  background-color: #000000;
+  color: #fefefe;
 }
 
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
+  background-color: black;
 }
+
+input{
+  border-radius: 5px;
+}
+
+a {
+  color: white;
+}
+
+
+.nav-bar-black{
+  background-color: black;
+}
+
+
+
+.container {
+  background-color: #000000;
+  color: #fefefe
+}
+
 .footer {
   position: absolute;
   bottom: 0;
@@ -87,11 +111,15 @@ body {
 .answer-input
 {
   width: 100%;
+  border-radius: 5px;
 }
 .answer-submit
 {
-  margin: auto;
-  width: 50%;
+  width: 100%;
+  border-radius: 5px;
+  background-color: black;
+  border: 1px solid white;
+  color: white;
 }
 
 .host-join-container
@@ -110,11 +138,45 @@ body {
 {
   width: 100%;
 }
+
 .host-join-submit
 {
-  margin: auto;
-  width: 50%;
+  width: 100%;
+  border-radius: 5px;
+  background-color: black;
+  border: 1px solid white;
+  color: white;
 }
+
+.host-question-input
+{
+  border-radius: 5px;
+}
+
+.host-question-submit
+{
+  width: 100%;
+  border-radius: 5px;
+  background-color: black;
+  border: 1px solid white;
+  color: white;
+}
+
+.host-score-button 
+{
+  margin: auto;
+  width: 25%;
+  border-radius: 5px;
+  background-color: black;
+  border: 1px solid white;
+  color: white;
+}
+.host-score-input
+{
+  border-radius: 5px;
+  width: 25%;
+}
+
 
 .score-row
 {
@@ -137,9 +199,13 @@ body {
 
 /* Modal Content */
 .modal-content {
-  background-color: #fefefe;
+  background-color: rgb(14, 14, 14);
   margin: auto;
   padding: 20px;
-  border: 1px solid #888;
+  border: 1px solid rgb(57, 57, 57);
   width: 80%;
+}
+
+hr{
+  border: 1px solid white;
 }

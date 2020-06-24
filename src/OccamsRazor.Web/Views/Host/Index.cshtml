@@ -31,17 +31,14 @@
     <h1>{{game.metadata.name}}</h1>
     <p>
         <h2>
-            <a class="text-dark" ng-click="state='questions'" href="#">Edit Questions</a> | 
-            <a class="text-dark" ng-click="state='score'" href="#">Score Questions</a></p>
+            <a ng-click="state='questions'" href="#">Edit Questions</a> | 
+            <a ng-click="state='score'" href="#">Score Questions</a></p>
         </h2>
         <hr/>
 </div>
 
 
 <div style="width: 75%;" ng-controller="questionController" ng-show="$parent.state=='questions'">
-    {{$parent.game.rounds}}
-
-
     <form method="POST">
     <h2>Game Name </h2>
     <input ng-model="$parent.game.metadata.name" />
@@ -49,13 +46,13 @@
     <br/>
 
         <div style="margin-left:20px; width: 75%;" ng-repeat="question in $parent.game.questions">
-            <h4>Round {{question.round}} | Question {{question.number}}</h4><input ng-model="question.text"/>
+            <label>Round {{$parent.roundNames[question.round]}} | Question {{question.number}}</label>
+            <input class="host-question-input" ng-model="question.text"/>
         <hr/>
         <br/>
 
     </div>
-    <input type="button" value="Save" ng-click="submit($parent.game)" /> <br/><br/>
-    <label style="width: 100%; background: green; color:white" ng-show="saved">Saved</label>
+    <input type="button" value="Save" ng-click="submit($parent.game)" class="host-question-submit"/> <br/><br/>
     </form>
 </div>
 
@@ -78,12 +75,16 @@
                 <option ng-repeat="question in game.rounds[1].questions" value="{{question.number}}">{{question.number}}</option>
             </select>
             -->
-            <select ng-model="selectedQuestion">
-                <option ng-repeat="question in game.questions" value="{{question}}">{{roundNames[question.round]}} Question {{question.number}}</option>
+            <select ng-model="selectedQuestion" class="host-score-input">
+                <option ng-repeat="question in game.questions" value="{{question}}">{{$parent.roundNames[question.round]}} Question {{question.number}}</option>
             </select>
-            <button ng-click="setCurrentQuestion(selectedQuestion)">Update</button>
+            <button class="host-score-button" ng-click="setCurrentQuestion(selectedQuestion)">Update</button>
         </div>
-        <button ng-click="reload(game)">Refresh</button> <button ng-click="updateScores(playerAnswers)">UpdateScores</button>
+
+        <hr/>
+        <br/>
+
+        <button class="host-score-button" ng-click="reload(game)">Refresh</button> <button class="host-score-button" ng-click="updateScores(playerAnswers)">Update Scores</button>
     <table>
         <tr>
             <th class="score">Round Number</th>
@@ -96,7 +97,7 @@
         </tr>
 
         <tr ng-repeat="answer in playerAnswers" ng-class="answer.questionNumber % 2 == 0 ? 'score-row':''" >
-                <td>{{answer.round}}</td>
+                <td>{{$parent.roundNames[answer.round]}}</td>
                 <td>{{answer.questionNumber}}</td>
                 <td>{{answer.player.name}}</td>
                 <td>{{answer.answerText}}</td>
@@ -115,5 +116,15 @@
 
     </table>
  </div>
+
+ <div id="myModal" class="modal" ng-controller="modal" ng-show="show">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" ng-click="show=false">&times;</span>
+    <p>{{text}}</p>
+  </div>
+
+</div>
 
 </div>
