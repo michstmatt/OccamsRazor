@@ -20,6 +20,7 @@ namespace OccamsRazor.Web.Persistence.Service
             => playerAnswerRepository.SubmitAnswer(answer);
 
         public Task<IEnumerable<PlayerAnswer>> GetAllAnswers(int gameId) => playerAnswerRepository.GetAllAnswers(gameId);
-    }
 
+        public Task<bool> SubmitPlayerScores(IEnumerable<PlayerAnswer> playerAnswers) => playerAnswerRepository.SubmitPlayerScores(playerAnswers);
+    }
 }

@@ -87,6 +87,15 @@ namespace OccamsRazor.Web.Controllers
             return Ok(result);
         }
 
+        [Route("/api/Host/UpdatePlayerScores")]
+        [HttpPost]
+        public async Task<IActionResult> UpdatePlayerScores([FromBody]IEnumerable<PlayerAnswer> answers)
+        {
+            var ok = await _playerAnswerService.SubmitPlayerScores(answers); 
+            //var result = await _playerAnswerService.GetAllAnswers(answers[0])
+            return Ok(true);
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

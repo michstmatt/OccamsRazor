@@ -100,6 +100,7 @@
                 <td>{{answer.wager}}</td>
                 <td>
                     <select name="Wager" ng-model="answer.correct" ng-change="playerScoreChanged(answer)" 
+            
                         ng-options="val for val in ['Correct', 'Incorrect', 'Partial']">
                     </select> 
                 </td>

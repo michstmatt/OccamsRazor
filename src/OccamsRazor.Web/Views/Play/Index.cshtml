@@ -43,5 +43,17 @@
         <input type="submit" ng-click="submitAnswer(answer)" class="answer-submit"/>
     </form>
     </div>
+
+
+<div id="myModal" class="modal" ng-controller="modal" ng-show="show">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" ng-click="show=false">&times;</span>
+    <p>{{text}}</p>
+  </div>
+
+</div>
+
 </div>
 </div>

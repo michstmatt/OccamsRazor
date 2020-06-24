@@ -27,6 +27,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             answer.Player = new Player() { Name = System.Convert.ToString(reader[4]) };
             answer.AnswerText = System.Convert.ToString(reader[5]);
             answer.Wager = System.Convert.ToInt32(reader[6]);
+            answer.PointsAwarded = System.Convert.ToInt32(reader[7]);
             return answer;
         }
 
@@ -119,7 +120,7 @@ namespace OccamsRazor.Web.Persistence.Repository
                 await conn.OpenAsync();
                 var command = new SqlCommand(
                     @"UPDATE [dbo].[PlayerAnswers]
-                              SET AnswerText = @Text, Wager = @Wager
+                              SET AnswerText = @Text, Wager = @Wager, PointsAwarded=@Points
                               WHERE GameId=@GameId AND RoundNum=@Round AND QuestionNum=@Question And PlayerName=@Name",
                     conn);
 
@@ -129,6 +130,7 @@ namespace OccamsRazor.Web.Persistence.Repository
                 command.Parameters.AddWithValue("@Name", answer.Player.Name ?? "");
                 command.Parameters.AddWithValue("@Text", answer.AnswerText ?? "");
                 command.Parameters.AddWithValue("@Wager", answer.Wager);
+                command.Parameters.AddWithValue("@Points", answer.PointsAwarded);
 
 
                 var reader = await command.ExecuteReaderAsync();
@@ -144,8 +146,8 @@ namespace OccamsRazor.Web.Persistence.Repository
 
                 var command = new SqlCommand(
                     @"INSERT INTO [dbo].[PlayerAnswers]
-                              (GameId, RoundNum, QuestionNum, PlayerName, AnswerText, Wager)
-                              VALUES(@GameID, @Round, @Question, @Name, @Text, @Wager)",
+                              (GameId, RoundNum, QuestionNum, PlayerName, AnswerText, Wager, PointsAwarded)
+                              VALUES(@GameID, @Round, @Question, @Name, @Text, @Wager, @Points)",
                     conn);
 
                 command.Parameters.AddWithValue("@GameId", answer.GameId);
@@ -154,6 +156,7 @@ namespace OccamsRazor.Web.Persistence.Repository
                 command.Parameters.AddWithValue("@Name", answer.Player.Name ?? "");
                 command.Parameters.AddWithValue("@Text", answer.AnswerText ?? "");
                 command.Parameters.AddWithValue("@Wager", answer.Wager);
+                command.Parameters.AddWithValue("@Points", 0);
 
 
                 var reader = await command.ExecuteReaderAsync();
@@ -161,8 +164,6 @@ namespace OccamsRazor.Web.Persistence.Repository
             }
 
         }
-
-
 
         public async Task<bool> SubmitAnswer(PlayerAnswer answer)
         {
@@ -182,6 +183,15 @@ namespace OccamsRazor.Web.Persistence.Repository
         public async Task<IEnumerable<PlayerAnswer>> GetAllAnswers(int gameId)
         {
             return await GetAnswersForGame(gameId);
+        }
+
+        public async Task<bool> SubmitPlayerScores(IEnumerable<PlayerAnswer> scoredAnswers)
+        {
+            foreach(var answer in scoredAnswers)
+            {
+                await UpdateExistingAnswerAsync(answer);
+            }
+            return true;
         }
 
     }

@@ -94,21 +94,23 @@ hostApp.controller('scoreController', ['$scope', '$http', function ($scope, $htt
         });
     }
 
-    $scope.playerScoreChanged = function(playerAnswer)
-    {
-        if (playerAnswer.correct == "Correct")
-        {
+    $scope.playerScoreChanged = function (playerAnswer) {
+        if (playerAnswer.correct == "Correct") {
             playerAnswer.pointsAwarded = playerAnswer.wager;
         }
-        else if (playerAnswer.correct == "Incorrect")
-        {
+        else if (playerAnswer.correct == "Incorrect") {
             playerAnswer.pointsAwarded = 0;
         }
-    } 
+    }
 
-    $scope.updateScores = function(playerAnswers)
-    {
-        alert(JSON.stringify(playerAnswers));
+    $scope.updateScores = function (playerAnswers) {
+        $http({
+            method: "POST",
+            url: "/api/Host/updatePlayerScores",
+            data: playerAnswers
+        }).then(function mySuccess(response) {
+            
+        });
     }
 }]);
 
@@ -165,7 +167,7 @@ playApp.controller('setupController', ['$scope', '$http', function ($scope, $htt
         $scope.$parent.selectedGame = game;
         $scope.$parent.player = player;
         $scope.$parent.state = "Answer";
-        $scope.$parent.$broadcast('joined', game * 1);
+        $scope.$parent.$broadcast('joined', {game: game * 1, player: player});
     }
 
 
@@ -177,18 +179,19 @@ playApp.controller('questionController', ['$scope', '$http', function ($scope, $
     $scope.answer = {
         player:
         {
-            name: "Matt"
+            name: ""
         },
         answerText: "",
         wager: 0,
-        questionNumber: 1,
-        round: 1,
+        questionNumber: 0,
+        round: 0,
         gameId: 0
     };
     $scope.$on('joined', function (event, args) {
 
 
-        $scope.answer.gameId = args;
+        $scope.answer.gameId = args.game;
+        $scope.answer.player = args.player;
 
         $http({
             method: "GET",
@@ -212,8 +215,21 @@ playApp.controller('questionController', ['$scope', '$http', function ($scope, $
             data: JSON.stringify(answer)
         }).then(function mySuccess(response) {
             $scope.saved = response.data;
+
+            $scope.$parent.$broadcast('showMessage', {text: "Your answer was received: " + answer.answerText + " for " + answer.wager + " points", error: false})
         }, function myError(response) {
             console.log("error");
         });
     }
 }]);
+
+playApp.controller('modal', ['$scope', '$http', function ($scope, $http){
+    $scope.show = false;
+    $scope.$on('showMessage', function(event, args)
+    {
+        alert("showMessage");
+        $scope.text = args.text;
+        $scope.show = true;
+    });
+
+}])

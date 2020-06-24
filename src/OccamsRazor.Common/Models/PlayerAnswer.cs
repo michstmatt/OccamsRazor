@@ -27,6 +27,6 @@ namespace OccamsRazor.Common.Models
         public int GameId { get; set; }
 
         [JsonPropertyName("pointsAwarded")]
-        public int pointsAwarded { get; set; }
+        public int PointsAwarded { get; set; }
     }
 }

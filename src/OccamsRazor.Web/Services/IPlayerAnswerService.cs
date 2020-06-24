@@ -10,5 +10,6 @@ namespace OccamsRazor.Web.Service
     {
         public Task<bool> SubmitPlayerAnswer(PlayerAnswer answer);
         public Task<IEnumerable<PlayerAnswer>> GetAllAnswers(int gameId);
+        public Task<bool> SubmitPlayerScores(IEnumerable<PlayerAnswer> answers);
     }
 }
