@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+ViewData["Title"] = "Home Page";
 }
 
 <div class="card">
@@ -7,9 +7,13 @@
 
     <div style="margin: auto;">
         <div style="width:45%; float:left;">
-            <p><a asp-area="" asp-controller="Host" asp-action="Index"><h2>Host a Game</h2></a></p>
+            <p><a asp-area="" asp-controller="Host" asp-action="Index">
+                    <h2>Host a Game</h2>
+                </a></p>
         </div>
         <div style="width:45%; float: left;">
-            <p><a  asp-area="" asp-controller="Play" asp-action="Index"><h2>Join a Game</h2></a></p>
+            <p><a asp-area="" asp-controller="Play" asp-action="Index">
+                    <h2>Join a Game</h2>
+                </a></p>
         </div>
-</div>
+    </div>

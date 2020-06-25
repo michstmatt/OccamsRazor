@@ -2,59 +2,67 @@
 <script src="~/js/site.js"></script>
 <div>
 
-<div ng-app="playApp" ng-controller="myCtrl" ng-init="state='Join'">
-        <h2>{{player.name}}</h2>
+	<div ng-app="playApp" ng-controller="myCtrl" ng-init="state='Join'">
+		<h2>{{player.name}}</h2>
 
-        <div ng-controller="setupController" ng-show="$parent.state=='Join'" class="card">
-                <form method="POST" class="answer-container">
-                        <h3 class="host-join-label">Choose a Game:</h3>
+		<div ng-controller="setupController" ng-show="$parent.state=='Join'" class="card">
+			<form method="POST" class="answer-container">
+				<h3 class="host-join-label">Choose a Game:</h3>
 
-                        <select ng-model="selectedGame" class="answer-input">
-                                <option ng-repeat="game in games" value="{{game.gameId}}">{{game.name}}</option>
-                        </select>
-                        <br/>
+				<select ng-model="selectedGame" class="answer-input">
+					<option ng-repeat="game in games" value="{{game.gameId}}">{{game.name}}</option>
+				</select>
+				<br />
 
-                        <h3 class="host-join-label">Name: </h3>
-                        <input ng-model="player.name" class="answer-input"/>
+				<h3 class="host-join-label">Name: </h3>
+				<input ng-model="player.name" class="answer-input" />
 
-                        <br/>
-                        <br/>
-                        <input type="submit" value="Join" ng-click="join(selectedGame, player)" class="answer-submit"/>
-                </form>
-        </div>
+				<br />
+				<br />
+				<input type="submit" value="Join" ng-click="join(selectedGame, player)" class="answer-submit" />
+			</form>
+		</div>
 
-     <div ng-controller="questionController" ng-show="$parent.state=='Answer'" class="card">
+		<div ng-controller="questionController" ng-show="$parent.state=='Answer'" class="card">
 
 
-    <h3>Round {{question.round}} Question {{question.number}} </h3>
-    <h2>Category: {{question.category}}</h2>
-    <h2>Question: {{question.text}}</h2>
+			<h3>Round {{question.round}} Question {{question.number}} </h3>
+			<h2>Category: {{question.category}}</h2>
+			<h2>Question: {{question.text}}</h2>
 
-    <form method="POST" class="answer-container">
-        <label>Answer</label>
-        <br/>
-        <input name="AnswerText" ng-model="answer.answerText" class="answer-input"/>
-        <br/><br/>
+			<form method="POST" class="answer-container">
+				<label>Answer</label>
+				<br />
+				<input name="AnswerText" ng-model="answer.answerText" class="answer-input" />
+				<br /><br />
 
-        <label>Wager</label>
-        <br/>
-        <select name="Wager" ng-model="answer.wager" ng-options="val*1 for val in [1,2,3,4,5,6]" class="answer-input"></select>
-        <br/><br/>
-        <input type="submit" ng-click="submitAnswer(answer)" class="answer-submit"/>
-    </form>
-    </div>
-<div ng-controller="playerResults">
-        </div>
+				<label>Wager</label>
+				<br />
+				<select name="Wager" ng-model="answer.wager" ng-options="val*1 for val in [1,2,3,4,5,6]"
+					class="answer-input"></select>
+				<br /><br />
+				<input type="submit" ng-click="submitAnswer(answer)" class="answer-submit" />
+			</form>
+		</div>
 
-<div id="myModal" class="modal" ng-controller="modal" ng-show="show">
+		<br />
+		<div ng-controller="playerResults">
+			<table>
+				<tr>
+				</tr>
+			</table>
 
-  <!-- Modal content -->
-  <div class="modal-content">
-    <span class="close" ng-click="show=false">&times;</span>
-    <p>{{text}}</p>
-  </div>
+		</div>
 
-</div>
+		<div id="myModal" class="modal" ng-controller="modal" ng-show="show">
 
-</div>
+			<!-- Modal content -->
+			<div class="modal-content">
+				<span class="close" ng-click="show=false">&times;</span>
+				<p>{{text}}</p>
+			</div>
+
+		</div>
+
+	</div>
 </div>
