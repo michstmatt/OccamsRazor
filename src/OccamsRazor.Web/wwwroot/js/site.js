@@ -263,7 +263,7 @@ playApp.controller('playerResults', ['$scope', '$http', function ($scope, $http)
             url: "/api/Play/GetScoredResponses",
             params: { "gameId": args.game, "name": args.player.name }
         }).then(function mySuccess(response) {
-            alert(response.data);
+            $scope.scores = response.data;
         }, function myError(response) {
             console.log("error");
         });

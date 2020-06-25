@@ -46,9 +46,16 @@
 		</div>
 
 		<br />
-		<div ng-controller="playerResults">
-			<table>
-				<tr>
+		<div ng-controller="playerResults" ng-show="scores!=null" class="card">
+			<h3>Your Score </h3>
+			<table class="playerScores">
+				<tr style="width:100%;">
+					<td class="playerScores">Question</td>
+					<td ng-repeat="result in scores" class="playerScores"> R {{result.round}} Q{{result.questionNumber}}</td>
+				</tr>
+				<tr style="width:100%">
+					<td class="playerScores">Points Awarded</td>
+					<td ng-repeat="result in scores" class="playerScores"> {{result.pointsAwarded}} </td>
 				</tr>
 			</table>
 
