@@ -5,7 +5,7 @@
 <div ng-app="playApp" ng-controller="myCtrl" ng-init="state='Join'">
         <h2>{{player.name}}</h2>
 
-        <div ng-controller="setupController" ng-show="$parent.state=='Join'" class="answer-container">
+        <div ng-controller="setupController" ng-show="$parent.state=='Join'" class="card">
                 <form method="POST" class="answer-container">
                         <label for="games">Choose a Game:</label>
                         <br/>
@@ -20,14 +20,16 @@
                         <input ng-model="player.name" class="answer-input"/>
 
                         <br/>
+                        <br/>
                         <input type="submit" value="Join" ng-click="join(selectedGame, player)" class="answer-submit"/>
                 </form>
         </div>
 
-     <div ng-controller="questionController" ng-show="$parent.state=='Answer'" class="answer-container">
+     <div ng-controller="questionController" ng-show="$parent.state=='Answer'" class="card">
 
 
     <h3>Round {{question.round}} Question {{question.number}} </h3>
+    <h2>Category: {{question.category}}</h2>
     <h2>Question: {{question.text}}</h2>
 
     <form method="POST" class="answer-container">

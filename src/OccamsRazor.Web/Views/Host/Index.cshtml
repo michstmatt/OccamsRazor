@@ -9,55 +9,68 @@
 
 <div ng-app="hostApp" ng-controller="indexController" ng-init="state='home'">
 
-    <div ng-show="state=='home'" class="host-join-container">
+    <div ng-show="state=='home'" class="card">
 
-    <h3 class="host-join-label">Edit Game</h3>
-    <select name="selectedGameId" id="selectedGame" ng-model="selectedGame.gameId" class="host-join-input">
-        <option ng-repeat="game in games" value="{{game.gameId}}">{{game.name}}</option>
-    </select>
-    <br/>
-    <button ng-click="loadGame()" class="host-join-submit">Edit</button>
+        <h3 class="host-join-label">Edit Game</h3>
+        <select name="selectedGameId" id="selectedGame" ng-model="selectedGame.gameId" class="host-join-input">
+            <option ng-repeat="game in games" value="{{game.gameId}}">{{game.name}}</option>
+        </select>
+        <br/>
+        <button ng-click="loadGame()" class="host-join-submit">Edit</button>
 
-    <br/> <br/>
-    <hr/>
-    <br/><br/>
+        <br/> <br/>
+        <hr/>
+        <br/><br/>
 
-    <h3 class="host-join-label">Create Game</h3>
-    <input ng-model="selectedGame.name" class="host-join-input"/>
-    <button ng-click="createGame()" class="host-join-submit">Create</button>
+        <h3 class="host-join-label">Create Game</h3>
+        <input ng-model="selectedGame.name" class="host-join-input"/>
+        <br/>
+        <button ng-click="createGame()" class="host-join-submit">Create</button>
     </div>
 
 <div ng-show="game!=null">
     <h1>{{game.metadata.name}}</h1>
     <p>
         <h2>
-            <a ng-click="state='questions'" href="#">Edit Questions</a> | 
-            <a ng-click="state='score'" href="#">Score Questions</a></p>
+            <a ng-click="state='questions'" href="#" >Edit Questions</a> | 
+            <a ng-click="state='score'" href="#" class="state=='score'? 'tabSelected' : ''">Score Questions</a></p>
         </h2>
         <hr/>
 </div>
 
 
-<div style="width: 75%;" ng-controller="questionController" ng-show="$parent.state=='questions'">
+<div style="width: 75%;" ng-controller="questionController" ng-show="$parent.state=='questions'" class="card">
     <form method="POST">
     <h2>Game Name </h2>
-    <input ng-model="$parent.game.metadata.name" />
+    <input class="host-question-input" ng-model="$parent.game.metadata.name" />
     <hr/>
     <br/>
-
-        <div style="margin-left:20px; width: 75%;" ng-repeat="question in $parent.game.questions">
-            <label>Round {{$parent.roundNames[question.round]}} | Question {{question.number}}</label>
-            <input class="host-question-input" ng-model="question.text"/>
-        <hr/>
+        <label>Round</label>
+        <select class="host-score-input" ng-model="roundNum" ng-init="roundNum='1'">
+            <option ng-repeat="(key,value) in $parent.roundNames" value="{{key}}">{{value}}</option>
+        </select>
         <br/>
+        <table style="width:100%;">
+            <tr>
+                <th style="width:10%; margin:15px;">Number</th>
+                <th style="width:30%; margin:15px;">Category</th>
+                <th style="width:40%; margin:15px; ">Quetion</th/>
+            </tr>
+            
 
-    </div>
+        <tr ng-repeat="question in $parent.game.questions |filter:{round: roundNum}" style="margin:15px">
+            <td>{{question.number}}</td>
+            <td><input class="host-question-input" ng-model="question.category"/></td>
+            <td><input class="host-question-input" ng-model="question.text"/></td>
+        </tr>
+    </table>
+    <br/>
     <input type="button" value="Save" ng-click="submit($parent.game)" class="host-question-submit"/> <br/><br/>
     </form>
 </div>
 
 
- <div ng-controller="scoreController" ng-show="$parent.state=='score'">
+ <div ng-controller="scoreController" ng-show="$parent.state=='score'" class="card">
         <div>
             
             <h4> Current Round: {{roundNames[game.metadata.currentRound]}}</h4>            
@@ -96,7 +109,7 @@
             <th class="score">Points Awarded</th>
         </tr>
 
-        <tr ng-repeat="answer in playerAnswers" ng-class="answer.questionNumber % 2 == 0 ? 'score-row':''" >
+        <tr ng-repeat="answer in playerAnswers | filter: {questionNumber: game.metadata.currentQuestion, round: game.metadata.currentRound}" ng-class="answer.questionNumber % 2 == 0 ? 'score-row':''" >
                 <td>{{$parent.roundNames[answer.round]}}</td>
                 <td>{{answer.questionNumber}}</td>
                 <td>{{answer.player.name}}</td>

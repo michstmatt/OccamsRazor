@@ -28,6 +28,7 @@ a {
 -------------------------------------------------- */
 html {
   font-size: 14px;
+  font-family: 'Helvetica';
 }
 @media (min-width: 768px) {
   html {
@@ -56,14 +57,18 @@ button.accept-policy {
 html {
   position: relative;
   min-height: 100%;
-  background-color: #000000;
+  background-image: url("/img/Background.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   color: #fefefe;
 }
 
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
-  background-color: black;
+  background-color: transparent;
+
 }
 
 input{
@@ -82,8 +87,7 @@ a {
 
 
 .container {
-  background-color: #000000;
-  color: #fefefe
+  color: #fefefe;
 }
 
 .footer {
@@ -101,32 +105,22 @@ a {
   margin: 150px;
 }
 
-.answer-container
-{
-  min-width: 450px;
-  width: 50%;
-  margin: auto;
-}
+
 
 .answer-input
 {
   width: 100%;
   border-radius: 5px;
+  background-color: #323232;
+  color: #fff;
 }
 .answer-submit
 {
   width: 100%;
   border-radius: 5px;
-  background-color: black;
-  border: 1px solid white;
+  background-color:transparent;
+  border: 2px solid #7EEFF4;
   color: white;
-}
-
-.host-join-container
-{
-  min-width: 450px;
-  width: 25%;
-  margin: auto;
 }
 
 .host-join-label
@@ -136,6 +130,8 @@ a {
 
 .host-join-input
 {
+  background-color: #323232;
+  color: #fff;
   width: 100%;
 }
 
@@ -143,13 +139,15 @@ a {
 {
   width: 100%;
   border-radius: 5px;
-  background-color: black;
-  border: 1px solid white;
+  background-color: transparent;
+  border: 2px solid #7EEFF4;
   color: white;
 }
 
 .host-question-input
 {
+  background-color: #323232;
+  color: #fff;
   border-radius: 5px;
 }
 
@@ -157,8 +155,8 @@ a {
 {
   width: 100%;
   border-radius: 5px;
-  background-color: black;
-  border: 1px solid white;
+  background-color: transparent;
+  border: 2px solid #7EEFF4;
   color: white;
 }
 
@@ -167,12 +165,14 @@ a {
   margin: auto;
   width: 25%;
   border-radius: 5px;
-  background-color: black;
-  border: 1px solid white;
+  background-color: transparent;
+  border: 2px solid #7EEFF4;
   color: white;
 }
 .host-score-input
 {
+  background-color: #323232;
+  color: #fff;
   border-radius: 5px;
   width: 25%;
 }
@@ -208,4 +208,15 @@ a {
 
 hr{
   border: 1px solid white;
+}
+
+.card 
+{
+  min-width: 480px;
+  width: 70%;
+  margin:auto;
+  background-color: #252525;
+  padding: 20px;
+  box-shadow: 0px 30px 40px #00000073;
+  border-radius: 5px;
 }

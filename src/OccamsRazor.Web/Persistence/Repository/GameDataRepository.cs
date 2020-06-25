@@ -39,6 +39,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             question.Round = (RoundEnum)System.Convert.ToInt32(reader[1]);
             question.Number = System.Convert.ToInt32(reader[2]);
             question.Text = System.Convert.ToString(reader[3]);
+            question.Category = System.Convert.ToString(reader[4]);
             return question;
         }
 
@@ -200,7 +201,7 @@ namespace OccamsRazor.Web.Persistence.Repository
 
                     var command = new SqlCommand(
                         @"UPDATE [dbo].[Questions]
-                              SET QuestionText=@Text
+                              SET QuestionText=@Text, CategoryText=@Category
                               WHERE GameId=@GameId AND RoundNum=@Round AND QuestionNum=@Question",
                         conn);
 
@@ -208,6 +209,7 @@ namespace OccamsRazor.Web.Persistence.Repository
                     command.Parameters.AddWithValue("@Round", question.Round);
                     command.Parameters.AddWithValue("@Question", question.Number);
                     command.Parameters.AddWithValue("@Text", question.Text);
+                    command.Parameters.AddWithValue("@Category", question.Category);
 
 
                     var reader = await command.ExecuteReaderAsync();
@@ -226,14 +228,15 @@ namespace OccamsRazor.Web.Persistence.Repository
 
                     var command = new SqlCommand(
                         @"INSERT INTO [dbo].[Questions]
-                              (GameId, RoundNum, QuestionNum, QuestionText)
-                              VALUES(@GameID, @Round, @Question, @Text)",
+                              (GameId, RoundNum, QuestionNum, QuestionText, CategoryText)
+                              VALUES(@GameID, @Round, @Question, @Text, @Category)",
                         conn);
 
                     command.Parameters.AddWithValue("@GameId", gameId);
                     command.Parameters.AddWithValue("@Round", question.Round);
                     command.Parameters.AddWithValue("@Question", question.Number);
                     command.Parameters.AddWithValue("@Text", question.Text ?? "");
+                    command.Parameters.AddWithValue("@Category", question.Category ?? "");
 
 
                     var reader = await command.ExecuteReaderAsync();
