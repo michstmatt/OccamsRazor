@@ -7,16 +7,14 @@
 
         <div ng-controller="setupController" ng-show="$parent.state=='Join'" class="card">
                 <form method="POST" class="answer-container">
-                        <label for="games">Choose a Game:</label>
-                        <br/>
+                        <h3 class="host-join-label">Choose a Game:</h3>
 
                         <select ng-model="selectedGame" class="answer-input">
                                 <option ng-repeat="game in games" value="{{game.gameId}}">{{game.name}}</option>
                         </select>
                         <br/>
 
-                        <label for="name">Name: </label>
-                        <br/>
+                        <h3 class="host-join-label">Name: </h3>
                         <input ng-model="player.name" class="answer-input"/>
 
                         <br/>
