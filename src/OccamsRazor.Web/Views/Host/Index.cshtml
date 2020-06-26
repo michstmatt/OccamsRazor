@@ -7,7 +7,7 @@ ViewData["Title"] = "Host Page";
 <script src="~/js/angular.min.js"></script>
 <script src="~/js/site.js"></script>
 
-<div ng-app="hostApp" ng-controller="indexController" ng-init="state='home'">
+<div ng-app="hostApp" ng-controller="indexController" ng-init="state='home'" class="cardLarge">
 
     <div ng-show="state=='home'" class="card">
 
@@ -29,11 +29,14 @@ ViewData["Title"] = "Host Page";
     </div>
 
     <div ng-show="game!=null">
-        <h1>{{game.metadata.name}}</h1>
+        <h1> <span class="secondary">Hosting</span> {{game.metadata.name}}</h1>
         <p>
             <h2>
-                <a ng-click="state='questions'" href="#">Edit Questions</a> |
-                <a ng-click="state='score'" href="#" class="state=='score'? 'tabSelected' : ''">Score Questions</a>
+                <a ng-click="state='questions'" href="#" class="{{state=='questions'? 'tabSelected' : ''}}">Edit
+                    Questions</a> |
+                <a ng-click="state='score'" href="#" class="{{state=='score'? 'tabSelected' : ''}}">Host Game</a>
+                |
+                <a ng-click="state='results'" href="#" class="{{state=='results'? 'tabSelected' : ''}}">View Results</a>
         </p>
         </h2>
         <hr />
@@ -51,11 +54,13 @@ ViewData["Title"] = "Host Page";
                 <option ng-repeat="(key,value) in $parent.roundNames" value="{{key}}">{{value}}</option>
             </select>
             <br />
-            <table style="width:100%;">
+            <table class="hostScore">
                 <tr>
                     <th style="width:10%; margin:15px;">Number</th>
                     <th style="width:30%; margin:15px;">Category</th>
-                    <th style="width:40%; margin:15px; ">Quetion</th />
+                    <th style="width:30%; margin:15px; ">Question</th>
+                    <th style="width:30%; margin:15px; ">Answer</th>
+                    <th style="width:10%; margin 15px;">Show</th>
                 </tr>
 
 
@@ -63,6 +68,8 @@ ViewData["Title"] = "Host Page";
                     <td>{{question.number}}</td>
                     <td><input class="host-question-input" ng-model="question.category" /></td>
                     <td><input class="host-question-input" ng-model="question.text" /></td>
+                    <td><input class="host-question-input" ng-model="question.answerText" type="{{question.show ? 'text' : 'password'}}"/></td>
+                    <td><input ng-model="question.show" type="checkbox" value="show"></td>
                 </tr>
             </table>
             <br />
@@ -75,21 +82,13 @@ ViewData["Title"] = "Host Page";
     <div ng-controller="scoreController" ng-show="$parent.state=='score'" class="card">
         <div>
 
-            <h4> Current Round: {{roundNames[game.metadata.currentRound]}}</h4>
-            <h4> Current Question: {{game.metadata.currentQuestion}}</h4>
-            <!--<h4> Question Text: {{game.rounds[1].questions[2].text}}</h4>-->
+            <h4> <span class="secondary"> Current Round</span> {{roundNames[game.metadata.currentRound]}}</h4>
+            <h4> <span class="secondary"> Current Question</span> {{game.metadata.currentQuestion}}</h4>
+            <h4> <span class="primary"> Category </span> {{currentQuestion.category }}</h4>
+            <h4> <span class="primary"> Question </span> {{currentQuestion.text }}</h4>
+            <h4> <span class="primary"> Answer </span> {{currentQuestion.answerText }}</h4>
 
-            <!-- 
-            <label>Current Round</label>
-            <select ng-model="selectedRound">
-                <option ng-repeat="(round, questions) in game.questions | groupBy: 'round'" value="">{{roundNames[round]}}</option>
-            </select>
-            
-            <label>Current Question</label>
-            <select ng-model="selectedQuestion">
-                <option ng-repeat="question in game.rounds[1].questions" value="{{question.number}}">{{question.number}}</option>
-            </select>
-            -->
+
             <select ng-model="selectedQuestion" class="host-score-input">
                 <option ng-repeat="question in game.questions" value="{{question}}">
                     {{$parent.roundNames[question.round]}} Question {{question.number}}</option>
@@ -100,38 +99,84 @@ ViewData["Title"] = "Host Page";
         <hr />
         <br />
 
-        <button class="host-score-button" ng-click="reload(game)">Refresh</button> <button class="host-score-button"
-            ng-click="updateScores(playerAnswers)">Update Scores</button>
-        <table>
+        <button class="host-score-button" ng-click="reload(game)">Check for new responses</button>
+        <button class="host-score-button" ng-click="updateScores(playerAnswers)">Update Scores</button>
+        <table class="hostScore">
             <tr>
-                <th class="score">Round Number</th>
-                <th class="score">Question Number</th>
-                <th class="score">Player Name</th>
-                <th class="score">Answer</th>
-                <th class="score">Wager</th>
-                <th class="score">Correct?</th>
-                <th class="score">Points Awarded</th>
+                <th class="hostScore">Player Name</th>
+                <th class="hostScore">Answer</th>
+                <th class="hostScore">Wager</th>
+                <th class="hostScore">Correct?</th>
+                <th class="hostScore">Points Awarded</th>
             </tr>
 
             <tr ng-repeat="answer in playerAnswers | filter: {questionNumber: game.metadata.currentQuestion, round: game.metadata.currentRound}"
                 ng-class="answer.questionNumber % 2 == 0 ? 'score-row':''">
-                <td>{{$parent.roundNames[answer.round]}}</td>
-                <td>{{answer.questionNumber}}</td>
                 <td>{{answer.player.name}}</td>
                 <td>{{answer.answerText}}</td>
                 <td>{{answer.wager}}</td>
                 <td>
-                    <select name="Wager" ng-model="correct" ng-change="playerScoreChanged(answer, correct)"
+                    <select class="host-score-input" style="width: 100%;" name="Wager" ng-model="correct"
+                        ng-change="playerScoreChanged(answer, correct)"
                         ng-options="val for val in ['Correct', 'Incorrect', 'Partial']">
                     </select>
                 </td>
                 <td>
-                    <input ng-disabled="correct != 'Partial'" ng-model="answer.pointsAwarded" />
+                    <input class="host-score-input" style="width:100%;" ng-disabled="correct != 'Partial'"
+                        ng-model="answer.pointsAwarded" />
 
                 </td>
             </tr>
 
         </table>
+    </div>
+
+
+
+    <div ng-controller="resultsController" ng-show="$parent.state=='results'">
+
+        <div class="card">
+            <h3><span class="primary">Summary</span></h3>
+            <table class="playerScores">
+                <tr>
+                    <th class="playerScores">Name</th>
+                    <th class="playerScores">Score</th>
+                </tr>
+                <tr ng-repeat="playerData in results">
+                    <td class="playerScores">{{playerData.player.name}}</td>
+                    <td class="playerScores">{{playerData.totalScore}}</td>
+                </tr>
+            </table>
+        </div>
+        <br />
+
+        <div class="card">
+            <h3> <span class="primary">Score Breakdown</span></h3>
+            <table class="playerScores">
+                <tr style="width:100%;">
+                    <td class="playerScores">Question</td>
+                    <td ng-repeat="result in results[0].playerAnswers" class="playerScores"> R {{result.round}} Q{{result.questionNumber}}
+                    </td>
+                </tr>
+                <tr style="width:100%" ng-repeat="playerData in results">
+                    <td class="playerScores">{{playerData.player.name}}</td>
+                    <td ng-repeat="result in playerData.playerAnswers" class="playerScores"> {{result.pointsAwarded}}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br/>
+
+        <div class="card">
+            <h3> <span class="secondary">Show Results Screen to people playing</span></h3>
+            <form>
+                <label>Show results?</label>
+                <input type="checkbox" ng-model="showResults" value="false" checked="{{showResults == true;}}"/>
+                <input type="button" value="Save" ng-click="submitShowHideResults(showResults)" class="host-question-submit" />
+            </form>
+            
+        </div>
+
     </div>
 
     <div id="myModal" class="modal" ng-controller="modal" ng-show="show">
@@ -143,5 +188,6 @@ ViewData["Title"] = "Host Page";
         </div>
 
     </div>
+
 
 </div>

@@ -14,6 +14,8 @@ namespace OccamsRazor.Web.Service
         Task<IEnumerable<GameMetadata>> LoadGames();
 
         Task<Question> GetCurrentQuestion(string gameName);
-        Task<GameMetadata> SetCurrentQuestion(GameMetadata game);
+        Task<Question> SetCurrentQuestion(GameMetadata game);
+
+        Task<GameMetadata> SetShowResults(GameMetadata game);
     }
 }

@@ -95,6 +95,21 @@ namespace OccamsRazor.Web.Controllers
             //var result = await _playerAnswerService.GetAllAnswers(answers[0])
             return Ok(true);
         }
+        [Route("/api/Host/GetScoredResponses")]
+        [HttpGet]
+        public async Task<IActionResult> GetScoredAnswers(int gameId)
+        {
+            var results = await _playerAnswerService.GetScoresForGame(gameId);
+            return Ok(results);
+        }
+
+        [Route("/api/Host/ShowResults")]
+        [HttpPost]
+        public async Task<IActionResult> UpdateShowHideResults([FromBody]GameMetadata game)
+        {
+            var result = await _gameDataService.SetShowResults(game);
+            return Ok(result);
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

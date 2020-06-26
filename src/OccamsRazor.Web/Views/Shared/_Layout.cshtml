@@ -24,6 +24,9 @@
                     </ul>
                 </div>
             </div>
+            <div>
+                <button id="logout" onclick="logout()"  class="logout">Logout</button>
+            </div>
         </nav>
     </header>
     
@@ -40,7 +43,22 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/angular.min.js"></script>
+    <script src="~/js/site.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        if(localStorage.length == 0)
+        {
+            document.getElementById("logout").style.display = "none";
+        }
+        function logout()
+        {
+            localStorage.clear();
+            alert("Your info has been cleared");
+            document.getElementById("logout").style.display = "none";
+            location.replace("/");
+        }
+    </script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

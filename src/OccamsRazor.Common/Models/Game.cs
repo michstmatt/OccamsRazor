@@ -18,7 +18,7 @@ namespace OccamsRazor.Common.Models
 
         public Game()
         {
-            Metadata = new GameMetadata();
+            Metadata = new GameMetadata(){ShowResults=false};
             var format = new Dictionary<RoundEnum, int>
             {
                 {RoundEnum.One, 3},
@@ -29,7 +29,6 @@ namespace OccamsRazor.Common.Models
                 {RoundEnum.Five, 3},
                 {RoundEnum.Six, 3},
                 {RoundEnum.Final, 1},
-                {RoundEnum.Scores, 1}
             };
 
             Questions = new List<Question>();
@@ -39,7 +38,7 @@ namespace OccamsRazor.Common.Models
                 var round = pair.Key;
                 for (int i = 0; i < pair.Value; i++)
                 {
-                    Questions.Add(new Question { Round = pair.Key, Number = i + 1, Text = "" });
+                    Questions.Add(new Question { Round = pair.Key, Number = i + 1, Text = "", AnswerText = "" });
                 }
                 
             }

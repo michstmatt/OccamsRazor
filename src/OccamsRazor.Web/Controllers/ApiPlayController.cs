@@ -45,11 +45,15 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpGet]
         [Route("/api/Play/GetCurrentQuestion")]
-        public async Task<IActionResult> GetCurrentQuestion(string gameId)
+        public async Task<IActionResult> GetCurrentQuestion(string gameId, string host)
         {
             //var playerName = _accessor.HttpContext.Request.Cookies[CookiePlayerName];
             //var gameName = _accessor.HttpContext.Request.Cookies[CookieGameName];
             var question = await _gameDataService.GetCurrentQuestion(gameId);
+            if(string.IsNullOrEmpty(host) || host!=gameId)
+            {
+                question.AnswerText = "";
+            }
             return Ok(question);
         }
 
@@ -66,12 +70,26 @@ namespace OccamsRazor.Web.Controllers
             return Ok(result);
         }
 
-        [Route("/api/Play/GetScoredResponses")]
+        [Route("/api/Play/GetScoredResponsesForPlayer")]
         [HttpGet]
-        public async Task<IActionResult> GetScoredAnswers(int gameId, string name)
+        public async Task<IActionResult> GetScoredAnswersForPlayer(int gameId, string name)
         {
             var answers = await _playerAnswerService.GetScoresForPlayer(gameId, name);
             return Ok(answers);
+        }
+
+        [Route("/api/Play/GetScoredResponses")]
+        [HttpGet]
+        public async Task<IActionResult> GetScoredAnswers(int gameId)
+        {
+            var games = await _gameDataService.LoadGames();
+            var ok = games.Where(g => g.GameId == gameId).FirstOrDefault().ShowResults;
+            if(!ok)
+            {
+                return Ok(Array.Empty<GameResults>());
+            }
+            var results = await _playerAnswerService.GetScoresForGame(gameId);
+            return Ok(results);
         }
 
 
