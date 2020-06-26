@@ -174,7 +174,8 @@ namespace OccamsRazor.Web.Persistence.Repository
 
                 var command = new SqlCommand(
                     @"SELECT a.*, g.* FROM [dbo].[PlayerAnswers] a, [dbo].[GameMetadata] g
-                    WHERE a.PlayerName=@Name AND (a.GameId=@ID AND g.GameId=@ID AND a.RoundNum<g.CurrentRoundNum OR ( a.roundNum = g.CurrentRoundNum AND a.QuestionNum<g.CurrentQuestionNum))",
+                    WHERE a.GameId=@ID AND g.GameId=@ID AND a.PlayerName=@Name AND (a.RoundNum<g.CurrentRoundNum OR ( a.roundNum = g.CurrentRoundNum AND a.QuestionNum<g.CurrentQuestionNum))
+                    ORDER BY RoundNum, QuestionNum",
                     conn);
                 command.Parameters.AddWithValue("@Id", gameId);
                 command.Parameters.AddWithValue("@Name", name);
@@ -192,7 +193,6 @@ namespace OccamsRazor.Web.Persistence.Repository
             }
             return answers;
         }
-
         public async Task<IEnumerable<PlayerAnswer>> GetScoresForPlayer(int gameId, string name)
         {
             return await GetScoredAnswersForPlayerAsync(gameId, name);

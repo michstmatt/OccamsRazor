@@ -14,7 +14,12 @@ namespace OccamsRazor.Common.Models
 
         [JsonPropertyName("currentRound")]
         public RoundEnum CurrentRound { get; set; } = RoundEnum.One;
+
         [JsonPropertyName("currentQuestion")]
         public int CurrentQuestion { get; set; } = 1;
+
+        [JsonPropertyName("showResults")]
+        public bool ShowResults {get;set;}
+
     }
 }

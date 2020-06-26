@@ -19,5 +19,8 @@ namespace OccamsRazor.Common.Models
 
         [JsonPropertyName("number")]
         public int Number { get; set; }
+
+        [JsonPropertyName("answerText")]
+        public string AnswerText { get; set; }
     }
 }

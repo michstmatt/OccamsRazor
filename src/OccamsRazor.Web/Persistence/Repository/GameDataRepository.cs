@@ -29,6 +29,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             game.Name = System.Convert.ToString(reader[1]);
             game.CurrentRound = (RoundEnum)System.Convert.ToInt32(reader[2]);
             game.CurrentQuestion = System.Convert.ToInt32(reader[3]);
+            game.ShowResults= System.Convert.ToInt32(reader[4]??0) == 1;
             return game;
         }
 
@@ -40,6 +41,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             question.Number = System.Convert.ToInt32(reader[2]);
             question.Text = System.Convert.ToString(reader[3]);
             question.Category = System.Convert.ToString(reader[4]);
+            question.AnswerText = System.Convert.ToString(reader[5]??"");
             return question;
         }
 
@@ -69,14 +71,14 @@ namespace OccamsRazor.Web.Persistence.Repository
             return games;
         }
 
-        public async Task UpdateExistingGameMetadataAsync(GameMetadata game)
+        public async Task<bool> UpdateExistingGameMetadataAsync(GameMetadata game)
         {
             using (var conn = Context.GetSqlConnection())
             {
 
                 var command = new SqlCommand(
                     @"UPDATE [dbo].[GameMetadata]
-                              SET Name=@Name, CurrentRoundNum=@Round, CurrentQuestionNum=@Question
+                              SET Name=@Name, CurrentRoundNum=@Round, CurrentQuestionNum=@Question, ShowResults=@Show
                               WHERE GameId=@Id",
                     conn);
 
@@ -84,11 +86,13 @@ namespace OccamsRazor.Web.Persistence.Repository
                 command.Parameters.AddWithValue("@Round", game.CurrentRound);
                 command.Parameters.AddWithValue("@Question", game.CurrentQuestion);
                 command.Parameters.AddWithValue("@Id", game.GameId);
+                command.Parameters.AddWithValue("@Show", game.ShowResults?1:0);
 
                 await conn.OpenAsync();
                 var reader = await command.ExecuteReaderAsync();
                 await reader.CloseAsync();
             }
+            return true;
         }
         public async Task<GameMetadata> InsertGameMetadataAsync(GameMetadata game)
         {
@@ -97,15 +101,16 @@ namespace OccamsRazor.Web.Persistence.Repository
 
                 var command = new SqlCommand(
                     @"INSERT INTO [dbo].[GameMetadata]
-                        (Name, CurrentRoundNum, CurrentQuestionNum)
+                        (Name, CurrentRoundNum, CurrentQuestionNum, ShowResults)
                         OUTPUT INSERTED.GameId
-                        VALUES (@Name, @Round, @Question)",
+                        VALUES (@Name, @Round, @Question, @Show)",
 
                     conn);
 
                 command.Parameters.AddWithValue("@Name", game.Name);
                 command.Parameters.AddWithValue("@Round", game.CurrentRound);
                 command.Parameters.AddWithValue("@Question", game.CurrentQuestion);
+                command.Parameters.AddWithValue("@Show", game.ShowResults ? 1:0);
 
                 await conn.OpenAsync();
                 var reader = await command.ExecuteReaderAsync();
@@ -201,7 +206,7 @@ namespace OccamsRazor.Web.Persistence.Repository
 
                     var command = new SqlCommand(
                         @"UPDATE [dbo].[Questions]
-                              SET QuestionText=@Text, CategoryText=@Category
+                              SET QuestionText=@Text, CategoryText=@Category, AnswerText=@Answer
                               WHERE GameId=@GameId AND RoundNum=@Round AND QuestionNum=@Question",
                         conn);
 
@@ -210,6 +215,7 @@ namespace OccamsRazor.Web.Persistence.Repository
                     command.Parameters.AddWithValue("@Question", question.Number);
                     command.Parameters.AddWithValue("@Text", question.Text);
                     command.Parameters.AddWithValue("@Category", question.Category);
+                    command.Parameters.AddWithValue("@Answer", question.AnswerText);
 
 
                     var reader = await command.ExecuteReaderAsync();
@@ -228,8 +234,8 @@ namespace OccamsRazor.Web.Persistence.Repository
 
                     var command = new SqlCommand(
                         @"INSERT INTO [dbo].[Questions]
-                              (GameId, RoundNum, QuestionNum, QuestionText, CategoryText)
-                              VALUES(@GameID, @Round, @Question, @Text, @Category)",
+                              (GameId, RoundNum, QuestionNum, QuestionText, CategoryText, AnswerText)
+                              VALUES(@GameID, @Round, @Question, @Text, @Category, @Answer)",
                         conn);
 
                     command.Parameters.AddWithValue("@GameId", gameId);
@@ -237,6 +243,7 @@ namespace OccamsRazor.Web.Persistence.Repository
                     command.Parameters.AddWithValue("@Question", question.Number);
                     command.Parameters.AddWithValue("@Text", question.Text ?? "");
                     command.Parameters.AddWithValue("@Category", question.Category ?? "");
+                    command.Parameters.AddWithValue("@Answer", question.AnswerText ?? "");
 
 
                     var reader = await command.ExecuteReaderAsync();
@@ -312,6 +319,10 @@ namespace OccamsRazor.Web.Persistence.Repository
         public async Task<GameMetadata> SetCurrentQuestion(GameMetadata game)
         {
             return await UpdateCurrentQuestionAsync(game);
+        }
+        public async Task<bool> UpdateGameMetadata(GameMetadata game)
+        {
+            return await UpdateExistingGameMetadataAsync(game);
         }
 
     }

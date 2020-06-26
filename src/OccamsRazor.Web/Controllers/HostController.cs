@@ -31,9 +31,11 @@ namespace OccamsRazor.Web.Controllers
             _playerAnswerService = playerAnswerService;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string key)
         {
-            return View();
+            if (key == Environment.GetEnvironmentVariable("HOST_KEY"))
+                return View();
+            return Redirect("/");
         }
 
         public IActionResult Questions()
