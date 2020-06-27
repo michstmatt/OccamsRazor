@@ -8,18 +8,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 using OccamsRazor.Common.Models;
+using OccamsRazor.Web.Models;
 using OccamsRazor.Web.Service;
 
 namespace OccamsRazor.Web.Controllers
 {
     public class ApiHostController : Controller
     {
-        private readonly ILogger<ApiHostController> _logger;
+        private readonly ILogger<HostController> _logger;
         private readonly IGameDataService _gameDataService;
         private readonly IPlayerAnswerService _playerAnswerService;
         private readonly IHttpContextAccessor _accessor;
         private readonly string cookieName = "gameName";
-        public ApiHostController(ILogger<ApiHostController> logger,
+        public ApiHostController(ILogger<HostController> logger,
             IHttpContextAccessor accessor,
             IGameDataService gameDataService,
             IPlayerAnswerService playerAnswerService)
@@ -42,10 +43,10 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpGet]
         [Route("/api/Host/GetQuestions")]
-        public async Task<IActionResult> Questions(int? gameId)
+        public async Task<IActionResult> Questions(string id)
         {
             Game model;
-            var found = await _gameDataService.LoadQuestions(gameId?.ToString()??"");
+            var found = await _gameDataService.LoadQuestions(id);
             if (found == null)
                 model = new Game();
             else
@@ -72,9 +73,9 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpGet]
         [Route("/api/Host/GetPlayerAnswers")]
-        public async Task<IActionResult> PlayerAnswers(int gameId)
+        public async Task<IActionResult> PlayerAnswers(int id)
         {
-            var results = await _playerAnswerService.GetAllAnswers(gameId);
+            var results = await _playerAnswerService.GetAllAnswers(id);
             return Ok(results);
         }
 
@@ -110,5 +111,10 @@ namespace OccamsRazor.Web.Controllers
             return Ok(result);
         }
 
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
     }
 }
