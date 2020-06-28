@@ -93,7 +93,6 @@ export class PlayGame extends Component {
     }
 
     async submitAnswer(answer) {
-        alert(JSON.stringify(answer));
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

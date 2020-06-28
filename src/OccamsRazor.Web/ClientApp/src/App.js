@@ -9,6 +9,8 @@ import './custom.css'
 import { PlaySetup } from './components/PlaySetup';
 import { PlayGame } from './components/PlayGame';
 import { HostQuestions } from './components/HostQuestions';
+import { HostScoreQuestions } from './components/HostScoreQuestions';
+import { HostPage } from './components/HostPage';
 
 export default class App extends Component {
   static displayName = App.name;
@@ -22,6 +24,8 @@ export default class App extends Component {
         <Route path='/play-setup' component={PlaySetup} />
         <Route path='/play-game' component={PlayGame} />
         <Route path='/host-game-questions' component={HostQuestions} />
+        <Route path='/host-score-questions' component={HostScoreQuestions} />
+        <Route path='/host' component={HostPage} />
       </Layout>
     );
   }

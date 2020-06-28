@@ -197,6 +197,27 @@ namespace OccamsRazor.Web.Persistence.Repository
         {
             return await GetScoredAnswersForPlayerAsync(gameId, name);
         }
+        public async Task<bool> DeletePlayerAnswer(PlayerAnswer answer){
+            using (var conn = Context.GetSqlConnection())
+            {
+
+                await conn.OpenAsync();
+                var command = new SqlCommand(
+                    @"DELETE FROM [dbo].[PlayerAnswers]
+                              WHERE GameId=@GameId AND RoundNum=@Round AND QuestionNum=@Question And PlayerName=@Name",
+                    conn);
+
+                command.Parameters.AddWithValue("@GameId", answer.GameId);
+                command.Parameters.AddWithValue("@Round", answer.Round);
+                command.Parameters.AddWithValue("@Question", answer.QuestionNumber);
+                command.Parameters.AddWithValue("@Name", answer.Player.Name ?? "");
+
+
+                var reader = await command.ExecuteReaderAsync();
+                await reader.CloseAsync();
+            } 
+            return true;
+        }
 
 
         public async Task<bool> SubmitAnswer(PlayerAnswer answer)

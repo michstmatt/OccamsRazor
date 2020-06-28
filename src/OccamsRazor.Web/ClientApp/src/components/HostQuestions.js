@@ -7,7 +7,10 @@ export class HostQuestions extends Component {
         super(props);
         this.state = {
             loading: true,
-            selectedGame: 20,
+            selectedGame: this.props.gameId,
+            selectedRound: 1,
+            gameData: {},
+            questions: [],
             rounds: [
                 {name: 'One', number:1},
                 {name: 'Two', number:2},
@@ -22,7 +25,7 @@ export class HostQuestions extends Component {
     }
 
     componentDidMount() {
-        this.loadGames();
+        this.loadQuestions();
     }
 
     joinSubmitHandler = (event) => {
@@ -32,12 +35,59 @@ export class HostQuestions extends Component {
         this.props.history.push("/play-game");
     }
 
-    gameSelectedHandler = (event) => {
-        this.setState({ selectedGame: event.target.value });
+    roundSelectedHandler = (event) => {
+        this.setState({ selectedRound: event.target.value });
     }
 
     nameChangeHandler = (event) => {
         this.setState({ player: event.target.value });
+    }
+
+    categoryChangedHandler = (event, question) => {
+        this.setState({
+            questions: this.state.questions.map(q =>
+                {
+                    if (q.round == question.round && q.number == question.number)
+                    {
+                        q.category = event.target.value;
+                    }
+                    return q;
+                })
+        })
+
+    }
+
+    questionTextChangeHandler = (event, question) => {
+        this.setState({
+            questions: this.state.questions.map(q =>
+                {
+                    if (q.round == question.round && q.number == question.number)
+                    {
+                        q.text = event.target.value;
+                    }
+                    return q;
+                })
+        })
+
+    }
+
+    answerTextChangeHandler = (event, question) => {
+        this.setState({
+            questions: this.state.questions.map(q =>
+                {
+                    if (q.round == question.round && q.number == question.number)
+                    {
+                        q.answerText = event.target.value;
+                    }
+                    return q;
+                })
+        })
+    }
+
+    saveQuestionsHandler = (evt) => {
+        let game = this.state.gameData;
+        game.questions = this.state.questions;
+        this.saveQuestions(game);
     }
 
     renderHostQuestions(rounds, questions) {
@@ -45,29 +95,43 @@ export class HostQuestions extends Component {
             <div className="card">
                 <form method="POST">
                     <h2>Game Name </h2>
-                    <input className="host-question-input" />
+                    <input className="host-question-input" value={this.state.gameData.metadata.name} />
                     <hr />
                     <br />
                     <label>Round</label>
-                    <select class="host-score-input" ng-model="roundNum" ng-init="roundNum='1'">
+                    <select className="host-score-input" onChange={this.roundSelectedHandler}>
                         {rounds.map(round =>
-                            <option value={round.number}> { round.name }</option>
+                            <option key={round.number} value={round.number}> { round.name }</option>
                         )}
                     </select>
                     <br />
-                    <table class="hostScore">
+                    <table className="hostScore">
+                        <thead>
                         <tr>
-                            <th style="width:10%; margin:15px;">Number</th>
-                            <th style="width:30%; margin:15px;">Category</th>
-                            <th style="width:30%; margin:15px; ">Question</th>
-                            <th style="width:30%; margin:15px; ">Answer</th>
-                            <th style="width:10%; margin 15px;">Show</th>
+                            <th >Number</th>
+                            <th >Category</th>
+                            <th >Question</th>
+                            <th >Answer</th>
+                            <th >Show</th>
                         </tr>
+                        </thead>
+                        <tbody>
+
+                        {questions.filter(q => q.round == this.state.selectedRound).map(question =>
+                            <tr key={`${question.round}-${question.number}`}>
+                                <td>{question.number}</td>
+                                <td><input className="host-question-input" value={question.category} onChange={(evt) => this.categoryChangedHandler(evt, question)}/></td>
+                                <td><textarea className="host-question-input" value={question.text} onChange={(evt) => this.questionTextChangeHandler(evt, question)}/></td>
+                                <td><input className="host-question-input" value={question.answerText} onChange={(evt) => this.answerTextChangeHandler(evt, question)}/></td>
+                                <td><input type="checkbox" value="show"></input></td>
+                            </tr>
+                        )}
+                        </tbody>
 
 
                     </table>
                     <br />
-                    <input type="button" value="Save" ng-click="submit($parent.game)" class="host-question-submit" />
+                    <input type="button" value="Save" className="host-question-submit" onClick={this.saveQuestionsHandler}/>
                     <br /><br />
                 </form>
             </div>
@@ -77,21 +141,29 @@ export class HostQuestions extends Component {
     render() {
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderHostQuestions(this.state.questions, this.state.rounds);
+            : this.renderHostQuestions(this.state.rounds, this.state.questions);
 
         return (
-            <div className="card">
-                {this.state.player}
-                <h1 id="tabelLabel" >Join a game</h1>
+            <div>
                 {contents}
             </div>
         );
     }
 
     async loadQuestions() {
-        const response = await fetch('/api/Host/GetQuestions?gameId=20');
+        const response = await fetch(`/api/Host/GetQuestions?gameId=${this.state.selectedGame}`);
         const data = await response.json();
-        this.setState({ questions: data, loading: false});
+        this.setState({ gameData: data, questions: data.questions, loading: false});
+    }
+
+    async saveQuestions(game)
+    {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(game)
+        };
+        const response = await fetch('/api/Host/SaveQuestions', requestOptions);
     }
 }
 

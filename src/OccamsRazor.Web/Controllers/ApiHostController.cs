@@ -110,5 +110,13 @@ namespace OccamsRazor.Web.Controllers
             return Ok(result);
         }
 
+        [Route("/api/Host/DeletePlayerAnswer")]
+        [HttpPost]
+        public async Task<IActionResult> DeletePlayerAnswer([FromBody]PlayerAnswer answer)
+        {
+            var result = await _playerAnswerService.DeletePlayerAnswer(answer);
+            return Ok(result);
+        }
+
     }
 }
