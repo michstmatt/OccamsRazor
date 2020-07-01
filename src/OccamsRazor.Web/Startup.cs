@@ -62,6 +62,7 @@ namespace OccamsRazor.Web
             app.UseSpaStaticFiles();
 
             app.UseRouting();
+            app.UseWebSockets();
 
             app.UseEndpoints(endpoints =>
             {

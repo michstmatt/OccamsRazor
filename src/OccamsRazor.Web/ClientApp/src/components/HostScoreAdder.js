@@ -76,6 +76,8 @@ export class HostScoreAdder extends Component {
             answerText: ""
         });
 
+        this.props.refresh();
+
     }
 
 }

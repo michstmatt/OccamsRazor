@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Modal } from './Modal';
 
 export class PlayGame extends Component {
     static displayName = PlayGame.name;
@@ -12,7 +13,8 @@ export class PlayGame extends Component {
             player: storedState.player,
             selectedGameId: storedState.gameId,
             wager: 1,
-            answer: ""
+            answer: "",
+            showMessage: false
         };
     }
 
@@ -82,6 +84,7 @@ export class PlayGame extends Component {
                 {this.state.player.name}
                 {question}
                 {this.renderForm()}
+                <Modal show={this.state.showMessage} text="Your Answer has been received" />
             </div>
         );
     }
@@ -100,6 +103,8 @@ export class PlayGame extends Component {
         };
         const response = await fetch('/api/Play/submitAnswer', requestOptions);
        // const data = await response.json();
+
+       this.setState({showMessage:true});
 
     }
 }

@@ -64,7 +64,27 @@ export class HostScoreQuestions extends Component {
 
     deleteAnswerHandler = (event, answer) =>
     {
-        this.deleteAnswer(answer);
+        let shouldDelete = window.confirm("Are you sure you want to delete this response?");
+        if(shouldDelete)
+        {
+            this.deleteAnswer(answer);
+        }
+    }
+
+    handleComponentEvent = () =>
+    {
+        this.loadQuestions();
+    }
+
+    newCurrentQuestionEvent = (currentQuestion) =>
+    {
+        this.setState(
+            {
+                selectedRound: currentQuestion.round,
+                selectedQuestion: currentQuestion.number 
+            }
+        );
+        
     }
 
     renderHostScoreQuestions(answers) {
@@ -107,7 +127,7 @@ export class HostScoreQuestions extends Component {
 
         return (
             <div className="card">
-                <HostCurrentQuestion gameId={this.state.selectedGame} />
+                <HostCurrentQuestion gameId={this.state.selectedGame} newQuestionEvent={this.newCurrentQuestionEvent} />
                 <hr />
                 <div>
                     <h3>Score Responses</h3>
@@ -117,7 +137,7 @@ export class HostScoreQuestions extends Component {
 
                 {contents}
                 <hr/>
-                <HostScoreAdder gameId={this.state.selectedGame} cRound={this.state.selectedRound} cQuestion={this.state.selectedQuestion} />
+                <HostScoreAdder gameId={this.state.selectedGame} cRound={this.state.selectedRound} cQuestion={this.state.selectedQuestion} refresh={this.handleComponentEvent}/>
             </div>
         );
     }
