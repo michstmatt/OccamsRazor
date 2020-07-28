@@ -10,7 +10,7 @@ export class HostCurrentQuestion extends Component {
             selectedGame: this.props.gameId,
             selectedQuestion: {},
             questions: [],
-            currentQuestion: {},
+            currentQuestionIndex: 0,
             rounds: [
                 {name: 'One', number:1},
                 {name: 'Two', number:2},
@@ -47,7 +47,7 @@ export class HostCurrentQuestion extends Component {
             <h4> <span className="primary"> Question </span></h4>
             <p>{cQuestion.text} </p>
             <h4> <span className="primary"> Answer </span>{cQuestion.answerText} </h4>
-            <select className="host-score-input" onChange={this.questionSelectedHandler}>
+            <select className="host-score-input" onChange={this.questionSelectedHandler} defaultValue={this.state.currentQuestionIndex}>
                 {questions.map( (question, index) =>
                     <option value={index}>R {question.round } Q {question.number}</option>
                 )}
@@ -61,7 +61,7 @@ export class HostCurrentQuestion extends Component {
     render() {
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderHostCurrentQuestion(this.state.gameData.questions, this.state.currentQuestion);
+            : this.renderHostCurrentQuestion(this.state.gameData.questions, this.state.gameData.questions[this.state.currentQuestionIndex]);
 
         return (
             <div className="container">
@@ -74,10 +74,8 @@ export class HostCurrentQuestion extends Component {
         this.setState({loading:true});
         const response = await fetch(`/api/Host/GetQuestions?gameId=${this.state.selectedGame}`);
         const data = await response.json();
-        this.setState({ gameData: data, loading: false, currentQuestion: data.questions.find(q => 
-            q.round == data.metadata.currentRound && q.number == data.metadata.currentQuestion
-            )
-        });
+        const questionIndex = data.questions.findIndex( q => q.round == data.metadata.currentRound && q.number == data.metadata.currentQuestion);
+        this.setState({ gameData: data, loading: false, currentQuestionIndex: questionIndex});
         
     }
 

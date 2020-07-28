@@ -202,14 +202,14 @@ namespace OccamsRazor.Web.Persistence.Repository
             {
 
                 var command = conn.CreateCommand();
+                command.Parameters.AddWithValue("@GameId", gameId);
                 for (int i = 0; i < questions.Count(); i++)
                 {
                     command.CommandText +=
                         string.Format(@"UPDATE [dbo].[Questions] 
                               SET QuestionText=@Text{0}, CategoryText=@Category{0}, AnswerText=@Answer{0}
-                              WHERE GameId=@GameId AND RoundNum=@Round{0} AND QuestionNum=@Question{0}", i);
+                              WHERE GameId=@GameId AND RoundNum=@Round{0} AND QuestionNum=@Question{0};", i);
 
-                    command.Parameters.AddWithValue("@GameId", gameId);
                     command.Parameters.AddWithValue($"@Round{i}", questions[i].Round);
                     command.Parameters.AddWithValue($"@Question{i}", questions[i].Number);
                     command.Parameters.AddWithValue($"@Text{i}", questions[i].Text);
@@ -229,14 +229,14 @@ namespace OccamsRazor.Web.Persistence.Repository
             {
 
                 var command = conn.CreateCommand();
+                    command.Parameters.AddWithValue("@GameId", gameId);
                 for (int i = 0; i < questions.Count(); i++)
                 {
                     command.CommandText +=
                         string.Format(@"INSERT INTO [dbo].[Questions]
                               (GameId, RoundNum, QuestionNum, QuestionText, CategoryText, AnswerText)
-                              VALUES(@GameID, @Round{0}, @Question{0}, @Text{0}, @Category{0}, @Answer{0})", i);
+                              VALUES(@GameID, @Round{0}, @Question{0}, @Text{0}, @Category{0}, @Answer{0});", i);
 
-                    command.Parameters.AddWithValue("@GameId", gameId);
                     command.Parameters.AddWithValue($"@Round{i}", questions[i].Round);
                     command.Parameters.AddWithValue($"@Question{i}", questions[i].Number);
                     command.Parameters.AddWithValue($"@Text{i}", questions[i].Text);
