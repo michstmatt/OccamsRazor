@@ -121,6 +121,8 @@ export class HostScoreQuestions extends Component {
         );
     }
 
+    
+
     render() {
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>
@@ -140,7 +142,7 @@ export class HostScoreQuestions extends Component {
 
                 {contents}
                 <hr/>
-                <HostScoreAdder gameId={this.state.selectedGame} cRound={this.state.selectedRound} cQuestion={this.state.selectedQuestion} refresh={this.handleComponentEvent}/>
+                <HostScoreAdder gameId={this.state.selectedGame} cRound={this.state.selectedRound} cQuestion={this.state.selectedQuestion} refresh={this.handleComponentEvent}/> ;
             </div>
         );
     }

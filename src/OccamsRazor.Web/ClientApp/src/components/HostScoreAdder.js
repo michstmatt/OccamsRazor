@@ -16,6 +16,16 @@ export class HostScoreAdder extends Component {
         };
     }
 
+    componentWillReceiveProps(props)
+    {
+        this.setState(
+            {
+                selectedRound: props.cRound,
+                selectedQuestion: props.cQuestion
+            }
+        );
+    }
+
     componentDidMount() {
         this.setState();
     }
