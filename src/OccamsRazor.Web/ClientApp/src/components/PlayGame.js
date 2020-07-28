@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Modal } from './Modal';
+import { Toast } from './Toast';
+import { WaitPage } from './WaitPage';
 
 export class PlayGame extends Component {
     static displayName = PlayGame.name;
@@ -14,12 +15,13 @@ export class PlayGame extends Component {
             selectedGameId: storedState.gameId,
             wager: 1,
             answer: "",
-            showMessage: false
+            gameState : 0
         };
     }
 
     componentDidMount() {
-        this.loadQuestion();
+        this.checkState();
+        setInterval(()=> this.checkState(), 10000);
     }
 
     answerSumbitHandler = (event) => {
@@ -30,10 +32,14 @@ export class PlayGame extends Component {
             answerText: this.state.answer,
             wager: this.state.wager*1,
             questionNumber: this.state.currentQuestion.number,
-            roundNumber: this.state.currentQuestion.number,
+            round: this.state.currentQuestion.round,
             gameId: this.state.selectedGameId,
-        }
-        this.submitAnswer(answer);
+        };
+
+        if (answer.answerText != "" && answer.wager >0 && answer.wager <7)
+            this.submitAnswer(answer);
+        else
+            this.refs.toast.setText("You must fill out all fields!");
     }
 
     wagerChangeHandler = (event) => {
@@ -43,6 +49,7 @@ export class PlayGame extends Component {
     answerChangeHandler = (event) => {
         this.setState({ answer: event.target.value });
     }
+
 
     renderQuestion(games) {
         return (
@@ -72,27 +79,61 @@ export class PlayGame extends Component {
         );
     }
 
-    render() {
+    renderWait() {
+        return (
+            <WaitPage gameName={"Game Night"} />
+        )
+    }
+
+    renderPlay() 
+    {
         let question = this.state.loading
-            ? <p><em>Loading...</em></p>
-            : this.renderQuestion(this.state.currentQuestion);
+        ? <p><em>Loading...</em></p>
+        : this.renderQuestion(this.state.currentQuestion);
+        return (
+            <div className="card">
+            {this.state.player.name}
+            {question}
+            {this.renderForm()}
+            
+        </div>)
+    }
+
+    render() {
+
+
+        let content = this.state.gameState == 0 ?
+            this.renderWait() : this.renderPlay();
 
 
 
         return (
-            <div className="card">
-                {this.state.player.name}
-                {question}
-                {this.renderForm()}
-                <Modal show={this.state.showMessage} text="Your Answer has been received" />
+            <div>
+                {content}
+                <Toast ref="toast" />
             </div>
         );
+    }
+
+    checkState() {
+        this.getState().then( () => {
+            if (this.state.gameState == 1)
+            {
+                this.loadQuestion();
+            }
+        });
     }
 
     async loadQuestion() {
         const response = await fetch('/api/Play/GetCurrentQuestion?gameId='+ this.state.selectedGameId);
         const data = await response.json();
         this.setState({ currentQuestion: data,loading: false });
+    }
+
+    async getState(){
+        const response = await fetch('/api/Play/GetState?gameId='+ this.state.selectedGameId);
+        const data = await response.json();
+        this.setState({gameState: data.state});
     }
 
     async submitAnswer(answer) {
@@ -103,8 +144,9 @@ export class PlayGame extends Component {
         };
         const response = await fetch('/api/Play/submitAnswer', requestOptions);
        // const data = await response.json();
+        this.refs.toast.setText("Your answer was received");
 
-       this.setState({showMessage:true});
+        this.setState({})
 
     }
 }

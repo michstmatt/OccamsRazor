@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Data.Common;
 using System.Data.SqlClient;
 
 using Microsoft.EntityFrameworkCore;
@@ -22,18 +23,18 @@ namespace OccamsRazor.Web.Persistence.Repository
         }
 
 
-        public GameMetadata ReaderToGameMetadata(SqlDataReader reader)
+        public GameMetadata ReaderToGameMetadata(DbDataReader reader)
         {
             var game = new GameMetadata();
             game.GameId = System.Convert.ToInt32(reader[0]);
             game.Name = System.Convert.ToString(reader[1]);
             game.CurrentRound = (RoundEnum)System.Convert.ToInt32(reader[2]);
             game.CurrentQuestion = System.Convert.ToInt32(reader[3]);
-            game.ShowResults= System.Convert.ToInt32(reader[4]??0) == 1;
+            game.State = (GameStateEnum)(System.Convert.ToInt32(reader[4] ?? 0));
             return game;
         }
 
-        public Question ReaderToQuestion(SqlDataReader reader)
+        public Question ReaderToQuestion(DbDataReader reader)
         {
             var question = new Question();
             question.GameId = System.Convert.ToInt32(reader[0]);
@@ -41,7 +42,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             question.Number = System.Convert.ToInt32(reader[2]);
             question.Text = System.Convert.ToString(reader[3]);
             question.Category = System.Convert.ToString(reader[4]);
-            question.AnswerText = System.Convert.ToString(reader[5]??"");
+            question.AnswerText = System.Convert.ToString(reader[5] ?? "");
             return question;
         }
 
@@ -53,9 +54,9 @@ namespace OccamsRazor.Web.Persistence.Repository
             using (var conn = Context.GetSqlConnection())
             {
 
-                var command = new SqlCommand(
-                    @"SELECT * FROM [dbo].[GameMetadata]",
-                    conn);
+                var command = conn.CreateCommand();
+                command.CommandText =
+                    @"SELECT * FROM [dbo].[GameMetadata]";
 
 
                 await conn.OpenAsync();
@@ -75,18 +76,17 @@ namespace OccamsRazor.Web.Persistence.Repository
         {
             using (var conn = Context.GetSqlConnection())
             {
-
-                var command = new SqlCommand(
+                var command = conn.CreateCommand();
+                command.CommandText =
                     @"UPDATE [dbo].[GameMetadata]
-                              SET Name=@Name, CurrentRoundNum=@Round, CurrentQuestionNum=@Question, ShowResults=@Show
-                              WHERE GameId=@Id",
-                    conn);
+                              SET Name=@Name, CurrentRoundNum=@Round, CurrentQuestionNum=@Question, State=@State
+                              WHERE GameId=@Id";
 
                 command.Parameters.AddWithValue("@Name", game.Name);
                 command.Parameters.AddWithValue("@Round", game.CurrentRound);
                 command.Parameters.AddWithValue("@Question", game.CurrentQuestion);
                 command.Parameters.AddWithValue("@Id", game.GameId);
-                command.Parameters.AddWithValue("@Show", game.ShowResults?1:0);
+                command.Parameters.AddWithValue("@State", game.State);
 
                 await conn.OpenAsync();
                 var reader = await command.ExecuteReaderAsync();
@@ -99,18 +99,17 @@ namespace OccamsRazor.Web.Persistence.Repository
             using (var conn = Context.GetSqlConnection())
             {
 
-                var command = new SqlCommand(
-                    @"INSERT INTO [dbo].[GameMetadata]
-                        (Name, CurrentRoundNum, CurrentQuestionNum, ShowResults)
+                var command = conn.CreateCommand();
+                command.CommandText = @"INSERT INTO [dbo].[GameMetadata]
+                        (Name, CurrentRoundNum, CurrentQuestionNum, State)
                         OUTPUT INSERTED.GameId
-                        VALUES (@Name, @Round, @Question, @Show)",
+                        VALUES (@Name, @Round, @Question, @State)";
 
-                    conn);
 
                 command.Parameters.AddWithValue("@Name", game.Name);
                 command.Parameters.AddWithValue("@Round", game.CurrentRound);
                 command.Parameters.AddWithValue("@Question", game.CurrentQuestion);
-                command.Parameters.AddWithValue("@Show", game.ShowResults ? 1:0);
+                command.Parameters.AddWithValue("@State", game.State);
 
                 await conn.OpenAsync();
                 var reader = await command.ExecuteReaderAsync();
@@ -127,9 +126,9 @@ namespace OccamsRazor.Web.Persistence.Repository
             using (var conn = Context.GetSqlConnection())
             {
 
-                var command = new SqlCommand(
-                    @"SELECT * FROM [dbo].[GameMetadata] WHERE GameId=@Id",
-                    conn);
+                var command = conn.CreateCommand();
+                command.CommandText =
+                    @"SELECT * FROM [dbo].[GameMetadata] WHERE GameId=@Id";
 
                 command.Parameters.AddWithValue("@Id", gameId);
                 await conn.OpenAsync();
@@ -150,9 +149,10 @@ namespace OccamsRazor.Web.Persistence.Repository
             using (var conn = Context.GetSqlConnection())
             {
 
-                var command = new SqlCommand(
-                    @"SELECT * FROM [dbo].[Questions] WHERE GameId=@ID",
-                    conn);
+                var command = conn.CreateCommand();
+                command.CommandText =
+                    @"SELECT * FROM [dbo].[Questions] WHERE GameId=@ID";
+
                 command.Parameters.AddWithValue("@Id", gameId);
 
 
@@ -175,10 +175,11 @@ namespace OccamsRazor.Web.Persistence.Repository
             using (var conn = Context.GetSqlConnection())
             {
 
-                var command = new SqlCommand(
+                var command = conn.CreateCommand();
+                command.CommandText =
                     @"SELECT q.*, g.* FROM [dbo].[Questions] q, [dbo].[GameMetadata] g
-                    WHERE q.GameId=@ID AND g.GameId=@ID AND q.RoundNum=g.CurrentRoundNum AND q.QuestionNum=g.CurrentQuestionNum",
-                    conn);
+                    WHERE q.GameId=@ID AND g.GameId=@ID AND q.RoundNum=g.CurrentRoundNum AND q.QuestionNum=g.CurrentQuestionNum";
+
                 command.Parameters.AddWithValue("@Id", gameId);
 
 
@@ -195,60 +196,57 @@ namespace OccamsRazor.Web.Persistence.Repository
             return question;
         }
 
-        public async Task UpdateExistingQuestionsAsync(int gameId, IEnumerable<Question> questions)
+        public async Task UpdateExistingQuestionsAsync(int gameId, IList<Question> questions)
         {
             using (var conn = Context.GetSqlConnection())
             {
 
-                await conn.OpenAsync();
-                foreach (var question in questions)
+                var command = conn.CreateCommand();
+                for (int i = 0; i < questions.Count(); i++)
                 {
-
-                    var command = new SqlCommand(
-                        @"UPDATE [dbo].[Questions]
-                              SET QuestionText=@Text, CategoryText=@Category, AnswerText=@Answer
-                              WHERE GameId=@GameId AND RoundNum=@Round AND QuestionNum=@Question",
-                        conn);
+                    command.CommandText +=
+                        string.Format(@"UPDATE [dbo].[Questions] 
+                              SET QuestionText=@Text{0}, CategoryText=@Category{0}, AnswerText=@Answer{0}
+                              WHERE GameId=@GameId AND RoundNum=@Round{0} AND QuestionNum=@Question{0}", i);
 
                     command.Parameters.AddWithValue("@GameId", gameId);
-                    command.Parameters.AddWithValue("@Round", question.Round);
-                    command.Parameters.AddWithValue("@Question", question.Number);
-                    command.Parameters.AddWithValue("@Text", question.Text);
-                    command.Parameters.AddWithValue("@Category", question.Category);
-                    command.Parameters.AddWithValue("@Answer", question.AnswerText);
+                    command.Parameters.AddWithValue($"@Round{i}", questions[i].Round);
+                    command.Parameters.AddWithValue($"@Question{i}", questions[i].Number);
+                    command.Parameters.AddWithValue($"@Text{i}", questions[i].Text);
+                    command.Parameters.AddWithValue($"@Category{i}", questions[i].Category);
+                    command.Parameters.AddWithValue($"@Answer{i}", questions[i].AnswerText);
 
 
-                    var reader = await command.ExecuteReaderAsync();
-                    await reader.CloseAsync();
                 }
+                await conn.OpenAsync();
+                await command.ExecuteNonQueryAsync();
+                await conn.CloseAsync();
             }
         }
-        public async Task InsertQuestionsAsync(int gameId, IEnumerable<Question> questions)
+        public async Task InsertQuestionsAsync(int gameId, IList<Question> questions)
         {
             using (var conn = Context.GetSqlConnection())
             {
 
-                await conn.OpenAsync();
-                foreach (var question in questions)
+                var command = conn.CreateCommand();
+                for (int i = 0; i < questions.Count(); i++)
                 {
-
-                    var command = new SqlCommand(
-                        @"INSERT INTO [dbo].[Questions]
+                    command.CommandText +=
+                        string.Format(@"INSERT INTO [dbo].[Questions]
                               (GameId, RoundNum, QuestionNum, QuestionText, CategoryText, AnswerText)
-                              VALUES(@GameID, @Round, @Question, @Text, @Category, @Answer)",
-                        conn);
+                              VALUES(@GameID, @Round{0}, @Question{0}, @Text{0}, @Category{0}, @Answer{0})", i);
 
                     command.Parameters.AddWithValue("@GameId", gameId);
-                    command.Parameters.AddWithValue("@Round", question.Round);
-                    command.Parameters.AddWithValue("@Question", question.Number);
-                    command.Parameters.AddWithValue("@Text", question.Text ?? "");
-                    command.Parameters.AddWithValue("@Category", question.Category ?? "");
-                    command.Parameters.AddWithValue("@Answer", question.AnswerText ?? "");
+                    command.Parameters.AddWithValue($"@Round{i}", questions[i].Round);
+                    command.Parameters.AddWithValue($"@Question{i}", questions[i].Number);
+                    command.Parameters.AddWithValue($"@Text{i}", questions[i].Text);
+                    command.Parameters.AddWithValue($"@Category{i}", questions[i].Category);
+                    command.Parameters.AddWithValue($"@Answer{i}", questions[i].AnswerText);
 
-
-                    var reader = await command.ExecuteReaderAsync();
-                    await reader.CloseAsync();
                 }
+                await conn.OpenAsync();
+                await command.ExecuteNonQueryAsync();
+                await conn.CloseAsync();
             }
         }
 
@@ -275,23 +273,32 @@ namespace OccamsRazor.Web.Persistence.Repository
             using (var conn = Context.GetSqlConnection())
             {
 
-                await conn.OpenAsync();
+                var command = conn.CreateCommand();
 
 
-                var command = new SqlCommand(
+                command.CommandText +=
                     @"UPDATE [dbo].[GameMetadata]
                               SET CurrentRoundNum=@Round, CurrentQuestionNum=@Question
-                              WHERE GameId=@GameId",
-                    conn);
+                              WHERE GameId=@GameId";
 
                 command.Parameters.AddWithValue("@Question", game.CurrentQuestion);
                 command.Parameters.AddWithValue("@Round", game.CurrentRound);
                 command.Parameters.AddWithValue("@GameId", game.GameId);
-                var reader = await command.ExecuteReaderAsync();
-                await reader.CloseAsync();
+                await conn.OpenAsync();
+                await command.ExecuteNonQueryAsync();
+                await conn.CloseAsync();
             }
             return game;
         }
+        public async Task<GameMetadata> SetGameState(GameMetadata game)
+        {
+            return game;
+        }
+        public async Task<GameMetadata> GetGameState(int gameId)
+        {
+            return await GetGameMetadataAsync(gameId);
+        }
+
 
 
 

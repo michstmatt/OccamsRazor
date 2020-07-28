@@ -49,11 +49,19 @@ namespace OccamsRazor.Web.Controllers
         public async Task<IActionResult> GetCurrentQuestion(string gameId, string host)
         {
             var question = await _gameDataService.GetCurrentQuestion(gameId);
-            if(string.IsNullOrEmpty(host) || host!=gameId)
+            if (string.IsNullOrEmpty(host) || host != gameId)
             {
                 question.AnswerText = "";
             }
             return Ok(question);
+        }
+
+        [HttpGet]
+        [Route("/api/Play/GetState")]
+        public async Task<IActionResult> GetSTate(int gameId)
+        {
+            var gameState = await _gameDataService.GetGameState(gameId);
+            return Ok(gameState);
         }
 
         [Route("/api/Play/SubmitAnswer")]
@@ -77,8 +85,8 @@ namespace OccamsRazor.Web.Controllers
         public async Task<IActionResult> GetScoredAnswers(int gameId)
         {
             var games = await _gameDataService.LoadGames();
-            var ok = games.Where(g => g.GameId == gameId).FirstOrDefault().ShowResults;
-            if(!ok)
+            var ok = games.Where(g => g.GameId == gameId).FirstOrDefault().State == GameStateEnum.Results;
+            if (!ok)
             {
                 return Ok(Array.Empty<GameResults>());
             }

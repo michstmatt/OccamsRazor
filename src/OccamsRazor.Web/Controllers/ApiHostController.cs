@@ -74,7 +74,7 @@ namespace OccamsRazor.Web.Controllers
         [Route("/api/Host/GetPlayerAnswers")]
         public async Task<IActionResult> PlayerAnswers(int gameId)
         {
-            var results = await _playerAnswerService.GetAllAnswers(gameId);
+            var results = await _playerAnswerService.GetAllAnswers(gameId) ?? Array.Empty<PlayerAnswer>();
             return Ok(results);
         }
 
@@ -91,7 +91,6 @@ namespace OccamsRazor.Web.Controllers
         public async Task<IActionResult> UpdatePlayerScores([FromBody]IEnumerable<PlayerAnswer> answers)
         {
             var ok = await _playerAnswerService.SubmitPlayerScores(answers); 
-            //var result = await _playerAnswerService.GetAllAnswers(answers[0])
             return Ok(true);
         }
         [Route("/api/Host/GetScoredResponses")]
@@ -108,6 +107,14 @@ namespace OccamsRazor.Web.Controllers
         {
             var result = await _gameDataService.SetShowResults(game);
             return Ok(result);
+        }
+
+        [Route("/api/Host/SetState")]
+        [HttpPost]
+        public async Task<IActionResult> SetState([FromBody] GameMetadata game)
+        {
+            var response = await _gameDataService.SetGameState(game);
+            return Ok(response);
         }
 
         [Route("/api/Host/DeletePlayerAnswer")]

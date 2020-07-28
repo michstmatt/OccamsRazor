@@ -207,3 +207,9 @@ hr {
   border: 1px solid rgb(57, 57, 57);
   width: 80%;
 }
+
+.toast {
+  background-color: #FE3F7D;
+  width: 100%;
+
+}

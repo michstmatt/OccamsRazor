@@ -35,9 +35,12 @@ namespace OccamsRazor.Web
                 configuration.RootPath = "ClientApp/build";
             });
 
-            services.AddSingleton<OccamsRazorSqlClient>();
+
+            services.AddScoped<OccamsRazorSqlClient>();
+            //services.AddSingleton<IGameDataRepository, GameTestDataRepository>();
             services.AddScoped<IGameDataRepository, GameDataRepository>();
             services.AddScoped<IGameDataService, GameDataService>();
+            //services.AddSingleton<IPlayerAnswerRepository, PlayerTestAnswerRepository>();
             services.AddScoped<IPlayerAnswerRepository, PlayerAnswerRepository>();
             services.AddScoped<IPlayerAnswerService, PlayerAnswerService>();
             services.AddHttpContextAccessor();
@@ -62,7 +65,6 @@ namespace OccamsRazor.Web
             app.UseSpaStaticFiles();
 
             app.UseRouting();
-            app.UseWebSockets();
 
             app.UseEndpoints(endpoints =>
             {

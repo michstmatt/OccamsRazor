@@ -17,6 +17,7 @@ export class HostScoreAdder extends Component {
     }
 
     componentDidMount() {
+        this.setState();
     }
 
     playerNameChanged = (event) => {

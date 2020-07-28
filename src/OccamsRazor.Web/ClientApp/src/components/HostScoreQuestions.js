@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { HostCurrentQuestion } from './HostCurrentQuestion';
 import { HostScoreAdder } from './HostScoreAdder';
+import { HostGameState } from './HostGameState';
 
 export class HostScoreQuestions extends Component {
     static displayName = HostScoreQuestions.name;
@@ -127,8 +128,10 @@ export class HostScoreQuestions extends Component {
 
         return (
             <div className="card">
+                <HostGameState gameId={this.state.selectedGame}/>
                 <HostCurrentQuestion gameId={this.state.selectedGame} newQuestionEvent={this.newCurrentQuestionEvent} />
                 <hr />
+
                 <div>
                     <h3>Score Responses</h3>
                     <button className="host-score-button" onClick={this.refreshResponses} >Check for new responses</button>

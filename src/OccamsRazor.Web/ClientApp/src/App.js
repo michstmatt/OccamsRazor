@@ -11,6 +11,7 @@ import { PlayGame } from './components/PlayGame';
 import { HostQuestions } from './components/HostQuestions';
 import { HostScoreQuestions } from './components/HostScoreQuestions';
 import { HostPage } from './components/HostPage';
+import { WaitPage } from './components/WaitPage';
 
 export default class App extends Component {
   static displayName = App.name;
@@ -26,6 +27,7 @@ export default class App extends Component {
         <Route path='/host-game-questions' component={HostQuestions} />
         <Route path='/host-score-questions' component={HostScoreQuestions} />
         <Route path='/host' component={HostPage} />
+        <Route path="/play-waiting" component={WaitPage} />
       </Layout>
     );
   }

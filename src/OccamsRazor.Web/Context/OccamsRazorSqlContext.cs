@@ -1,6 +1,6 @@
 using System;
 using System.Data.SqlClient;
-using System.Data;
+using System.Data.Common;
 
 namespace OccamsRazor.Web.Context
 {

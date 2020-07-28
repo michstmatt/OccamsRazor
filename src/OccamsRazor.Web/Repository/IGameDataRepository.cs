@@ -14,5 +14,7 @@ namespace OccamsRazor.Web.Repository
         Task<Question> GetCurrentQuestion(string questionNames);
         Task<GameMetadata> SetCurrentQuestion(GameMetadata game);
         Task<bool> UpdateGameMetadata(GameMetadata game);
+        Task<GameMetadata> SetGameState(GameMetadata game);
+        Task<GameMetadata> GetGameState(int gameId);
     }
 }

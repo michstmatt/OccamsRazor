@@ -18,7 +18,7 @@ namespace OccamsRazor.Common.Models
 
         public Game()
         {
-            Metadata = new GameMetadata(){ShowResults=false};
+            Metadata = new GameMetadata(){State = GameStateEnum.Created};
             var format = new Dictionary<RoundEnum, int>
             {
                 {RoundEnum.One, 3},

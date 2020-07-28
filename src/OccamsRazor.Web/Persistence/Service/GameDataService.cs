@@ -36,5 +36,18 @@ namespace OccamsRazor.Web.Persistence.Service
             return game;
         }
 
+
+        public async Task<GameMetadata> SetGameState(GameMetadata game)
+        {
+            await Repository.UpdateGameMetadata(game);
+            return game;
+        }
+
+        public async Task<GameMetadata> GetGameState(int gameId)
+        {
+            var result = await Repository.GetGameState(gameId);
+            return result;
+        }
+
     }
 }

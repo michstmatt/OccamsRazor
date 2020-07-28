@@ -37,12 +37,11 @@ namespace OccamsRazor.Web.Persistence.Repository
             var answers = new List<PlayerAnswer>();
             using (var conn = Context.GetSqlConnection())
             {
-
-                var command = new SqlCommand(
+                var command = conn.CreateCommand();
+                command.CommandText =
                     @"SELECT * FROM [dbo].[PlayerAnswers]
                     WHERE GameId=@GameId
-                    ORDER BY RoundNum, QuestionNum ASC",
-                    conn);
+                    ORDER BY RoundNum, QuestionNum ASC";
                 command.Parameters.AddWithValue("@GameId", gameId);
 
                 await conn.OpenAsync();
@@ -54,6 +53,7 @@ namespace OccamsRazor.Web.Persistence.Repository
                     answers.Add(ReaderToAnswer(reader));
                 }
                 await reader.CloseAsync();
+                await conn.CloseAsync();
             }
             return answers;
         }
@@ -64,10 +64,11 @@ namespace OccamsRazor.Web.Persistence.Repository
             using (var conn = Context.GetSqlConnection())
             {
 
-                var command = new SqlCommand(
+                var command = conn.CreateCommand();
+                command.CommandText =
                     @"SELECT * FROM [dbo].[PlayerAnswers]
-                    WHERE GameId=@GameId AND RoundNum=@Round AND QuestionNum=@Question",
-                    conn);
+                    WHERE GameId=@GameId AND RoundNum=@Round AND QuestionNum=@Question";
+
                 command.Parameters.AddWithValue("@GameId", gameId);
                 command.Parameters.AddWithValue("@Round", round);
                 command.Parameters.AddWithValue("@Question", questionNum);
@@ -82,6 +83,7 @@ namespace OccamsRazor.Web.Persistence.Repository
                     answers.Add(ReaderToAnswer(reader));
                 }
                 await reader.CloseAsync();
+                await conn.CloseAsync();
             }
             return answers;
         }
@@ -90,10 +92,11 @@ namespace OccamsRazor.Web.Persistence.Repository
             var existing = new PlayerAnswer();
             using (var conn = Context.GetSqlConnection())
             {
-                var command = new SqlCommand(
+                var command = conn.CreateCommand();
+                command.CommandText = 
                     @"SELECT * FROM [dbo].[PlayerAnswers]
-                    WHERE GameId=@GameId AND RoundNum=@Round AND QuestionNum=@Question AND PlayerName=@Name",
-                    conn);
+                    WHERE GameId=@GameId AND RoundNum=@Round AND QuestionNum=@Question AND PlayerName=@Name";
+
                 command.Parameters.AddWithValue("@GameId", answer.GameId);
                 command.Parameters.AddWithValue("@Round", answer.Round);
                 command.Parameters.AddWithValue("@Question", answer.QuestionNumber);
@@ -109,6 +112,7 @@ namespace OccamsRazor.Web.Persistence.Repository
                     existing = ReaderToAnswer(reader);
                 }
                 await reader.CloseAsync();
+                await conn.CloseAsync();
             }
             return existing;
         }
@@ -118,12 +122,11 @@ namespace OccamsRazor.Web.Persistence.Repository
             using (var conn = Context.GetSqlConnection())
             {
 
-                await conn.OpenAsync();
-                var command = new SqlCommand(
+                var command = conn.CreateCommand();
+                command.CommandText =
                     @"UPDATE [dbo].[PlayerAnswers]
                               SET AnswerText = @Text, Wager = @Wager, PointsAwarded=@Points
-                              WHERE GameId=@GameId AND RoundNum=@Round AND QuestionNum=@Question And PlayerName=@Name",
-                    conn);
+                              WHERE GameId=@GameId AND RoundNum=@Round AND QuestionNum=@Question And PlayerName=@Name";
 
                 command.Parameters.AddWithValue("@GameId", answer.GameId);
                 command.Parameters.AddWithValue("@Round", answer.Round);
@@ -134,8 +137,9 @@ namespace OccamsRazor.Web.Persistence.Repository
                 command.Parameters.AddWithValue("@Points", answer.PointsAwarded);
 
 
-                var reader = await command.ExecuteReaderAsync();
-                await reader.CloseAsync();
+                await conn.OpenAsync();
+                await command.ExecuteNonQueryAsync();
+                await conn.CloseAsync();
             }
         }
         public async Task InsertAnswerAsync(PlayerAnswer answer)
@@ -143,13 +147,12 @@ namespace OccamsRazor.Web.Persistence.Repository
             using (var conn = Context.GetSqlConnection())
             {
 
-                await conn.OpenAsync();
 
-                var command = new SqlCommand(
+                var command = conn.CreateCommand();
+                command.CommandText = 
                     @"INSERT INTO [dbo].[PlayerAnswers]
                               (GameId, RoundNum, QuestionNum, PlayerName, AnswerText, Wager, PointsAwarded)
-                              VALUES(@GameID, @Round, @Question, @Name, @Text, @Wager, @Points)",
-                    conn);
+                              VALUES(@GameID, @Round, @Question, @Name, @Text, @Wager, @Points)";
 
                 command.Parameters.AddWithValue("@GameId", answer.GameId);
                 command.Parameters.AddWithValue("@Round", answer.Round);
@@ -160,8 +163,9 @@ namespace OccamsRazor.Web.Persistence.Repository
                 command.Parameters.AddWithValue("@Points", 0);
 
 
-                var reader = await command.ExecuteReaderAsync();
-                await reader.CloseAsync();
+                await conn.OpenAsync();
+                await command.ExecuteNonQueryAsync();
+                await conn.CloseAsync();
             }
 
         }
@@ -172,11 +176,12 @@ namespace OccamsRazor.Web.Persistence.Repository
             using (var conn = Context.GetSqlConnection())
             {
 
-                var command = new SqlCommand(
+                var command = conn.CreateCommand();
+                command.CommandText =
                     @"SELECT a.*, g.* FROM [dbo].[PlayerAnswers] a, [dbo].[GameMetadata] g
                     WHERE a.GameId=@ID AND g.GameId=@ID AND a.PlayerName=@Name AND (a.RoundNum<g.CurrentRoundNum OR ( a.roundNum = g.CurrentRoundNum AND a.QuestionNum<g.CurrentQuestionNum))
-                    ORDER BY RoundNum, QuestionNum",
-                    conn);
+                    ORDER BY RoundNum, QuestionNum";
+
                 command.Parameters.AddWithValue("@Id", gameId);
                 command.Parameters.AddWithValue("@Name", name);
 
@@ -190,6 +195,7 @@ namespace OccamsRazor.Web.Persistence.Repository
                     answers.Add(ReaderToAnswer(reader));
                 }
                 await reader.CloseAsync();
+                await conn.CloseAsync();
             }
             return answers;
         }
@@ -201,11 +207,10 @@ namespace OccamsRazor.Web.Persistence.Repository
             using (var conn = Context.GetSqlConnection())
             {
 
-                await conn.OpenAsync();
-                var command = new SqlCommand(
+                var command = conn.CreateCommand();
+                command.CommandText = 
                     @"DELETE FROM [dbo].[PlayerAnswers]
-                              WHERE GameId=@GameId AND RoundNum=@Round AND QuestionNum=@Question And PlayerName=@Name",
-                    conn);
+                              WHERE GameId=@GameId AND RoundNum=@Round AND QuestionNum=@Question And PlayerName=@Name";
 
                 command.Parameters.AddWithValue("@GameId", answer.GameId);
                 command.Parameters.AddWithValue("@Round", answer.Round);
@@ -213,8 +218,9 @@ namespace OccamsRazor.Web.Persistence.Repository
                 command.Parameters.AddWithValue("@Name", answer.Player.Name ?? "");
 
 
-                var reader = await command.ExecuteReaderAsync();
-                await reader.CloseAsync();
+                await conn.OpenAsync();
+                await command.ExecuteNonQueryAsync();
+                await conn.CloseAsync();
             } 
             return true;
         }
