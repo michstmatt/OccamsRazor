@@ -8,37 +8,40 @@ export class HostPage extends Component {
 
     constructor(props) {
         super(props);
+        let storedState = JSON.parse(localStorage.getItem('state'));
         this.state = {
             games: [],
             loading: true,
-            player: "",
-            selectedGame: 20,
+            selectedGame: storedState.gameId,
+            password: storedState.password,
             selectedTab: "Questions"
         };
+
+        if(this.state.selectedGame == undefined || this.state.selectedGame == undefined)
+        {
+            this.props.history.push("/host");
+        }
+        
     }
 
     componentDidMount() {
         
     }
 
-    tabSelected = (event, tab) =>
-    {
-        this.setState({selectedTab: tab})
+    tabSelected = (event, tab) => {
+        this.setState({ selectedTab: tab })
     }
 
     render() {
 
         let component;
-        if (this.state.selectedTab == "Questions")
-        {
-            component = <HostQuestions gameId={this.state.selectedGame}/>;
+        if (this.state.selectedTab == "Questions") {
+            component = <HostQuestions gameId={this.state.selectedGame} />;
         }
-        if (this.state.selectedTab == "Answers")
-        {
+        if (this.state.selectedTab == "Answers") {
             component = <HostScoreQuestions gameId={this.state.selectedGame} />;
         }
-        if (this.state.selectedTab == "Results")
-        {
+        if (this.state.selectedTab == "Results") {
             component = <Results gameId={this.state.selectedGame} />;
         }
 
@@ -46,9 +49,17 @@ export class HostPage extends Component {
         return (
             <div className="cardLarge">
                 <h2>
-                    <a onClick={ (evt) => this.tabSelected(evt,"Questions")} >Edit Questions</a> |
-                    <a onClick={ (evt) => this.tabSelected(evt,"Answers")} >Host Game</a> |
-                    <a onClick={ (evt) => this.tabSelected(evt,"Results")} >View Results</a>
+                    <span className={this.state.selectedTab == "Questions"? "primary": "" }>
+                    <a onClick={(evt) => this.tabSelected(evt, "Questions")} >Edit Questions</a>
+                    </span>
+                    |
+                    <span className={this.state.selectedTab == "Answers"? "primary": "" }>
+                    <a onClick={(evt) => this.tabSelected(evt, "Answers")} >Host Game</a>
+                    </span>
+                    |
+                    <span className={this.state.selectedTab == "Results"? "primary": "" }>
+                    <a onClick={(evt) => this.tabSelected(evt, "Results")} >View Results</a>
+                    </span>
                 </h2>
                 {component}
             </div>
@@ -58,7 +69,7 @@ export class HostPage extends Component {
     async loadGames() {
         const response = await fetch('/api/Play/LoadGames');
         const data = await response.json();
-        this.setState({ games: data, loading: false, selectedGame: data[0].gameId});
+        this.setState({ games: data, loading: false, selectedGame: data[0].gameId });
     }
 }
 

@@ -46,10 +46,10 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpGet]
         [Route("/api/Play/GetCurrentQuestion")]
-        public async Task<IActionResult> GetCurrentQuestion(string gameId, string host)
+        public async Task<IActionResult> GetCurrentQuestion(int gameId, string host)
         {
             var question = await _gameDataService.GetCurrentQuestion(gameId);
-            if (string.IsNullOrEmpty(host) || host != gameId)
+            if (string.IsNullOrEmpty(host) || host != gameId.ToString())
             {
                 question.AnswerText = "";
             }
@@ -58,7 +58,7 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpGet]
         [Route("/api/Play/GetState")]
-        public async Task<IActionResult> GetSTate(int gameId)
+        public async Task<IActionResult> GetState(int gameId)
         {
             var gameState = await _gameDataService.GetGameState(gameId);
             return Ok(gameState);

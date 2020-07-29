@@ -32,13 +32,6 @@ export class HostScoreQuestions extends Component {
         this.loadQuestions();
     }
 
-    joinSubmitHandler = (event) => {
-        event.preventDefault();
-        localStorage.setItem('state', JSON.stringify({ player: { name: this.state.player }, gameId: 20 }));
-
-        this.props.history.push("/play-game");
-    }
-
     roundSelectedHandler = (event) => {
         this.setState({ selectedRound: event.target.value });
     }
@@ -142,7 +135,7 @@ export class HostScoreQuestions extends Component {
 
                 {contents}
                 <hr/>
-                <HostScoreAdder gameId={this.state.selectedGame} cRound={this.state.selectedRound} cQuestion={this.state.selectedQuestion} refresh={this.handleComponentEvent}/> ;
+                <HostScoreAdder gameId={this.state.selectedGame} cRound={this.state.selectedRound} cQuestion={this.state.selectedQuestion} refresh={this.handleComponentEvent}/>
             </div>
         );
     }

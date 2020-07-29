@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 
-export class PlaySetup extends Component {
-    static displayName = PlaySetup.name;
+export class HostSetup extends Component {
+    static displayName = HostSetup.name;
 
     constructor(props) {
         super(props);
         this.state = {
             games: [],
             loading: true,
-            player: "",
+            password: "",
             selectedGame: 20
         };
     }
@@ -19,20 +19,19 @@ export class PlaySetup extends Component {
 
     joinSubmitHandler = (event) => {
         event.preventDefault();
-        localStorage.setItem('state', JSON.stringify({player: {name: this.state.player}, gameId: 20}));
-
-        this.props.history.push("/play-game");
+        localStorage.setItem('state', JSON.stringify({password: this.state.password, gameId: this.state.selectedGame}));
+        this.props.history.push("/host-edit");
     }
 
     gameSelectedHandler = (event) =>{
         this.setState({ selectedGame : event.target.value });
     }
     
-    nameChangeHandler = (event) => {
-        this.setState({player : event.target.value});
+    passwordChangeHandler = (event) => {
+        this.setState({password : event.target.value});
     }
 
-    renderPlaySetup(games) {
+    renderHostSetup(games) {
         return (
             <form className="answer-container" onSubmit={this.joinSubmitHandler}>
                 <h3 className="host-join-label">Choose a Game:</h3>
@@ -44,8 +43,8 @@ export class PlaySetup extends Component {
                 </select>
                 <br />
 
-                <h3 className="host-join-label">Name: </h3>
-                <input className="answer-input" type="text" onChange={ this.nameChangeHandler } />
+                <h3 className="host-join-label">Password: </h3>
+                <input className="answer-input" type="password" onChange={ this.passwordChangeHandler } />
 
                 <br />
                 <br />
@@ -57,12 +56,11 @@ export class PlaySetup extends Component {
     render() {
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderPlaySetup(this.state.games);
+            : this.renderHostSetup(this.state.games);
 
         return (
             <div className="card">
-                {this.state.player}
-                <h1 id="tabelLabel" >Join a game</h1>
+                <h1 id="tabelLabel" >Host a game</h1>
                 {contents}
             </div>
         );

@@ -300,15 +300,11 @@ namespace OccamsRazor.Web.Persistence.Repository
         }
 
 
-
-
-
-        public async Task<Game> LoadGameData(string id)
+        public async Task<Game> LoadGameData(int id)
         {
-            int gId = int.Parse(id);
             var game = new Game();
-            game.Metadata = await GetGameMetadataAsync(gId);
-            var questions = await GetQuestionsForGameAsync(gId);
+            game.Metadata = await GetGameMetadataAsync(id);
+            var questions = await GetQuestionsForGameAsync(id);
             game.Questions = questions.ToList();
             return game;
         }
@@ -318,9 +314,9 @@ namespace OccamsRazor.Web.Persistence.Repository
             return await GetExistingGamesAsync();
         }
 
-        public async Task<Question> GetCurrentQuestion(string id)
+        public async Task<Question> GetCurrentQuestion(int id)
         {
-            return await GetCurrentQuestionAsync(int.Parse(id));
+            return await GetCurrentQuestionAsync(id);
         }
 
         public async Task<GameMetadata> SetCurrentQuestion(GameMetadata game)

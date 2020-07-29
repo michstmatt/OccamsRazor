@@ -31,7 +31,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             
         }
 
-        public async Task<Game> LoadGameData(string id)
+        public async Task<Game> LoadGameData(int id)
         {
             return GameData;
         }
@@ -41,7 +41,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             return new GameMetadata [] {GameData.Metadata};
         }
 
-        public async Task<Question> GetCurrentQuestion(string id)
+        public async Task<Question> GetCurrentQuestion(int id)
         {
             return GameData.Questions.Where(q => q.Number == GameData.Metadata.CurrentQuestion && q.Round == GameData.Metadata.CurrentRound).FirstOrDefault();
         }

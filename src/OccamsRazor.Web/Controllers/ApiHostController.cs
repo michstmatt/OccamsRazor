@@ -32,7 +32,7 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpPost]
         [Route("/api/Host/CreateGame")]
-        public async Task<IActionResult> CreateGame([FromBody]GameMetadata data)
+        public async Task<IActionResult> CreateGame([FromBody] GameMetadata data)
         {
             var game = new Game();
             game.Metadata.Name = data.Name;
@@ -42,32 +42,55 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpGet]
         [Route("/api/Host/GetQuestions")]
-        public async Task<IActionResult> Questions(int? gameId)
+        public async Task<IActionResult> Questions([FromQuery] int? gameId)
         {
-            Game model;
-            var found = await _gameDataService.LoadQuestions(gameId?.ToString()??"");
-            if (found == null)
-                model = new Game();
-            else
-                model = found;
+            if (gameId == null)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                Game model;
+                var found = await _gameDataService.LoadQuestions(gameId.Value);
+                if (found == null)
+                {
+                    model = new Game();
+                }
+                else
+                {
+                    model = found;
+                }
 
-            //model.Metadata.Name = "test";
-            return Ok(model);
+                return Ok(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest();
+            }
         }
 
         [Route("/api/Host/SaveQuestions")]
         [HttpPost]
         public async Task<IActionResult> Questions([FromBody] Game game)
         {
-            var gameMetadata = await _gameDataService.SaveQuestions(game);
-            var options = new CookieOptions
+            try
             {
-                Expires = DateTime.Now.AddDays(1),
-                Secure = true
-            };
+                var gameMetadata = await _gameDataService.SaveQuestions(game);
+                var options = new CookieOptions
+                {
+                    Expires = DateTime.Now.AddDays(1),
+                    Secure = true
+                };
 
-            HttpContext.Response.Cookies.Append(cookieName, gameMetadata.GameId.ToString(), options);
-            return Ok(true);
+                HttpContext.Response.Cookies.Append(cookieName, gameMetadata.GameId.ToString(), options);
+                return Ok(true);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return BadRequest();
+            }
         }
 
         [HttpGet]
@@ -80,7 +103,7 @@ namespace OccamsRazor.Web.Controllers
 
         [Route("/api/Host/SetCurrentQuestion")]
         [HttpPost]
-        public async Task<IActionResult> SetCurrentQuestion([FromBody]GameMetadata game)
+        public async Task<IActionResult> SetCurrentQuestion([FromBody] GameMetadata game)
         {
             var result = await _gameDataService.SetCurrentQuestion(game);
             return Ok(result);
@@ -88,11 +111,12 @@ namespace OccamsRazor.Web.Controllers
 
         [Route("/api/Host/UpdatePlayerScores")]
         [HttpPost]
-        public async Task<IActionResult> UpdatePlayerScores([FromBody]IEnumerable<PlayerAnswer> answers)
+        public async Task<IActionResult> UpdatePlayerScores([FromBody] IEnumerable<PlayerAnswer> answers)
         {
-            var ok = await _playerAnswerService.SubmitPlayerScores(answers); 
-            return Ok(true);
+            var submitted = await _playerAnswerService.SubmitPlayerScores(answers);
+            return Ok(submitted);
         }
+
         [Route("/api/Host/GetScoredResponses")]
         [HttpGet]
         public async Task<IActionResult> GetScoredAnswers(int gameId)
@@ -103,7 +127,7 @@ namespace OccamsRazor.Web.Controllers
 
         [Route("/api/Host/ShowResults")]
         [HttpPost]
-        public async Task<IActionResult> UpdateShowHideResults([FromBody]GameMetadata game)
+        public async Task<IActionResult> UpdateShowHideResults([FromBody] GameMetadata game)
         {
             var result = await _gameDataService.SetShowResults(game);
             return Ok(result);
@@ -119,7 +143,7 @@ namespace OccamsRazor.Web.Controllers
 
         [Route("/api/Host/DeletePlayerAnswer")]
         [HttpPost]
-        public async Task<IActionResult> DeletePlayerAnswer([FromBody]PlayerAnswer answer)
+        public async Task<IActionResult> DeletePlayerAnswer([FromBody] PlayerAnswer answer)
         {
             var result = await _playerAnswerService.DeletePlayerAnswer(answer);
             return Ok(result);

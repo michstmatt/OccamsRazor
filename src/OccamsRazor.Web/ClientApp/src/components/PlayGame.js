@@ -17,6 +17,10 @@ export class PlayGame extends Component {
             answer: "",
             gameState : 0
         };
+        if (this.state.player == undefined || this.state.selectedGameId == undefined)
+        {
+            this.props.history.push("/play-setup");
+        }
     }
 
     componentDidMount() {
@@ -126,14 +130,20 @@ export class PlayGame extends Component {
 
     async loadQuestion() {
         const response = await fetch('/api/Play/GetCurrentQuestion?gameId='+ this.state.selectedGameId);
-        const data = await response.json();
-        this.setState({ currentQuestion: data,loading: false });
+        if (response.ok)
+        {
+            const data = await response.json();
+            this.setState({ currentQuestion: data,loading: false });
+        }
     }
 
     async getState(){
         const response = await fetch('/api/Play/GetState?gameId='+ this.state.selectedGameId);
-        const data = await response.json();
-        this.setState({gameState: data.state});
+        if (response.ok)
+        {
+            const data = await response.json();
+            this.setState({gameState: data.state});
+        }
     }
 
     async submitAnswer(answer) {
@@ -143,10 +153,16 @@ export class PlayGame extends Component {
             body: JSON.stringify(answer)
         };
         const response = await fetch('/api/Play/submitAnswer', requestOptions);
-       // const data = await response.json();
-        this.refs.toast.setText("Your answer was received");
-
-        this.setState({})
+        
+        if(response.ok)
+        {
+            this.refs.toast.setText("Your answer was received");
+            this.setState({})
+        }
+        else
+        {
+            this.refs.toast.setText("There was an error, please submit again");
+        }
 
     }
 }
