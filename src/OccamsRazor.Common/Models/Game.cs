@@ -38,7 +38,7 @@ namespace OccamsRazor.Common.Models
                 var round = pair.Key;
                 for (int i = 0; i < pair.Value; i++)
                 {
-                    Questions.Add(new Question { Round = pair.Key, Number = i + 1, Text = "", AnswerText = "" });
+                    Questions.Add(new Question { Round = pair.Key, Number = i + 1, Text = "", AnswerText = "", Category=""});
                 }
                 
             }

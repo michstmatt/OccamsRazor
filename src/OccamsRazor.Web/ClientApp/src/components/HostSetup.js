@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { HostSetupCreate } from './HostSetupCreate';
 
 export class HostSetup extends Component {
     static displayName = HostSetup.name;
@@ -34,8 +35,8 @@ export class HostSetup extends Component {
     renderHostSetup(games) {
         return (
             <form className="answer-container" onSubmit={this.joinSubmitHandler}>
-                <h3 className="host-join-label">Choose a Game:</h3>
-
+                <h3><span className="secondary">Choose a Game</span></h3>
+                <span>Name</span>
                 <select className="answer-input" onChange={ this.gameSelectedHandler }>
                     {games.map(game =>
                         <option key={game.gameId} value={game.gameId} >{game.name}</option>
@@ -43,7 +44,7 @@ export class HostSetup extends Component {
                 </select>
                 <br />
 
-                <h3 className="host-join-label">Password: </h3>
+                <span>Password</span>
                 <input className="answer-input" type="password" onChange={ this.passwordChangeHandler } />
 
                 <br />
@@ -60,8 +61,13 @@ export class HostSetup extends Component {
 
         return (
             <div className="card">
-                <h1 id="tabelLabel" >Host a game</h1>
-                {contents}
+                <h1 id="tabelLabel"><span className="primary">Host a Game</span></h1>
+                <div className="card">
+                    {contents}
+                </div>
+                <div className="card">
+                    <HostSetupCreate />
+                </div>
             </div>
         );
     }

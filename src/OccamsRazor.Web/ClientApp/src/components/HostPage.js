@@ -49,15 +49,15 @@ export class HostPage extends Component {
         return (
             <div className="cardLarge">
                 <h2>
-                    <span className={this.state.selectedTab == "Questions"? "primary": "" }>
+                    <span className={this.state.selectedTab == "Questions"? "secondary": "" }>
                     <a onClick={(evt) => this.tabSelected(evt, "Questions")} >Edit Questions</a>
                     </span>
                     |
-                    <span className={this.state.selectedTab == "Answers"? "primary": "" }>
+                    <span className={this.state.selectedTab == "Answers"? "secondary": "" }>
                     <a onClick={(evt) => this.tabSelected(evt, "Answers")} >Host Game</a>
                     </span>
                     |
-                    <span className={this.state.selectedTab == "Results"? "primary": "" }>
+                    <span className={this.state.selectedTab == "Results"? "secondary": "" }>
                     <a onClick={(evt) => this.tabSelected(evt, "Results")} >View Results</a>
                     </span>
                 </h2>
