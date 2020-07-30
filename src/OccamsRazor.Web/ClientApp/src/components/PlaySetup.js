@@ -24,6 +24,10 @@ export class PlaySetup extends Component {
             localStorage.setItem('state', JSON.stringify({player: {name: this.state.player}, gameId: this.state.selectedGame}));
             this.props.history.push("/play-game");
         }
+        else
+        {
+            alert("Please type in a name");
+        }
     }
 
     gameSelectedHandler = (event) =>{

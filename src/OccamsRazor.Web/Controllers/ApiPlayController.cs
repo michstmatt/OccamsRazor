@@ -64,6 +64,10 @@ namespace OccamsRazor.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitAnswer([FromBody] PlayerAnswer answer)
         {
+            if(answer == null)
+            {
+                return BadRequest();
+            }
             var result = await _playerAnswerService.SubmitPlayerAnswer(answer);
             return Ok(result);
         }

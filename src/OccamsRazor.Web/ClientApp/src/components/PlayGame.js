@@ -36,9 +36,9 @@ export class PlayGame extends Component {
             player: this.state.player,
             answerText: this.state.answer,
             wager: this.state.wager*1,
-            questionNumber: this.state.currentQuestion.number,
-            round: this.state.currentQuestion.round,
-            gameId: this.state.selectedGameId,
+            questionNumber: this.state.currentQuestion.number*1,
+            round: this.state.currentQuestion.round*1,
+            gameId: this.state.selectedGameId *1,
         };
 
         if (answer.answerText !== "" && answer.wager >0 && answer.wager <7)
