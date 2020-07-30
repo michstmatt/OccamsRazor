@@ -19,9 +19,11 @@ export class PlaySetup extends Component {
 
     joinSubmitHandler = (event) => {
         event.preventDefault();
-        localStorage.setItem('state', JSON.stringify({player: {name: this.state.player}, gameId: this.state.selectedGame.gameId, gameName: this.state.selectedGame.name}));
-
-        this.props.history.push("/play-game");
+        if(this.state.player !== "")
+        {
+            localStorage.setItem('state', JSON.stringify({player: {name: this.state.player}, gameId: this.state.selectedGame.gameId, gameName: this.state.selectedGame.name}));
+            this.props.history.push("/play-game");
+        }
     }
 
     gameSelectedHandler = (event) =>{
