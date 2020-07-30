@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using OccamsRazor.Web.Models;
+
+
 using OccamsRazor.Web.Service;
 
 using OccamsRazor.Common.Models;
@@ -15,24 +16,20 @@ namespace OccamsRazor.Web.Controllers
 {
     public class ApiPlayController : Controller
     {
-        private readonly ILogger<PlayController> _logger;
+        private readonly ILogger<ApiPlayController> _logger;
         private readonly IGameDataService _gameDataService;
         private readonly IPlayerAnswerService _playerAnswerService;
 
-        private readonly IHttpContextAccessor _accessor;
 
-        private readonly string CookiePlayerName = "PlayerName";
-        private readonly string CookieGameName = "GameName";
 
-        public ApiPlayController(ILogger<PlayController> logger,
+        public ApiPlayController(ILogger<ApiPlayController> logger,
             IGameDataService gameDataService,
-            IPlayerAnswerService answerService,
-            IHttpContextAccessor accessor)
+            IPlayerAnswerService answerService
+        )
         {
             _logger = logger;
             _gameDataService = gameDataService;
             _playerAnswerService = answerService;
-            _accessor = accessor;
         }
 
         [HttpGet]
@@ -45,27 +42,28 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpGet]
         [Route("/api/Play/GetCurrentQuestion")]
-        public async Task<IActionResult> GetCurrentQuestion(string gameId, string host)
+        public async Task<IActionResult> GetCurrentQuestion(int gameId, string host)
         {
-            //var playerName = _accessor.HttpContext.Request.Cookies[CookiePlayerName];
-            //var gameName = _accessor.HttpContext.Request.Cookies[CookieGameName];
             var question = await _gameDataService.GetCurrentQuestion(gameId);
-            if(string.IsNullOrEmpty(host) || host!=gameId)
+            if (string.IsNullOrEmpty(host) || host != gameId.ToString())
             {
                 question.AnswerText = "";
             }
             return Ok(question);
         }
 
+        [HttpGet]
+        [Route("/api/Play/GetState")]
+        public async Task<IActionResult> GetState(int gameId)
+        {
+            var gameState = await _gameDataService.GetGameState(gameId);
+            return Ok(gameState);
+        }
+
         [Route("/api/Play/SubmitAnswer")]
         [HttpPost]
         public async Task<IActionResult> SubmitAnswer([FromBody] PlayerAnswer answer)
         {
-            
-            var playerName = _accessor.HttpContext.Request.Cookies[CookiePlayerName];
-            var gameName = _accessor.HttpContext.Request.Cookies[CookieGameName];
-            //answer.GameId = int.Parse(gameName);
-            //answer.Player = new Player { Name = playerName };
             var result = await _playerAnswerService.SubmitPlayerAnswer(answer);
             return Ok(result);
         }
@@ -83,20 +81,13 @@ namespace OccamsRazor.Web.Controllers
         public async Task<IActionResult> GetScoredAnswers(int gameId)
         {
             var games = await _gameDataService.LoadGames();
-            var ok = games.Where(g => g.GameId == gameId).FirstOrDefault().ShowResults;
-            if(!ok)
+            var ok = games.Where(g => g.GameId == gameId).FirstOrDefault().State == GameStateEnum.Results;
+            if (!ok)
             {
                 return Ok(Array.Empty<GameResults>());
             }
             var results = await _playerAnswerService.GetScoresForGame(gameId);
             return Ok(results);
-        }
-
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

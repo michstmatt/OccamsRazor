@@ -18,8 +18,8 @@ namespace OccamsRazor.Common.Models
         [JsonPropertyName("currentQuestion")]
         public int CurrentQuestion { get; set; } = 1;
 
-        [JsonPropertyName("showResults")]
-        public bool ShowResults {get;set;}
+        [JsonPropertyName("state")]
+        public GameStateEnum State {get;set;}
 
     }
 }

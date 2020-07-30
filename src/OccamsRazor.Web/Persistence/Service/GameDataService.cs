@@ -20,21 +20,36 @@ namespace OccamsRazor.Web.Persistence.Service
         }
 
         public Task<GameMetadata> SaveQuestions(Game game) => Repository.StoreGameData(game);
-        public Task<Game> LoadQuestions(string name) => Repository.LoadGameData(name);
+        public Task<Game> LoadQuestions(int gameId) => Repository.LoadGameData(gameId);
         public Task<IEnumerable<GameMetadata>> LoadGames() => Repository.LoadGames();
 
-        public Task<Question> GetCurrentQuestion(string gameName) => Repository.GetCurrentQuestion(gameName);
+        public Task<Question> GetCurrentQuestion(int gameId) => Repository.GetCurrentQuestion(gameId);
 
         public async Task<Question> SetCurrentQuestion(GameMetadata game)
         {
             await Repository.SetCurrentQuestion(game);
-            return await Repository.GetCurrentQuestion(game.GameId.ToString());
+            return await Repository.GetCurrentQuestion(game.GameId);
         }
         public async Task<GameMetadata> SetShowResults(GameMetadata game)
         {
             await Repository.UpdateGameMetadata(game);
             return game;
         }
+
+
+        public async Task<GameMetadata> SetGameState(GameMetadata game)
+        {
+            await Repository.UpdateGameMetadata(game);
+            return game;
+        }
+
+        public async Task<GameMetadata> GetGameState(int gameId)
+        {
+            var result = await Repository.GetGameState(gameId);
+            return result;
+        }
+
+        public async Task<bool> DeleteGame(int gameId) => await Repository.DeleteGame(gameId);
 
     }
 }

@@ -34,5 +34,6 @@ namespace OccamsRazor.Web.Persistence.Service
 
         public Task<bool> SubmitPlayerScores(IEnumerable<PlayerAnswer> playerAnswers) => playerAnswerRepository.SubmitPlayerScores(playerAnswers);
         public Task<IEnumerable<PlayerAnswer>> GetScoresForPlayer(int gameId, string name) => playerAnswerRepository.GetScoresForPlayer(gameId, name);
+        public Task<bool> DeletePlayerAnswer(PlayerAnswer answer) => playerAnswerRepository.DeletePlayerAnswer(answer);
     }
 }

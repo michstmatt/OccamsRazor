@@ -12,5 +12,6 @@ namespace OccamsRazor.Web.Repository
         public Task<bool> SubmitPlayerScores(IEnumerable<PlayerAnswer> scoredAnswers);
 
         public Task<IEnumerable<PlayerAnswer>> GetScoresForPlayer(int gameId, string name);
+        public Task<bool> DeletePlayerAnswer(PlayerAnswer answer);
     }
 }
