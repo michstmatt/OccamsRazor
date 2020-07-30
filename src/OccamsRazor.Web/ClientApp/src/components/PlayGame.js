@@ -19,7 +19,7 @@ export class PlayGame extends Component {
             answer: "",
             gameState : 0
         };
-        if (this.state.player == undefined || this.state.selectedGameId == undefined)
+        if (this.state.player === undefined || this.state.selectedGameId === undefined)
         {
             this.props.history.push("/play-setup");
         }

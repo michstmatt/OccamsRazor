@@ -17,7 +17,7 @@ export class HostPage extends Component {
             selectedTab: "Questions"
         };
 
-        if(this.state.selectedGame == undefined || this.state.selectedGame == undefined)
+        if(this.state.selectedGame === undefined || this.state.selectedGame === undefined)
         {
             this.props.history.push("/host");
         }
@@ -35,13 +35,13 @@ export class HostPage extends Component {
     render() {
 
         let component;
-        if (this.state.selectedTab == "Questions") {
+        if (this.state.selectedTab === "Questions") {
             component = <HostQuestions password={this.state.password} gameId={this.state.selectedGame} />;
         }
-        if (this.state.selectedTab == "Answers") {
+        if (this.state.selectedTab === "Answers") {
             component = <HostScoreQuestions password={this.state.password} gameId={this.state.selectedGame} />;
         }
-        if (this.state.selectedTab == "Results") {
+        if (this.state.selectedTab === "Results") {
             component = <Results password={this.state.password} gameId={this.state.selectedGame} />;
         }
 
