@@ -8,6 +8,7 @@ export class HostScoreAdder extends Component {
         this.state = {
             loading: true,
             selectedGame: this.props.gameId,
+            password: this.props.password,
             selectedRound: this.props.cRound,
             selectedQuestion: this.props.cQuestion,
             playerName: "",
@@ -75,19 +76,22 @@ export class HostScoreAdder extends Component {
     async submitAnswer(answer) {
         const requestOptions = {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'hostKey': this.state.password },
             body: JSON.stringify(answer)
         };
         const response = await fetch('/api/Play/submitAnswer', requestOptions);
-        const data = await response.json();
+        if (response.ok)
+        {
+            const data = await response.json();
 
-        this.setState({
-            playerName: "",
-            wager: 0,
-            answerText: ""
-        });
+            this.setState({
+                playerName: "",
+                wager: 0,
+                answerText: ""
+            });
 
-        this.props.refresh();
+            this.props.refresh();
+        }
 
     }
 

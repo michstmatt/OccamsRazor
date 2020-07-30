@@ -8,7 +8,7 @@ export class HostSetupCreate extends Component {
         this.state = {
             name: "",
             password: "",
-            gameId: 0
+            gameId: 0,
         };
     }
 
@@ -65,7 +65,7 @@ export class HostSetupCreate extends Component {
 
         const requestOptions = {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'gameKey': this.state.password},
             body: JSON.stringify(game)
         };
         const response = await fetch('/api/Host/createGame', requestOptions);
@@ -73,7 +73,8 @@ export class HostSetupCreate extends Component {
         if(response.ok)
         {
             let data = await response.json();
-            alert(data.gameId);
+            localStorage.setItem('state', JSON.stringify({password: this.state.password, gameId: data.gameId}));
+            this.props.navigate();
         }
     }
 }

@@ -8,6 +8,7 @@ export class HostGameState extends Component {
         this.state = {
             loading: true,
             selectedGame: props.gameId,
+            password: this.props.password,
             gameData: {},
             states: ["Paused", "Playing", "Showing Results"],
             playPauseText: ""
@@ -58,7 +59,11 @@ export class HostGameState extends Component {
 
     async loadCurrentQuestion() {
         this.setState({loading:true});
-        const response = await fetch(`/api/Host/GetQuestions?gameId=${this.state.selectedGame}`);
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'gameKey' : this.state.password},
+        };
+        const response = await fetch(`/api/Host/GetQuestions?gameId=${this.state.selectedGame}`, requestOptions);
         const data = await response.json();
         this.setPlayPauseText(data.metadata);
     }
@@ -71,7 +76,7 @@ export class HostGameState extends Component {
 
         const requestOptions = {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'gameKey' : this.state.password},
             body: JSON.stringify(newGameData)
         };
         const response = await fetch('/api/Host/SetState', requestOptions);

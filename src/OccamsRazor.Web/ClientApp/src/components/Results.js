@@ -8,6 +8,7 @@ export class Results extends Component {
         this.state = {
             loading: true,
             selectedGame: this.props.gameId,
+            password: this.props.password,
             selectedRound: 1,
             playerScores: []
         };
@@ -38,27 +39,6 @@ export class Results extends Component {
         </div>
         <br />
 
-        <div className="card">
-            <h3> <span className="primary">Score Breakdown</span></h3>
-            <table className="playerScores">
-                <tr >
-                    <td className="playerScores">Question</td>
-                    {results[0].playerAnswers.map( result =>
-                        <td className="playerScores"> R {result.round} Q{result.questionNumber}
-                    </td>
-                    )}
-                </tr>
-                {results.map(playerData => 
-                <tr  ng-repeat="playerData in results">
-                    <td className="playerScores">{playerData.player.name}</td>
-                    {playerData.playerAnswers.map( result =>
-                    <td className="playerScores"> {result.pointsAwarded}
-                    </td>
-                    )}
-                </tr>
-                )}
-            </table>
-        </div>
         </div>
         );
     }
@@ -76,9 +56,16 @@ export class Results extends Component {
     }
 
     async loadResults() {
-        const response = await fetch(`/api/Host/GetScoredResponses?gameId=${this.state.selectedGame}`);
-        const data = await response.json();
-        this.setState({ playerScores: data, loading: false});
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'gameKey' : this.state.password },
+        };
+        const response = await fetch(`/api/Host/GetScoredResponses?gameId=${this.state.selectedGame}`, requestOptions);
+        if (response.ok)
+        {
+            const data = await response.json();
+            this.setState({ playerScores: data, loading: false});
+        }
     }
 }
 

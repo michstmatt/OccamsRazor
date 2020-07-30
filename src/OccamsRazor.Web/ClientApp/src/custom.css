@@ -147,6 +147,16 @@ span.secondary {
   border-radius: 5px;
   width: 25%;
 }
+.host-delete {
+  width: 100%;
+  border-radius: 5px;
+  background-color: transparent;
+  border: 2px solid #FE3F7D;
+  color: white;
+  text-transform: uppercase;
+}
+
+
 
 table.hostScore {
   width: 100%;

@@ -11,6 +11,7 @@ export class HostScoreQuestions extends Component {
         this.state = {
             loading: true,
             selectedGame: this.props.gameId,
+            password: this.props.password,
             selectedRound: 1,
             selectedQuestion: 1,
             gameData: {},
@@ -123,8 +124,8 @@ export class HostScoreQuestions extends Component {
 
         return (
             <div className="card">
-                <HostGameState gameId={this.state.selectedGame}/>
-                <HostCurrentQuestion gameId={this.state.selectedGame} newQuestionEvent={this.newCurrentQuestionEvent} />
+                <HostGameState password={this.state.password} gameId={this.state.selectedGame}/>
+                <HostCurrentQuestion password={this.state.password} gameId={this.state.selectedGame} newQuestionEvent={this.newCurrentQuestionEvent} />
                 <hr />
 
                 <div>
@@ -135,38 +136,51 @@ export class HostScoreQuestions extends Component {
 
                 {contents}
                 <hr/>
-                <HostScoreAdder gameId={this.state.selectedGame} cRound={this.state.selectedRound} cQuestion={this.state.selectedQuestion} refresh={this.handleComponentEvent}/>
+                <HostScoreAdder password={this.state.password} gameId={this.state.selectedGame} cRound={this.state.selectedRound} cQuestion={this.state.selectedQuestion} refresh={this.handleComponentEvent}/>
             </div>
         );
     }
 
     async loadQuestions() {
         this.setState({loading:true});
-        const response = await fetch(`/api/Host/GetPlayerAnswers?gameId=${this.state.selectedGame}`);
-        const data = await response.json();
-        this.setState({ answers: data, loading: false});
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'gameKey' : this.state.password }
+        };
+        const response = await fetch(`/api/Host/GetPlayerAnswers?gameId=${this.state.selectedGame}`, requestOptions);
+        if (response.ok)
+        {
+            const data = await response.json();
+            this.setState({ answers: data, loading: false});
+        }
     }
 
     async submitAnswers(answers) {
         const requestOptions = {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'gameKey' : this.state.password },
             body: JSON.stringify(answers)
         };
-        const response = await fetch('/api/Host/UpdatePlayerScores', requestOptions);
-        const data = await response.json();
+        const response = await fetch(`/api/Host/UpdatePlayerScores?gameId=${this.state.selectedGame}`, requestOptions);
+        if (response.ok)
+        {
+            const data = await response.json();
+        }
     }
 
     async deleteAnswer(answer)
     {
         const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', 'gameKey' : this.state.password },
             body: JSON.stringify(answer)
         };
-        const response = await fetch('/api/Host/DeletePlayerAnswer', requestOptions);
-        const data = await response.json();
-        this.loadQuestions(); 
+        const response = await fetch(`/api/Host/DeletePlayerAnswer?gameId=${this.state.selectedGame}`, requestOptions);
+        if (response.ok)
+        {
+            const data = await response.json();
+            this.loadQuestions(); 
+        }
     }
 }
 

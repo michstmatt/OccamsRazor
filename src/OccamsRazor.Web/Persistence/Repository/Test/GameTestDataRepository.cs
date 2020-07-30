@@ -35,6 +35,10 @@ namespace OccamsRazor.Web.Persistence.Repository
         {
             return GameData;
         }
+        public async Task<bool> DeleteGame(int gameId)
+        {
+            return true;
+        }
 
         public async Task<IEnumerable<GameMetadata>> LoadGames()
         {

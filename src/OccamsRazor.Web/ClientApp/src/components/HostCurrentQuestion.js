@@ -8,6 +8,7 @@ export class HostCurrentQuestion extends Component {
         this.state = {
             loading: true,
             selectedGame: this.props.gameId,
+            password: this.props.password,
             selectedQuestion: {},
             questions: [],
             currentQuestionIndex: 0,
@@ -72,7 +73,11 @@ export class HostCurrentQuestion extends Component {
 
     async loadCurrentQuestion() {
         this.setState({loading:true});
-        const response = await fetch(`/api/Host/GetQuestions?gameId=${this.state.selectedGame}`);
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'gameKey' : this.state.password },
+        };
+        const response = await fetch(`/api/Host/GetQuestions?gameId=${this.state.selectedGame}`, requestOptions);
         const data = await response.json();
         const questionIndex = data.questions.findIndex( q => q.round == data.metadata.currentRound && q.number == data.metadata.currentQuestion);
         this.setState({ gameData: data, loading: false, currentQuestionIndex: questionIndex});
@@ -86,7 +91,7 @@ export class HostCurrentQuestion extends Component {
         newGameData.currentRound = question.round;
         const requestOptions = {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'gameKey' : this.state.password},
             body: JSON.stringify(newGameData)
         };
         const response = await fetch('/api/Host/SetCurrentQuestion', requestOptions);

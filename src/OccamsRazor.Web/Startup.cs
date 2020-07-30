@@ -37,6 +37,8 @@ namespace OccamsRazor.Web
 
 
             services.AddScoped<OccamsRazorSqlClient>();
+            services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             //services.AddSingleton<IGameDataRepository, GameTestDataRepository>();
             services.AddScoped<IGameDataRepository, GameDataRepository>();
             services.AddScoped<IGameDataService, GameDataService>();

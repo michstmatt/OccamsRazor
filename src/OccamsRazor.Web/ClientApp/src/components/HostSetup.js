@@ -18,10 +18,14 @@ export class HostSetup extends Component {
         this.loadGames();
     }
 
+    navigateToHostPage = () =>
+    {
+        this.props.history.push("/host-edit");
+    }
+
     joinSubmitHandler = (event) => {
         event.preventDefault();
-        localStorage.setItem('state', JSON.stringify({password: this.state.password, gameId: this.state.selectedGame}));
-        this.props.history.push("/host-edit");
+        this.checkAuth();
     }
 
     gameSelectedHandler = (event) =>{
@@ -66,7 +70,7 @@ export class HostSetup extends Component {
                     {contents}
                 </div>
                 <div className="card">
-                    <HostSetupCreate />
+                    <HostSetupCreate navigate={this.navigateToHostPage}/>
                 </div>
             </div>
         );
@@ -76,6 +80,20 @@ export class HostSetup extends Component {
         const response = await fetch('/api/Play/LoadGames');
         const data = await response.json();
         this.setState({ games: data, loading: false, selectedGame: data[0].gameId});
+    }
+
+    async checkAuth()
+    {
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'gameKey' : this.state.password},
+        };
+        const response = await fetch(`/api/Host/Validate?gameId=${this.state.selectedGame}`, requestOptions);
+        if (response.ok)
+        {
+            localStorage.setItem('state', JSON.stringify({password: this.state.password, gameId: this.state.selectedGame}));
+            this.navigateToHostPage();
+        }
     }
 }
 

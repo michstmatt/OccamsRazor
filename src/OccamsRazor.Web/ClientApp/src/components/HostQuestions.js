@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { HostDeleteGame } from './HostDeleteGame';
 
 export class HostQuestions extends Component {
     static displayName = HostQuestions.name;
@@ -8,6 +9,7 @@ export class HostQuestions extends Component {
         this.state = {
             loading: true,
             selectedGame: this.props.gameId,
+            password: this.props.password,
             selectedRound: 1,
             gameData: {},
             questions: [],
@@ -146,24 +148,36 @@ export class HostQuestions extends Component {
         return (
             <div>
                 {contents}
+                <HostDeleteGame gameId={this.state.selectedGame} />
             </div>
         );
     }
 
     async loadQuestions() {
-        const response = await fetch(`/api/Host/GetQuestions?gameId=${this.state.selectedGame}`);
-        const data = await response.json();
-        this.setState({ gameData: data, questions: data.questions, loading: false});
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'gameKey' : this.state.password},
+        };
+        const response = await fetch(`/api/Host/GetQuestions?gameId=${this.state.selectedGame}`, requestOptions);
+        if (response.ok)
+        {
+            const data = await response.json();
+            this.setState({ gameData: data, questions: data.questions, loading: false});
+        }
     }
 
     async saveQuestions(game)
     {
         const requestOptions = {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'gameKey' : this.state.password},
             body: JSON.stringify(game)
         };
         const response = await fetch('/api/Host/SaveQuestions', requestOptions);
+        if (response.ok)
+        {
+
+        }
     }
 }
 

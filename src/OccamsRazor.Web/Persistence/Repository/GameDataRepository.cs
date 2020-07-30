@@ -290,6 +290,27 @@ namespace OccamsRazor.Web.Persistence.Repository
             }
             return game;
         }
+
+        public async Task<bool> DeleteGame(int gameId)
+        {
+            using (var conn = Context.GetSqlConnection())
+            {
+
+                var command = conn.CreateCommand();
+
+                command.CommandText += @"DELETE FROM [dbo].[GameMetadata] WHERE GameId=@GameId;";
+                command.CommandText += @"DELETE FROM [dbo].[Questions] WHERE GameID=@GameId;";
+                command.CommandText += @"DELETE FROM [dbo].[HostKeys] WHERE GameId=@GameId;";
+                command.CommandText += @"DELETE FROM [dbo].[PlayerAnswers] WHERE GameId=@GameId;";
+
+                command.Parameters.AddWithValue("@GameId", gameId);
+                await conn.OpenAsync();
+                await command.ExecuteNonQueryAsync();
+                await conn.CloseAsync();
+            }
+            return true;
+        }
+
         public async Task<GameMetadata> SetGameState(GameMetadata game)
         {
             return game;

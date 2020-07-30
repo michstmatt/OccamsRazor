@@ -16,5 +16,6 @@ namespace OccamsRazor.Web.Repository
         Task<bool> UpdateGameMetadata(GameMetadata game);
         Task<GameMetadata> SetGameState(GameMetadata game);
         Task<GameMetadata> GetGameState(int gameId);
+        Task<bool> DeleteGame(int gameId);
     }
 }

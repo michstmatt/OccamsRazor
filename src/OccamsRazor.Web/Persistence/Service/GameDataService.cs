@@ -49,5 +49,7 @@ namespace OccamsRazor.Web.Persistence.Service
             return result;
         }
 
+        public async Task<bool> DeleteGame(int gameId) => await Repository.DeleteGame(gameId);
+
     }
 }

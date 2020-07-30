@@ -20,20 +20,16 @@ namespace OccamsRazor.Web.Controllers
         private readonly IGameDataService _gameDataService;
         private readonly IPlayerAnswerService _playerAnswerService;
 
-        private readonly IHttpContextAccessor _accessor;
 
-        private readonly string CookiePlayerName = "PlayerName";
-        private readonly string CookieGameName = "GameName";
 
         public ApiPlayController(ILogger<ApiPlayController> logger,
             IGameDataService gameDataService,
-            IPlayerAnswerService answerService,
-            IHttpContextAccessor accessor)
+            IPlayerAnswerService answerService
+        )
         {
             _logger = logger;
             _gameDataService = gameDataService;
             _playerAnswerService = answerService;
-            _accessor = accessor;
         }
 
         [HttpGet]

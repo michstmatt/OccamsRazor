@@ -36,13 +36,13 @@ export class HostPage extends Component {
 
         let component;
         if (this.state.selectedTab == "Questions") {
-            component = <HostQuestions gameId={this.state.selectedGame} />;
+            component = <HostQuestions password={this.state.password} gameId={this.state.selectedGame} />;
         }
         if (this.state.selectedTab == "Answers") {
-            component = <HostScoreQuestions gameId={this.state.selectedGame} />;
+            component = <HostScoreQuestions password={this.state.password} gameId={this.state.selectedGame} />;
         }
         if (this.state.selectedTab == "Results") {
-            component = <Results gameId={this.state.selectedGame} />;
+            component = <Results password={this.state.password} gameId={this.state.selectedGame} />;
         }
 
 
@@ -64,12 +64,6 @@ export class HostPage extends Component {
                 {component}
             </div>
         );
-    }
-
-    async loadGames() {
-        const response = await fetch('/api/Play/LoadGames');
-        const data = await response.json();
-        this.setState({ games: data, loading: false, selectedGame: data[0].gameId });
     }
 }
 
