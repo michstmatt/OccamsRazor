@@ -42,7 +42,7 @@ export class HostScoreQuestions extends Component {
         this.setState({
             answers : this.state.answers.map( a => 
                 {
-                    if (a.round == answer.round && a.questionNumber == answer.questionNumber && a.player.name == answer.player.name)
+                    if (a.round === answer.round && a.questionNumber === answer.questionNumber && a.player.name === answer.player.name)
                     {
                         a.pointsAwarded = event.target.value * 1;
                     }
@@ -97,7 +97,7 @@ export class HostScoreQuestions extends Component {
                 </tr>
                 </thead>
                 <tbody>
-                {answers.filter(a => a.round == this.state.selectedRound && a.questionNumber == this.state.selectedQuestion).map( answer =>
+                {answers.filter(a => a.round === this.state.selectedRound && a.questionNumber === this.state.selectedQuestion).map( answer =>
                 <tr key={JSON.stringify(answer)}>
                     <td className="hostScore">{answer.player.name}</td>
                     <td className="hostScore">{answer.answerText}</td>

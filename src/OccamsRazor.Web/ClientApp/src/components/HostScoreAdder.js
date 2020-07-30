@@ -82,7 +82,6 @@ export class HostScoreAdder extends Component {
         const response = await fetch('/api/Play/submitAnswer', requestOptions);
         if (response.ok)
         {
-            const data = await response.json();
 
             this.setState({
                 playerName: "",

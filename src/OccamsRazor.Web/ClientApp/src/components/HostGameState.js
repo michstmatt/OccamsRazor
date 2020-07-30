@@ -22,7 +22,7 @@ export class HostGameState extends Component {
 
     setPlayPauseText = (gamemetadata) => 
     {
-        let text = (gamemetadata.state == "0") ? "Play" : "Pause";
+        let text = (gamemetadata.state === "0") ? "Play" : "Pause";
         let gameData = this.state.gameData;
         gameData.metadata = gamemetadata;
         this.setState({gameData: gameData, playPauseText: text, loading:false})
@@ -30,7 +30,7 @@ export class HostGameState extends Component {
 
     onPlayPauseClicked = (event) =>
     {
-        if (this.state.gameData.metadata.state == 1)
+        if (this.state.gameData.metadata.state === 1)
         {
             this.setGameState(0)
         }

@@ -119,15 +119,15 @@ export class PlayGame extends Component {
 
         let content = {};
         
-        if(this.state.gameState == 0)
+        if(this.state.gameState === 0)
         {
             content = this.renderWait();
         }
-        else if(this.state.gameState == 1)
+        else if(this.state.gameState === 1)
         {
             content = this.renderPlay();
         }
-        else if(this.state.gameState == 2)
+        else if(this.state.gameState === 2)
         {
             content = this.renderResults();
         }
@@ -142,7 +142,7 @@ export class PlayGame extends Component {
 
     checkState() {
         this.getState().then( () => {
-            if (this.state.gameState == 1)
+            if (this.state.gameState === 1)
             {
                 this.loadQuestion();
             }
