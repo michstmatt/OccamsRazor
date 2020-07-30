@@ -42,7 +42,7 @@ export class HostGameState extends Component {
 
     onResultsClicked = (event) =>
     {
-
+        this.setGameState(2);
     }
 
     render() {

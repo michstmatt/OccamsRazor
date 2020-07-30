@@ -145,24 +145,13 @@ namespace OccamsRazor.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetScoredAnswers(int gameId, [FromHeader(Name="gameKey")] string gameKey)
         {
-            if (await _authService.IsAuthenticated(gameId, gameKey ?? "") == false)
+            var game = await _gameDataService.GetGameState(gameId);
+            if (game.State != GameStateEnum.Results && await _authService.IsAuthenticated(gameId, gameKey ?? "") == false)
             {
                 return Unauthorized();
             }
             var results = await _playerAnswerService.GetScoresForGame(gameId);
             return Ok(results);
-        }
-
-        [Route("/api/Host/ShowResults")]
-        [HttpPost]
-        public async Task<IActionResult> UpdateShowHideResults([FromBody] GameMetadata game, [FromHeader(Name="gameKey")] string gameKey)
-        {
-            if (await _authService.IsAuthenticated(game.GameId, gameKey ?? "") == false)
-            {
-                return Unauthorized();
-            }
-            var result = await _gameDataService.SetShowResults(game);
-            return Ok(result);
         }
 
         [Route("/api/Host/SetState")]

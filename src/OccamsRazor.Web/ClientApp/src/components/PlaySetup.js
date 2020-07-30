@@ -9,7 +9,7 @@ export class PlaySetup extends Component {
             games: [],
             loading: true,
             player: "",
-            selectedGame: 20
+            selectedGame: {}
         };
     }
 
@@ -19,7 +19,7 @@ export class PlaySetup extends Component {
 
     joinSubmitHandler = (event) => {
         event.preventDefault();
-        localStorage.setItem('state', JSON.stringify({player: {name: this.state.player}, gameId: 20}));
+        localStorage.setItem('state', JSON.stringify({player: {name: this.state.player}, gameId: this.state.selectedGame.gameId, gameName: this.state.selectedGame.name}));
 
         this.props.history.push("/play-game");
     }
@@ -61,7 +61,6 @@ export class PlaySetup extends Component {
 
         return (
             <div className="card">
-                {this.state.player}
                 <h1 id="tabelLabel" >Join a game</h1>
                 {contents}
             </div>
@@ -71,7 +70,7 @@ export class PlaySetup extends Component {
     async loadGames() {
         const response = await fetch('/api/Play/LoadGames');
         const data = await response.json();
-        this.setState({ games: data, loading: false, selectedGame: data[0].gameId});
+        this.setState({ games: data, loading: false, selectedGame: data[0]});
     }
 }
 

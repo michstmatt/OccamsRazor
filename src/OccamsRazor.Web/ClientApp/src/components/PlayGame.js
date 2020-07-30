@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Toast } from './Toast';
 import { WaitPage } from './WaitPage';
+import { Results } from './Results';
 
 export class PlayGame extends Component {
     static displayName = PlayGame.name;
@@ -13,6 +14,7 @@ export class PlayGame extends Component {
             loading: true,
             player: storedState.player,
             selectedGameId: storedState.gameId,
+            gameName: storedState.gameName,
             wager: 1,
             answer: "",
             gameState : 0
@@ -85,7 +87,7 @@ export class PlayGame extends Component {
 
     renderWait() {
         return (
-            <WaitPage gameName={"Game Night"} />
+            <WaitPage gameName={this.state.gameName} />
         )
     }
 
@@ -96,25 +98,44 @@ export class PlayGame extends Component {
         : this.renderQuestion(this.state.currentQuestion);
         return (
             <div className="card">
-            {this.state.player.name}
+            <h3>{this.state.player.name} | {this.state.gameName}</h3>
             {question}
             {this.renderForm()}
             
         </div>)
     }
 
+    renderResults()
+    {
+        return(
+            <div>
+                <Results gameId= {this.state.selectedGameId} />
+            </div>
+        )
+    }
+
     render() {
 
 
-        let content = this.state.gameState == 0 ?
-            this.renderWait() : this.renderPlay();
-
-
+        let content = {};
+        
+        if(this.state.gameState == 0)
+        {
+            content = this.renderWait();
+        }
+        else if(this.state.gameState == 1)
+        {
+            content = this.renderPlay();
+        }
+        else if(this.state.gameState == 2)
+        {
+            content = this.renderResults();
+        }
 
         return (
             <div>
-                {content}
                 <Toast ref="toast" />
+                {content}
             </div>
         );
     }

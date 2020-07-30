@@ -50,7 +50,7 @@ export class HostCurrentQuestion extends Component {
             <h4> <span className="primary"> Answer </span>{cQuestion.answerText} </h4>
             <select className="host-score-input" onChange={this.questionSelectedHandler} defaultValue={this.state.currentQuestionIndex}>
                 {questions.map( (question, index) =>
-                    <option value={index}>R {question.round } Q {question.number}</option>
+                    <option value={index}>R { this.state.rounds.find(q => q.number == question.round).name} Q {question.number}</option>
                 )}
             </select>
             <button className="host-score-button" onClick={this.updateCurrentQuestionHandler} >Update Current Question</button>

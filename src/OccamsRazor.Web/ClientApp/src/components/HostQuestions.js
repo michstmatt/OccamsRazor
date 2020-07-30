@@ -114,7 +114,6 @@ export class HostQuestions extends Component {
                             <th >Category</th>
                             <th >Question</th>
                             <th >Answer</th>
-                            <th >Show</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -125,7 +124,6 @@ export class HostQuestions extends Component {
                                 <td><input className="host-question-input" value={question.category} onChange={(evt) => this.categoryChangedHandler(evt, question)}/></td>
                                 <td><textarea className="host-question-input" value={question.text} onChange={(evt) => this.questionTextChangeHandler(evt, question)}/></td>
                                 <td><input className="host-question-input" value={question.answerText} onChange={(evt) => this.answerTextChangeHandler(evt, question)}/></td>
-                                <td><input type="checkbox" value="show"></input></td>
                             </tr>
                         )}
                         </tbody>
