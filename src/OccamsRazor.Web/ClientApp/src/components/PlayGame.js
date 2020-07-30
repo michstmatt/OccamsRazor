@@ -14,7 +14,6 @@ export class PlayGame extends Component {
             loading: true,
             player: storedState.player,
             selectedGameId: storedState.gameId,
-            gameName: storedState.gameName,
             wager: 1,
             answer: "",
             gameState : 0
@@ -87,7 +86,7 @@ export class PlayGame extends Component {
 
     renderWait() {
         return (
-            <WaitPage gameName={this.state.gameName} />
+            <WaitPage gameName="Occams Razor" />
         )
     }
 
@@ -98,7 +97,7 @@ export class PlayGame extends Component {
         : this.renderQuestion(this.state.currentQuestion);
         return (
             <div className="card">
-            <h3>{this.state.player.name} | {this.state.gameName}</h3>
+            <h3>Playing as {this.state.player.name}</h3>
             {question}
             {this.renderForm()}
             

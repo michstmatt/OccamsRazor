@@ -22,7 +22,7 @@ export class HostGameState extends Component {
 
     setPlayPauseText = (gamemetadata) => 
     {
-        let text = (gamemetadata.state === "0") ? "Play" : "Pause";
+        let text = (gamemetadata.state === 0) ? "Play" : "Pause";
         let gameData = this.state.gameData;
         gameData.metadata = gamemetadata;
         this.setState({gameData: gameData, playPauseText: text, loading:false})
@@ -30,7 +30,7 @@ export class HostGameState extends Component {
 
     onPlayPauseClicked = (event) =>
     {
-        if (this.state.gameData.metadata.state === 1)
+        if (this.state.gameData.metadata.state !== 0)
         {
             this.setGameState(0)
         }
@@ -64,8 +64,11 @@ export class HostGameState extends Component {
             headers: { 'Content-Type': 'application/json', 'gameKey' : this.state.password},
         };
         const response = await fetch(`/api/Host/GetQuestions?gameId=${this.state.selectedGame}`, requestOptions);
-        const data = await response.json();
-        this.setPlayPauseText(data.metadata);
+        if(response.ok)
+        {
+            const data = await response.json();
+            this.setPlayPauseText(data.metadata);
+        }
     }
 
     async setGameState(state)
@@ -80,8 +83,11 @@ export class HostGameState extends Component {
             body: JSON.stringify(newGameData)
         };
         const response = await fetch('/api/Host/SetState', requestOptions);
-        const data = await response.json();
-        this.setPlayPauseText(data);
+        if (response.ok)
+        {
+            const data = await response.json();
+            this.setPlayPauseText(data);
+        }
     }
 
 

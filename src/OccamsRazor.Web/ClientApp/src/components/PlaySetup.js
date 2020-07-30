@@ -21,7 +21,7 @@ export class PlaySetup extends Component {
         event.preventDefault();
         if(this.state.player !== "")
         {
-            localStorage.setItem('state', JSON.stringify({player: {name: this.state.player}, gameId: this.state.selectedGame.gameId, gameName: this.state.selectedGame.name}));
+            localStorage.setItem('state', JSON.stringify({player: {name: this.state.player}, gameId: this.state.selectedGame}));
             this.props.history.push("/play-game");
         }
     }
@@ -72,7 +72,7 @@ export class PlaySetup extends Component {
     async loadGames() {
         const response = await fetch('/api/Play/LoadGames');
         const data = await response.json();
-        this.setState({ games: data, loading: false, selectedGame: data[0]});
+        this.setState({ games: data, loading: false, selectedGame: data[0].gameId});
     }
 }
 
