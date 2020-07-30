@@ -50,7 +50,7 @@ export class HostCurrentQuestion extends Component {
             <h4> <span className="primary"> Answer </span>{cQuestion.answerText} </h4>
             <select className="host-score-input" onChange={this.questionSelectedHandler} defaultValue={this.state.currentQuestionIndex}>
                 {questions.map( (question, index) =>
-                    <option value={index}>R { this.state.rounds.find(q => q.number == question.round).name} Q {question.number}</option>
+                    <option value={index}>R { this.state.rounds.find(q => q.number === question.round).name} Q {question.number}</option>
                 )}
             </select>
             <button className="host-score-button" onClick={this.updateCurrentQuestionHandler} >Update Current Question</button>
@@ -79,7 +79,7 @@ export class HostCurrentQuestion extends Component {
         };
         const response = await fetch(`/api/Host/GetQuestions?gameId=${this.state.selectedGame}`, requestOptions);
         const data = await response.json();
-        const questionIndex = data.questions.findIndex( q => q.round == data.metadata.currentRound && q.number == data.metadata.currentQuestion);
+        const questionIndex = data.questions.findIndex( q => q.round === data.metadata.currentRound && q.number === data.metadata.currentQuestion);
         this.setState({ gameData: data, loading: false, currentQuestionIndex: questionIndex});
         
     }
@@ -95,7 +95,10 @@ export class HostCurrentQuestion extends Component {
             body: JSON.stringify(newGameData)
         };
         const response = await fetch('/api/Host/SetCurrentQuestion', requestOptions);
-        const data = await response.json();
+        if(response.ok)
+        {
+            
+        }
         this.loadCurrentQuestion();
         this.props.newQuestionEvent(this.state.selectedQuestion);
     }

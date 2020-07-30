@@ -19,7 +19,7 @@ export class PlayGame extends Component {
             answer: "",
             gameState : 0
         };
-        if (this.state.player == undefined || this.state.selectedGameId == undefined)
+        if (this.state.player === undefined || this.state.selectedGameId === undefined)
         {
             this.props.history.push("/play-setup");
         }
@@ -42,7 +42,7 @@ export class PlayGame extends Component {
             gameId: this.state.selectedGameId,
         };
 
-        if (answer.answerText != "" && answer.wager >0 && answer.wager <7)
+        if (answer.answerText !== "" && answer.wager >0 && answer.wager <7)
             this.submitAnswer(answer);
         else
             this.refs.toast.setText("You must fill out all fields!");
@@ -119,15 +119,15 @@ export class PlayGame extends Component {
 
         let content = {};
         
-        if(this.state.gameState == 0)
+        if(this.state.gameState === 0)
         {
             content = this.renderWait();
         }
-        else if(this.state.gameState == 1)
+        else if(this.state.gameState === 1)
         {
             content = this.renderPlay();
         }
-        else if(this.state.gameState == 2)
+        else if(this.state.gameState === 2)
         {
             content = this.renderResults();
         }
@@ -142,7 +142,7 @@ export class PlayGame extends Component {
 
     checkState() {
         this.getState().then( () => {
-            if (this.state.gameState == 1)
+            if (this.state.gameState === 1)
             {
                 this.loadQuestion();
             }

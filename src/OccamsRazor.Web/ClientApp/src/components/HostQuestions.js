@@ -49,7 +49,7 @@ export class HostQuestions extends Component {
         this.setState({
             questions: this.state.questions.map(q =>
                 {
-                    if (q.round == question.round && q.number == question.number)
+                    if (q.round === question.round && q.number === question.number)
                     {
                         q.category = event.target.value;
                     }
@@ -63,7 +63,7 @@ export class HostQuestions extends Component {
         this.setState({
             questions: this.state.questions.map(q =>
                 {
-                    if (q.round == question.round && q.number == question.number)
+                    if (q.round === question.round && q.number === question.number)
                     {
                         q.text = event.target.value;
                     }
@@ -77,7 +77,7 @@ export class HostQuestions extends Component {
         this.setState({
             questions: this.state.questions.map(q =>
                 {
-                    if (q.round == question.round && q.number == question.number)
+                    if (q.round === question.round && q.number === question.number)
                     {
                         q.answerText = event.target.value;
                     }
@@ -118,7 +118,7 @@ export class HostQuestions extends Component {
                         </thead>
                         <tbody>
 
-                        {questions.filter(q => q.round == this.state.selectedRound).map(question =>
+                        {questions.filter(q => q.round === this.state.selectedRound).map(question =>
                             <tr key={`${question.round}-${question.number}`}>
                                 <td>{question.number}</td>
                                 <td><input className="host-question-input" value={question.category} onChange={(evt) => this.categoryChangedHandler(evt, question)}/></td>

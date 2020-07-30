@@ -17,7 +17,7 @@ export class HostPage extends Component {
             selectedTab: "Questions"
         };
 
-        if(this.state.selectedGame == undefined || this.state.selectedGame == undefined)
+        if(this.state.selectedGame === undefined || this.state.selectedGame === undefined)
         {
             this.props.history.push("/host");
         }
@@ -35,13 +35,13 @@ export class HostPage extends Component {
     render() {
 
         let component;
-        if (this.state.selectedTab == "Questions") {
+        if (this.state.selectedTab === "Questions") {
             component = <HostQuestions password={this.state.password} gameId={this.state.selectedGame} />;
         }
-        if (this.state.selectedTab == "Answers") {
+        if (this.state.selectedTab === "Answers") {
             component = <HostScoreQuestions password={this.state.password} gameId={this.state.selectedGame} />;
         }
-        if (this.state.selectedTab == "Results") {
+        if (this.state.selectedTab === "Results") {
             component = <Results password={this.state.password} gameId={this.state.selectedGame} />;
         }
 
@@ -49,16 +49,16 @@ export class HostPage extends Component {
         return (
             <div className="cardLarge">
                 <h2>
-                    <span className={this.state.selectedTab == "Questions"? "secondary": "" }>
-                    <a onClick={(evt) => this.tabSelected(evt, "Questions")} >Edit Questions</a>
+                    <span className={this.state.selectedTab === "Questions"? "secondary": "" }>
+                    <span onClick={(evt) => this.tabSelected(evt, "Questions")} >Edit Questions</span>
                     </span>
                     |
-                    <span className={this.state.selectedTab == "Answers"? "secondary": "" }>
-                    <a onClick={(evt) => this.tabSelected(evt, "Answers")} >Host Game</a>
+                    <span className={this.state.selectedTab === "Answers"? "secondary": "" }>
+                    <span onClick={(evt) => this.tabSelected(evt, "Answers")} >Host Game</span>
                     </span>
                     |
-                    <span className={this.state.selectedTab == "Results"? "secondary": "" }>
-                    <a onClick={(evt) => this.tabSelected(evt, "Results")} >View Results</a>
+                    <span className={this.state.selectedTab === "Results"? "secondary": "" }>
+                    <span onClick={(evt) => this.tabSelected(evt, "Results")} >View Results</span>
                     </span>
                 </h2>
                 {component}
