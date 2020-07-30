@@ -49,9 +49,9 @@ export class HostScoreAdder extends Component {
         let answer = {
             player: {name: this.state.playerName},
             answerText: this.state.answerText,
-            questionNumber: this.state.selectedQuestion,
-            round: this.state.selectedRound,
-            gameId: this.state.selectedGame,
+            questionNumber: this.state.selectedQuestion*1,
+            round: this.state.selectedRound *1,
+            gameId: this.state.selectedGame *1,
             wager: this.state.wager
         }
         this.submitAnswer(answer);

@@ -164,6 +164,7 @@ export class HostScoreQuestions extends Component {
         const response = await fetch(`/api/Host/UpdatePlayerScores?gameId=${this.state.selectedGame}`, requestOptions);
         if (response.ok)
         {
+            this.loadQuestions();
         }
     }
 
