@@ -42,7 +42,7 @@ export class PlayGame extends Component {
             gameId: this.state.selectedGameId,
         };
 
-        if (answer.answerText != "" && answer.wager >0 && answer.wager <7)
+        if (answer.answerText !== "" && answer.wager >0 && answer.wager <7)
             this.submitAnswer(answer);
         else
             this.refs.toast.setText("You must fill out all fields!");

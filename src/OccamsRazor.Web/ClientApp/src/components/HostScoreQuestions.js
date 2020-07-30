@@ -164,7 +164,6 @@ export class HostScoreQuestions extends Component {
         const response = await fetch(`/api/Host/UpdatePlayerScores?gameId=${this.state.selectedGame}`, requestOptions);
         if (response.ok)
         {
-            const data = await response.json();
         }
     }
 
@@ -178,7 +177,6 @@ export class HostScoreQuestions extends Component {
         const response = await fetch(`/api/Host/DeletePlayerAnswer?gameId=${this.state.selectedGame}`, requestOptions);
         if (response.ok)
         {
-            const data = await response.json();
             this.loadQuestions(); 
         }
     }

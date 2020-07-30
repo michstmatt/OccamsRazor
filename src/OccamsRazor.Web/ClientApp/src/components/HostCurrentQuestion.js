@@ -95,7 +95,10 @@ export class HostCurrentQuestion extends Component {
             body: JSON.stringify(newGameData)
         };
         const response = await fetch('/api/Host/SetCurrentQuestion', requestOptions);
-        const data = await response.json();
+        if(response.ok)
+        {
+            
+        }
         this.loadCurrentQuestion();
         this.props.newQuestionEvent(this.state.selectedQuestion);
     }
