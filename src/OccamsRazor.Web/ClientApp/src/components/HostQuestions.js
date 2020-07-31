@@ -38,7 +38,7 @@ export class HostQuestions extends Component {
     }
 
     roundSelectedHandler = (event) => {
-        this.setState({ selectedRound: event.target.value });
+        this.setState({ selectedRound: event.target.value*1});
     }
 
     nameChangeHandler = (event) => {
