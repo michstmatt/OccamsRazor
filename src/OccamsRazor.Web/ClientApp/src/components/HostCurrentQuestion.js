@@ -42,8 +42,8 @@ export class HostCurrentQuestion extends Component {
         return (
             <div>
     
-            <h4> <span className="secondary"> Current Round</span>{cQuestion.round} </h4>
-            <h4> <span className="secondary"> Current Question</span>{cQuestion.number} </h4>
+            <h4> <span className="secondary"> Current Round </span>{this.state.rounds.find(r => r.number == cQuestion.round).name} </h4>
+            <h4> <span className="secondary"> Current Question </span>{cQuestion.number} </h4>
             <h4> <span className="primary"> Category </span>{cQuestion.category} </h4>
             <h4> <span className="primary"> Question </span></h4>
             <p>{cQuestion.text} </p>

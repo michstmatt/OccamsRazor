@@ -50,9 +50,14 @@ export class HostScoreQuestions extends Component {
                 })
         })
     }
+    
+    getFilteredAnswers = (answers) => {
+        return answers.filter(a => a.round === this.state.selectedRound && a.questionNumber === this.state.selectedQuestion);
+    }
 
     submitPlayerScores = (event) => {
-        this.submitAnswers(this.state.answers);
+        var filtered = this.getFilteredAnswers(this.state.answers);
+        this.submitAnswers(filtered);
     }
 
     refreshResponses = (event) => this.loadQuestions();
@@ -97,7 +102,7 @@ export class HostScoreQuestions extends Component {
                 </tr>
                 </thead>
                 <tbody>
-                {answers.filter(a => a.round === this.state.selectedRound && a.questionNumber === this.state.selectedQuestion).map( answer =>
+                {answers.map( answer =>
                 <tr key={JSON.stringify(answer)}>
                     <td className="hostScore">{answer.player.name}</td>
                     <td className="hostScore">{answer.answerText}</td>
@@ -120,7 +125,7 @@ export class HostScoreQuestions extends Component {
     render() {
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderHostScoreQuestions(this.state.answers);
+            : this.renderHostScoreQuestions(this.getFilteredAnswers(this.state.answers));
 
         return (
             <div className="card">
@@ -164,7 +169,12 @@ export class HostScoreQuestions extends Component {
         const response = await fetch(`/api/Host/UpdatePlayerScores?gameId=${this.state.selectedGame}`, requestOptions);
         if (response.ok)
         {
+            alert("Scores have been saved successfully");
             this.loadQuestions();
+        }
+        else
+        {
+            alert("Something went wrong saving scores, wait and try again");
         }
     }
 

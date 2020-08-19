@@ -15,14 +15,26 @@ export class PlayGame extends Component {
             player: storedState.player,
             selectedGameId: storedState.gameId,
             wager: 1,
-            answer: "",
-            gameState : 0
+            answerText: "",
+            gameState : 0,
+            roundNames:
+            {
+                1: 'One',
+                2: 'Two',
+                3: 'Three',
+                4: 'Four',
+                5: 'Half-Time',
+                6: 'Five',
+                7: 'Six',
+                8: 'Final'
+            }
         };
         if (this.state.player === undefined || this.state.selectedGameId === undefined)
         {
             this.props.history.push("/play-setup");
         }
     }
+
 
     componentDidMount() {
         this.checkState();
@@ -34,7 +46,7 @@ export class PlayGame extends Component {
         let answer = 
         {
             player: this.state.player,
-            answerText: this.state.answer,
+            answerText: this.state.answerText,
             wager: this.state.wager*1,
             questionNumber: this.state.currentQuestion.number*1,
             round: this.state.currentQuestion.round*1,
@@ -52,14 +64,15 @@ export class PlayGame extends Component {
     }
 
     answerChangeHandler = (event) => {
-        this.setState({ answer: event.target.value });
+        this.setState({ answerText: event.target.value });
     }
 
 
     renderQuestion(games) {
         return (
             <div className="card">
-                <h4><span className="secondary">Round</span> {this.state.currentQuestion.round}  <span className="secondary">Question</span> {this.state.currentQuestion.number}</h4>
+                <h4><span className="secondary">Round</span> {this.state.roundNames[this.state.currentQuestion.round]}  
+                <span className="secondary">Question</span> {this.state.currentQuestion.number}</h4>
                 <h2><span className="primary">Category</span></h2>{this.state.currentQuestion.category}
                 <h2><span className="primary">Question</span></h2>{this.state.currentQuestion.text}
             </div>
@@ -176,7 +189,8 @@ export class PlayGame extends Component {
         
         if(response.ok)
         {
-            this.refs.toast.setText("Your answer was received");
+            var text = "Your answer " + this.state.answerText + " for " + this.state.roundNames[this.state.currentQuestion.round] + "-" + this.state.currentQuestion.number + " was received";
+            this.refs.toast.setText(text);
             this.setState({})
         }
         else

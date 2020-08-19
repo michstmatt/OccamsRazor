@@ -8,7 +8,8 @@ export class Toast extends Component {
         this.state = {
             show: this.props.show,
             text: this.props.text,
-            timeout: 1500
+            timeout: 3000,
+            expireTime: -1
         };
     }
 
@@ -18,8 +19,12 @@ export class Toast extends Component {
 
     setText = (text) => 
     {
-        this.setState({text: text, show: true});
-        setTimeout( ()=> this.setState({show: false}), this.state.timeout);
+        this.setState({text: text, show: true, expireTime: Date.now() + this.state.timeout});
+        setTimeout( this.checkTimedOut, this.state.timeout);
+    }
+
+    checkTimedOut = () => {
+        this.setState({show: Date.now() < this.state.expireTime});
     }
  
 
