@@ -8,12 +8,11 @@ namespace OccamsRazor.Web.Service
 {
     public interface IPlayerAnswerService
     {
-        public Task<bool> SubmitPlayerAnswer(PlayerAnswer answer);
-        public Task<IEnumerable<PlayerAnswer>> GetAllAnswers(int gameId);
-        public Task<bool> SubmitPlayerScores(IEnumerable<PlayerAnswer> answers);
-        public Task<IEnumerable<PlayerAnswer>> GetScoresForPlayer(int gameId, string name);
-        public Task<IEnumerable<GameResults>> GetScoresForGame(int gameId);
-
-        public Task<bool> DeletePlayerAnswer(PlayerAnswer answer);
+        Task<bool> SubmitPlayerAnswerAsync(PlayerAnswer answer);
+        Task<IEnumerable<PlayerAnswer>> GetAllAnswersAsync(int gameId);
+        Task<bool> SubmitPlayerScoresAsync(IEnumerable<PlayerAnswer> answers);
+        Task<IEnumerable<PlayerAnswer>> GetScoresForPlayerAsync(int gameId, string name);
+        Task<IEnumerable<GameResults>> GetScoresForGameAsync(int gameId);
+        Task<bool> DeletePlayerAnswerAsync(PlayerAnswer answer);
     }
 }

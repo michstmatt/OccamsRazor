@@ -13,7 +13,7 @@ namespace OccamsRazor.Web.Persistence.Service
 {
     public class AuthenticationService: IAuthenticationService
     {
-        private IAuthenticationRepository authenticationRepository;
+        private readonly IAuthenticationRepository authenticationRepository;
 
         public AuthenticationService(IAuthenticationRepository repo) => this.authenticationRepository = repo;
         public async Task<bool> IsAuthenticated(int gameId, string key)

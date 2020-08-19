@@ -31,49 +31,73 @@ namespace OccamsRazor.Web.Persistence.Repository
             
         }
 
-        public async Task<Game> LoadGameData(int id)
+        public async Task<Game> GetGameDataAsync(int id)
         {
             return GameData;
         }
-        public async Task<bool> DeleteGame(int gameId)
+        public async Task<bool> DeleteGameAsync(int gameId)
         {
             return true;
         }
 
-        public async Task<IEnumerable<GameMetadata>> LoadGames()
+        public async Task<ICollection<GameMetadata>> GetGamesAsync()
         {
             return new GameMetadata [] {GameData.Metadata};
         }
+        public async Task<ICollection<Question>> GetQuestionsAsync(int gameId)
+        {
+            return GameData.Questions;
+        }
 
-        public async Task<Question> GetCurrentQuestion(int id)
+        public async Task<ICollection<Question>> CreateQuestionsAsync(int gameId, IList<Question> questions)
+        {
+            GameData.Questions = questions.ToList();
+            return GameData.Questions;
+        }
+        public async Task<ICollection<Question>> UpdateQuestionsAsync(int gameId, IList<Question> questions)
+        {
+            GameData.Questions = questions.ToList();
+            return GameData.Questions;
+        }
+
+        public async Task<Question> GetCurrentQuestionAsync(int id)
         {
             return GameData.Questions.Where(q => q.Number == GameData.Metadata.CurrentQuestion && q.Round == GameData.Metadata.CurrentRound).FirstOrDefault();
         }
 
-        public async Task<GameMetadata> SetCurrentQuestion(GameMetadata game)
+        public async Task<GameMetadata> SetCurrentQuestionAsync(GameMetadata game)
         {
             GameData.Metadata = game;
             return game;
         }
-        public async Task<bool> UpdateGameMetadata(GameMetadata game)
+        public async Task<GameMetadata> CreateGameMetadataAsync(GameMetadata game)
         {
             GameData.Metadata = game;
-            return true;
+            return GameData.Metadata;
+        }
+        public async Task<GameMetadata> GetGameMetadataAsync(int gameId)
+        {
+            return GameData.Metadata;
+        }
+        public async Task<GameMetadata> UpdateGameMetadataAsync(GameMetadata game)
+        {
+            GameData.Metadata = game;
+            return game;
         }
 
-        public async Task<GameMetadata> StoreGameData(Game game)
+        public async Task<GameMetadata> SetGameDataAsync(Game game)
         {
             GameData = game;
             return GameData.Metadata;
         }
 
-        public async Task<GameMetadata> SetGameState(GameMetadata game)
+        public async Task<GameMetadata> SetGameStateAsync(GameMetadata game)
         {
             GameData.Metadata.State = game.State;
             return GameData.Metadata;
         }
 
-        public async Task<GameMetadata> GetGameState(int gameId)
+        public async Task<GameMetadata> GetGameStateAsync(int gameId)
         {
             return GameData.Metadata;
         }

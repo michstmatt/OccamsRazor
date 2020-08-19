@@ -9,17 +9,13 @@ namespace OccamsRazor.Web.Service
 {
     public interface IGameDataService
     {
-        Task<GameMetadata> SaveQuestions(Game game);
-        Task<Game> LoadQuestions(int gameId);
-        Task<IEnumerable<GameMetadata>> LoadGames();
-
-        Task<Question> GetCurrentQuestion(int gameId);
-        Task<Question> SetCurrentQuestion(GameMetadata game);
-
-        Task<GameMetadata> SetShowResults(GameMetadata game);
-
-        Task<GameMetadata> SetGameState(GameMetadata game);
-        Task<GameMetadata> GetGameState(int gameId);
-        Task<bool> DeleteGame(int gameId);
+        Task<GameMetadata> SetQuestionsAsync(Game game);
+        Task<Game> GetQuestionsAsync(int gameId);
+        Task<ICollection<GameMetadata>> GetGamesAsync();
+        Task<Question> GetCurrentQuestionAsync(int gameId);
+        Task<Question> SetCurrentQuestionAsync(GameMetadata game);
+        Task<GameMetadata> SetGameStateAsync(GameMetadata game);
+        Task<GameMetadata> GetGameStateAsync(int gameId);
+        Task<bool> DeleteGameAsync(int gameId);
     }
 }

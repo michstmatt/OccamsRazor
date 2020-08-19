@@ -16,9 +16,9 @@ namespace OccamsRazor.Web.Controllers
 {
     public class ApiPlayController : Controller
     {
-        private readonly ILogger<ApiPlayController> _logger;
-        private readonly IGameDataService _gameDataService;
-        private readonly IPlayerAnswerService _playerAnswerService;
+        private readonly ILogger<ApiPlayController> logger;
+        private readonly IGameDataService gameDataService;
+        private readonly IPlayerAnswerService playerAnswerService;
 
 
 
@@ -27,16 +27,16 @@ namespace OccamsRazor.Web.Controllers
             IPlayerAnswerService answerService
         )
         {
-            _logger = logger;
-            _gameDataService = gameDataService;
-            _playerAnswerService = answerService;
+            this.logger = logger;
+            this.gameDataService = gameDataService;
+            this.playerAnswerService = answerService;
         }
 
         [HttpGet]
         [Route("/api/Play/LoadGames")]
         public async Task<IActionResult> Index()
         {
-            var results = await _gameDataService.LoadGames();
+            var results = await gameDataService.GetGamesAsync();
             return Ok(results);
         }
 
@@ -44,7 +44,7 @@ namespace OccamsRazor.Web.Controllers
         [Route("/api/Play/GetCurrentQuestion")]
         public async Task<IActionResult> GetCurrentQuestion(int gameId, string host)
         {
-            var question = await _gameDataService.GetCurrentQuestion(gameId);
+            var question = await gameDataService.GetCurrentQuestionAsync(gameId);
             if (string.IsNullOrEmpty(host) || host != gameId.ToString())
             {
                 question.AnswerText = "";
@@ -56,7 +56,7 @@ namespace OccamsRazor.Web.Controllers
         [Route("/api/Play/GetState")]
         public async Task<IActionResult> GetState(int gameId)
         {
-            var gameState = await _gameDataService.GetGameState(gameId);
+            var gameState = await gameDataService.GetGameStateAsync(gameId);
             return Ok(gameState);
         }
 
@@ -68,7 +68,7 @@ namespace OccamsRazor.Web.Controllers
             {
                 return BadRequest();
             }
-            var result = await _playerAnswerService.SubmitPlayerAnswer(answer);
+            var result = await playerAnswerService.SubmitPlayerAnswer(answer);
             return Ok(result);
         }
 
@@ -76,7 +76,7 @@ namespace OccamsRazor.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetScoredAnswersForPlayer(int gameId, string name)
         {
-            var answers = await _playerAnswerService.GetScoresForPlayer(gameId, name);
+            var answers = await playerAnswerService.GetScoresForPlayer(gameId, name);
             return Ok(answers);
         }
 
@@ -84,13 +84,12 @@ namespace OccamsRazor.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetScoredAnswers(int gameId)
         {
-            var games = await _gameDataService.LoadGames();
-            var ok = games.Where(g => g.GameId == gameId).FirstOrDefault().State == GameStateEnum.Results;
-            if (!ok)
+            var game = await gameDataService.GetGameStateAsync(gameId);
+            if (game.State != GameStateEnum.Results)
             {
                 return Ok(Array.Empty<GameResults>());
             }
-            var results = await _playerAnswerService.GetScoresForGame(gameId);
+            var results = await playerAnswerService.GetScoresForGame(gameId);
             return Ok(results);
         }
     }

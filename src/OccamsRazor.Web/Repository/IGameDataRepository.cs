@@ -8,14 +8,14 @@ namespace OccamsRazor.Web.Repository
 {
     public interface IGameDataRepository
     {
-        Task<GameMetadata> StoreGameData(Game game);
-        Task<Game> LoadGameData(int gameId);
-        Task<IEnumerable<GameMetadata>> LoadGames();
-        Task<Question> GetCurrentQuestion(int gameId);
-        Task<GameMetadata> SetCurrentQuestion(GameMetadata game);
-        Task<bool> UpdateGameMetadata(GameMetadata game);
-        Task<GameMetadata> SetGameState(GameMetadata game);
-        Task<GameMetadata> GetGameState(int gameId);
-        Task<bool> DeleteGame(int gameId);
+        Task<ICollection<Question>> GetQuestionsAsync(int gameId);
+        Task<ICollection<Question>> CreateQuestionsAsync(int gameId, IList<Question> questions);
+        Task<ICollection<Question>> UpdateQuestionsAsync(int gameId, IList<Question> questions);
+        Task<ICollection<GameMetadata>> GetGamesAsync();
+        Task<Question> GetCurrentQuestionAsync(int gameId);
+        Task<GameMetadata> GetGameMetadataAsync(int gameId);
+        Task<GameMetadata> CreateGameMetadataAsync(GameMetadata game);
+        Task<GameMetadata> UpdateGameMetadataAsync(GameMetadata game);
+        Task<bool> DeleteGameAsync(int gameId);
     }
 }

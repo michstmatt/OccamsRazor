@@ -14,29 +14,26 @@ namespace OccamsRazor.Web.Controllers
 {
     public class ApiHostController : Controller
     {
-        private readonly ILogger<ApiHostController> _logger;
-        private readonly IAuthenticationService _authService;
-        private readonly IGameDataService _gameDataService;
-        private readonly IPlayerAnswerService _playerAnswerService;
-        private readonly IHttpContextAccessor _accessor;
+        private readonly ILogger<ApiHostController> logger;
+        private readonly IAuthenticationService authService;
+        private readonly IGameDataService gameDataService;
+        private readonly IPlayerAnswerService playerAnswerService;
         public ApiHostController(ILogger<ApiHostController> logger,
-            IHttpContextAccessor accessor,
             IAuthenticationService authService,
             IGameDataService gameDataService,
             IPlayerAnswerService playerAnswerService)
         {
-            _logger = logger;
-            _accessor = accessor;
-            _authService = authService;
-            _gameDataService = gameDataService;
-            _playerAnswerService = playerAnswerService;
+            this.logger = logger;
+            this.authService = authService;
+            this.gameDataService = gameDataService;
+            this.playerAnswerService = playerAnswerService;
         }
 
         [HttpGet]
         [Route("/api/Host/Validate")]
-        public async Task<IActionResult> Validate(int gameId, [FromHeader(Name="gameKey")]string gameKey)
+        public async Task<IActionResult> Validate(int gameId, [FromHeader(Name = "gameKey")] string gameKey)
         {
-            if (await _authService.IsAuthenticated(gameId, gameKey ?? "") == false)
+            if (await authService.IsAuthenticated(gameId, gameKey ?? "") == false)
             {
                 return Unauthorized();
             }
@@ -46,20 +43,20 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpPost]
         [Route("/api/Host/CreateGame")]
-        public async Task<IActionResult> CreateGame([FromBody] GameMetadata data, [FromHeader(Name="gameKey")] string gameKey)
+        public async Task<IActionResult> CreateGame([FromBody] GameMetadata data, [FromHeader(Name = "gameKey")] string gameKey)
         {
             var game = new Game();
             game.Metadata.Name = data.Name;
-            var stored = await _gameDataService.SaveQuestions(game);
-            await _authService.AddAuthentication(stored.GameId, gameKey);
+            var stored = await gameDataService.SetQuestionsAsync(game);
+            await authService.AddAuthentication(stored.GameId, gameKey);
             return Ok(stored);
         }
 
         [HttpGet]
         [Route("/api/Host/GetQuestions")]
-        public async Task<IActionResult> Questions([FromQuery] int? gameId, [FromHeader(Name="gameKey")] string gameKey)
+        public async Task<IActionResult> Questions([FromQuery] int? gameId, [FromHeader(Name = "gameKey")] string gameKey)
         {
-            if (await _authService.IsAuthenticated(gameId?? 0, gameKey ?? "") == false)
+            if (await authService.IsAuthenticated(gameId ?? 0, gameKey ?? "") == false)
             {
                 return Unauthorized();
             }
@@ -69,7 +66,7 @@ namespace OccamsRazor.Web.Controllers
             }
             try
             {
-                var found = await _gameDataService.LoadQuestions(gameId.Value);
+                var found = await gameDataService.GetQuestionsAsync(gameId.Value);
                 if (found == null)
                 {
                     return BadRequest();
@@ -79,114 +76,114 @@ namespace OccamsRazor.Web.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                logger.LogError(ex.Message);
                 return BadRequest();
             }
         }
 
         [Route("/api/Host/SaveQuestions")]
         [HttpPost]
-        public async Task<IActionResult> Questions([FromBody] Game game, [FromHeader(Name="gameKey")]string gameKey)
+        public async Task<IActionResult> Questions([FromBody] Game game, [FromHeader(Name = "gameKey")] string gameKey)
         {
-            if (await _authService.IsAuthenticated(game.Metadata.GameId, gameKey ?? "") == false)
+            if (await authService.IsAuthenticated(game.Metadata.GameId, gameKey ?? "") == false)
             {
                 return Unauthorized();
             }
             try
             {
-                var gameMetadata = await _gameDataService.SaveQuestions(game);
+                var gameMetadata = await gameDataService.SetQuestionsAsync(game);
                 return Ok(true);
             }
             catch (Exception e)
             {
-                _logger.LogError(e.Message);
+                logger.LogError(e.Message);
                 return BadRequest();
             }
         }
 
         [HttpGet]
         [Route("/api/Host/GetPlayerAnswers")]
-        public async Task<IActionResult> PlayerAnswers(int gameId, [FromHeader(Name="gameKey")]string gameKey)
+        public async Task<IActionResult> PlayerAnswers(int gameId, [FromHeader(Name = "gameKey")] string gameKey)
         {
-            if (await _authService.IsAuthenticated(gameId, gameKey ?? "") == false)
+            if (await authService.IsAuthenticated(gameId, gameKey ?? "") == false)
             {
                 return Unauthorized();
             }
 
-            var results = await _playerAnswerService.GetAllAnswers(gameId) ?? Array.Empty<PlayerAnswer>();
+            var results = await playerAnswerService.GetAllAnswers(gameId) ?? Array.Empty<PlayerAnswer>();
             return Ok(results);
         }
 
         [Route("/api/Host/SetCurrentQuestion")]
         [HttpPost]
-        public async Task<IActionResult> SetCurrentQuestion([FromBody] GameMetadata game, [FromHeader(Name="gameKey")] string gameKey)
+        public async Task<IActionResult> SetCurrentQuestion([FromBody] GameMetadata game, [FromHeader(Name = "gameKey")] string gameKey)
         {
-            if (await _authService.IsAuthenticated(game.GameId, gameKey ?? "") == false)
+            if (await authService.IsAuthenticated(game.GameId, gameKey ?? "") == false)
             {
                 return Unauthorized();
             }
-            var result = await _gameDataService.SetCurrentQuestion(game);
+            var result = await gameDataService.SetCurrentQuestionAsync(game);
             return Ok(result);
         }
 
         [Route("/api/Host/UpdatePlayerScores")]
         [HttpPost]
-        public async Task<IActionResult> UpdatePlayerScores(int gameId, [FromBody] IEnumerable<PlayerAnswer> answers, [FromHeader(Name="gameKey")] string gameKey)
+        public async Task<IActionResult> UpdatePlayerScores(int gameId, [FromBody] IEnumerable<PlayerAnswer> answers, [FromHeader(Name = "gameKey")] string gameKey)
         {
-            if (await _authService.IsAuthenticated(gameId, gameKey ?? "") == false)
+            if (await authService.IsAuthenticated(gameId, gameKey ?? "") == false)
             {
                 return Unauthorized();
             }
-            var submitted = await _playerAnswerService.SubmitPlayerScores(answers);
+            var submitted = await playerAnswerService.SubmitPlayerScores(answers);
             return Ok(submitted);
         }
 
         [Route("/api/Host/GetScoredResponses")]
         [HttpGet]
-        public async Task<IActionResult> GetScoredAnswers(int gameId, [FromHeader(Name="gameKey")] string gameKey)
+        public async Task<IActionResult> GetScoredAnswers(int gameId, [FromHeader(Name = "gameKey")] string gameKey)
         {
-            var game = await _gameDataService.GetGameState(gameId);
-            if (game.State != GameStateEnum.Results && await _authService.IsAuthenticated(gameId, gameKey ?? "") == false)
+            var game = await gameDataService.GetGameStateAsync(gameId);
+            if (game.State != GameStateEnum.Results && await authService.IsAuthenticated(gameId, gameKey ?? "") == false)
             {
                 return Unauthorized();
             }
-            var results = await _playerAnswerService.GetScoresForGame(gameId);
+            var results = await playerAnswerService.GetScoresForGame(gameId);
             return Ok(results);
         }
 
         [Route("/api/Host/SetState")]
         [HttpPost]
-        public async Task<IActionResult> SetState([FromBody] GameMetadata game, [FromHeader(Name="gameKey")] string gameKey)
+        public async Task<IActionResult> SetState([FromBody] GameMetadata game, [FromHeader(Name = "gameKey")] string gameKey)
         {
-            if (await _authService.IsAuthenticated(game.GameId, gameKey ?? "") == false)
+            if (await authService.IsAuthenticated(game.GameId, gameKey ?? "") == false)
             {
                 return Unauthorized();
             }
-            var response = await _gameDataService.SetGameState(game);
+            var response = await gameDataService.SetGameStateAsync(game);
             return Ok(response);
         }
 
         [Route("/api/Host/DeletePlayerAnswer")]
         [HttpDelete]
-        public async Task<IActionResult> DeletePlayerAnswer(int gameId, [FromBody] PlayerAnswer answer, [FromHeader(Name="gameKey")] string gameKey)
+        public async Task<IActionResult> DeletePlayerAnswer(int gameId, [FromBody] PlayerAnswer answer, [FromHeader(Name = "gameKey")] string gameKey)
         {
-            if (await _authService.IsAuthenticated(gameId, gameKey ?? "") == false)
+            if (await authService.IsAuthenticated(gameId, gameKey ?? "") == false)
             {
                 return Unauthorized();
             }
-            var result = await _playerAnswerService.DeletePlayerAnswer(answer);
+            var result = await playerAnswerService.DeletePlayerAnswer(answer);
             return Ok(result);
         }
 
         [Route("/api/Host/DeleteGame")]
         [HttpDelete]
-        public async Task<IActionResult> DeleteGame(int gameId, [FromHeader(Name="gameKey")] string gameKey)
+        public async Task<IActionResult> DeleteGame(int gameId, [FromHeader(Name = "gameKey")] string gameKey)
         {
-            if (await _authService.IsAuthenticated(gameId, gameKey ?? "") == false)
+            if (await authService.IsAuthenticated(gameId, gameKey ?? "") == false)
             {
                 return Unauthorized();
             }
-            var result = await _gameDataService.DeleteGame(gameId);
+            var result = await gameDataService.DeleteGameAsync(gameId);
             return Ok(result);
         }
 

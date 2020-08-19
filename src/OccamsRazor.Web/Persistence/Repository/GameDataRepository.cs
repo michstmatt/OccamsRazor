@@ -22,8 +22,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             Context = context;
         }
 
-
-        public GameMetadata ReaderToGameMetadata(DbDataReader reader)
+        private GameMetadata ReaderToGameMetadata(DbDataReader reader)
         {
             var game = new GameMetadata();
             game.GameId = System.Convert.ToInt32(reader[0]);
@@ -34,7 +33,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             return game;
         }
 
-        public Question ReaderToQuestion(DbDataReader reader)
+        private Question ReaderToQuestion(DbDataReader reader)
         {
             var question = new Question();
             question.GameId = System.Convert.ToInt32(reader[0]);
@@ -45,10 +44,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             question.AnswerText = System.Convert.ToString(reader[5] ?? "");
             return question;
         }
-
-
-
-        public async Task<IEnumerable<GameMetadata>> GetExistingGamesAsync()
+        public async Task<ICollection<GameMetadata>> GetGamesAsync()
         {
             var games = new List<GameMetadata>();
             using (var conn = Context.GetSqlConnection())
@@ -72,7 +68,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             return games;
         }
 
-        public async Task<bool> UpdateExistingGameMetadataAsync(GameMetadata game)
+        public async Task<GameMetadata> UpdateGameMetadataAsync(GameMetadata game)
         {
             using (var conn = Context.GetSqlConnection())
             {
@@ -92,9 +88,9 @@ namespace OccamsRazor.Web.Persistence.Repository
                 var reader = await command.ExecuteReaderAsync();
                 await reader.CloseAsync();
             }
-            return true;
+            return game;
         }
-        public async Task<GameMetadata> InsertGameMetadataAsync(GameMetadata game)
+        public async Task<GameMetadata> CreateGameMetadataAsync(GameMetadata game)
         {
             using (var conn = Context.GetSqlConnection())
             {
@@ -135,7 +131,7 @@ namespace OccamsRazor.Web.Persistence.Repository
                 var reader = await command.ExecuteReaderAsync();
 
 
-                while (await reader.ReadAsync())
+                if (await reader.ReadAsync())
                 {
                     game = ReaderToGameMetadata(reader);
                 }
@@ -143,7 +139,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             }
             return game;
         }
-        public async Task<IEnumerable<Question>> GetQuestionsForGameAsync(int gameId)
+        public async Task<ICollection<Question>> GetQuestionsAsync(int gameId)
         {
             var questions = new List<Question>();
             using (var conn = Context.GetSqlConnection())
@@ -196,7 +192,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             return question;
         }
 
-        public async Task UpdateExistingQuestionsAsync(int gameId, IList<Question> questions)
+        public async Task<ICollection<Question>> UpdateQuestionsAsync(int gameId, IList<Question> questions)
         {
             using (var conn = Context.GetSqlConnection())
             {
@@ -222,14 +218,15 @@ namespace OccamsRazor.Web.Persistence.Repository
                 await command.ExecuteNonQueryAsync();
                 await conn.CloseAsync();
             }
+            return questions;
         }
-        public async Task InsertQuestionsAsync(int gameId, IList<Question> questions)
+        public async Task<ICollection<Question>> CreateQuestionsAsync(int gameId, IList<Question> questions)
         {
             using (var conn = Context.GetSqlConnection())
             {
 
                 var command = conn.CreateCommand();
-                    command.Parameters.AddWithValue("@GameId", gameId);
+                command.Parameters.AddWithValue("@GameId", gameId);
                 for (int i = 0; i < questions.Count(); i++)
                 {
                     command.CommandText +=
@@ -248,25 +245,8 @@ namespace OccamsRazor.Web.Persistence.Repository
                 await command.ExecuteNonQueryAsync();
                 await conn.CloseAsync();
             }
+            return questions;
         }
-
-
-        public async Task<GameMetadata> StoreGameData(Game game)
-        {
-            var existing = await GetExistingGamesAsync();
-            if (existing.Where(g => g.GameId == game.Metadata.GameId).Any())
-            {
-                await UpdateExistingGameMetadataAsync(game.Metadata);
-                await UpdateExistingQuestionsAsync(game.Metadata.GameId, game.Questions);
-            }
-            else
-            {
-                await InsertGameMetadataAsync(game.Metadata);
-                await InsertQuestionsAsync(game.Metadata.GameId, game.Questions);
-            }
-            return game.Metadata;
-        }
-
 
         public async Task<GameMetadata> UpdateCurrentQuestionAsync(GameMetadata game)
         {
@@ -291,7 +271,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             return game;
         }
 
-        public async Task<bool> DeleteGame(int gameId)
+        public async Task<bool> DeleteGameAsync(int gameId)
         {
             using (var conn = Context.GetSqlConnection())
             {
@@ -309,44 +289,6 @@ namespace OccamsRazor.Web.Persistence.Repository
                 await conn.CloseAsync();
             }
             return true;
-        }
-
-        public async Task<GameMetadata> SetGameState(GameMetadata game)
-        {
-            return game;
-        }
-        public async Task<GameMetadata> GetGameState(int gameId)
-        {
-            return await GetGameMetadataAsync(gameId);
-        }
-
-
-        public async Task<Game> LoadGameData(int id)
-        {
-            var game = new Game();
-            game.Metadata = await GetGameMetadataAsync(id);
-            var questions = await GetQuestionsForGameAsync(id);
-            game.Questions = questions.ToList();
-            return game;
-        }
-
-        public async Task<IEnumerable<GameMetadata>> LoadGames()
-        {
-            return await GetExistingGamesAsync();
-        }
-
-        public async Task<Question> GetCurrentQuestion(int id)
-        {
-            return await GetCurrentQuestionAsync(id);
-        }
-
-        public async Task<GameMetadata> SetCurrentQuestion(GameMetadata game)
-        {
-            return await UpdateCurrentQuestionAsync(game);
-        }
-        public async Task<bool> UpdateGameMetadata(GameMetadata game)
-        {
-            return await UpdateExistingGameMetadataAsync(game);
         }
 
     }

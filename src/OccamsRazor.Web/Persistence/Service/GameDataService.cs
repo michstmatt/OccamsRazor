@@ -13,43 +13,61 @@ namespace OccamsRazor.Web.Persistence.Service
 {
     public class GameDataService : IGameDataService
     {
-        private IGameDataRepository Repository;
+        private readonly IGameDataRepository gameDataRepository;
         public GameDataService(IGameDataRepository repository)
         {
-            Repository = repository;
+            gameDataRepository = repository;
         }
 
-        public Task<GameMetadata> SaveQuestions(Game game) => Repository.StoreGameData(game);
-        public Task<Game> LoadQuestions(int gameId) => Repository.LoadGameData(gameId);
-        public Task<IEnumerable<GameMetadata>> LoadGames() => Repository.LoadGames();
-
-        public Task<Question> GetCurrentQuestion(int gameId) => Repository.GetCurrentQuestion(gameId);
-
-        public async Task<Question> SetCurrentQuestion(GameMetadata game)
+        public async Task<GameMetadata> SetQuestionsAsync(Game game)
         {
-            await Repository.SetCurrentQuestion(game);
-            return await Repository.GetCurrentQuestion(game.GameId);
+            var existing = await gameDataRepository.GetGameMetadataAsync(game.Metadata.GameId);
+            if (existing == null)
+            {
+                await gameDataRepository.CreateGameMetadataAsync(game.Metadata);
+                await gameDataRepository.CreateQuestionsAsync(game.Metadata.GameId, game.Questions);
+            }
+            else
+            {
+                await gameDataRepository.UpdateGameMetadataAsync(game.Metadata);
+                await gameDataRepository.UpdateQuestionsAsync(game.Metadata.GameId, game.Questions);
+            }
+
+            return game.Metadata;
         }
-        public async Task<GameMetadata> SetShowResults(GameMetadata game)
+        
+        public async Task<Game> GetQuestionsAsync(int gameId) 
         {
-            await Repository.UpdateGameMetadata(game);
+            var game = new Game();
+
+            game.Metadata = await gameDataRepository.GetGameMetadataAsync(gameId);
+            var questions = await gameDataRepository.GetQuestionsAsync(gameId);
+            game.Questions = questions.ToList();
+            return game;
+        } 
+        public Task<ICollection<GameMetadata>> GetGamesAsync() => gameDataRepository.GetGamesAsync();
+
+        public Task<Question> GetCurrentQuestionAsync(int gameId) => gameDataRepository.GetCurrentQuestionAsync(gameId);
+
+        public async Task<Question> SetCurrentQuestionAsync(GameMetadata game)
+        {
+            await gameDataRepository.UpdateGameMetadataAsync(game);
+            return await gameDataRepository.GetCurrentQuestionAsync(game.GameId);
+        }
+
+        public async Task<GameMetadata> SetGameStateAsync(GameMetadata game)
+        {
+            await gameDataRepository.UpdateGameMetadataAsync(game);
             return game;
         }
 
-
-        public async Task<GameMetadata> SetGameState(GameMetadata game)
+        public async Task<GameMetadata> GetGameStateAsync(int gameId)
         {
-            await Repository.UpdateGameMetadata(game);
-            return game;
-        }
-
-        public async Task<GameMetadata> GetGameState(int gameId)
-        {
-            var result = await Repository.GetGameState(gameId);
+            var result = await gameDataRepository.GetGameMetadataAsync(gameId);
             return result;
         }
 
-        public async Task<bool> DeleteGame(int gameId) => await Repository.DeleteGame(gameId);
+        public async Task<bool> DeleteGameAsync(int gameId) => await gameDataRepository.DeleteGameAsync(gameId);
 
     }
 }
