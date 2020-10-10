@@ -16,57 +16,31 @@ namespace OccamsRazor.Web.Persistence.Repository
 {
     public class AuthenticationRepository: IAuthenticationRepository
     {
-        private OccamsRazorSqlClient Context;
-        public AuthenticationRepository(OccamsRazorSqlClient context)
+        private OccamsRazorEfSqlContext Context;
+        public AuthenticationRepository(OccamsRazorEfSqlContext context)
         {
             Context = context;
         }
 
         public async Task<bool> IsAuthenticatedAsync(int gameId, string key)
         {
-            bool authenticated = false;
-            using (var conn = Context.GetSqlConnection())
-            {
-
-                var command = conn.CreateCommand();
-                command.CommandText =
-                    @"SELECT COUNT(*) FROM [dbo].[HostKeys] 
-                    WHERE GameId=@GameId AND GameKey=@GameKey";
-
-                command.Parameters.AddWithValue("@GameId", gameId);
-                command.Parameters.AddWithValue("@GameKey", key);
-
-                await conn.OpenAsync();
-                var reader = await command.ExecuteReaderAsync();
-
-                if (await reader.ReadAsync())
-                {
-                    var count = System.Convert.ToInt32(reader?.GetValue(0) ?? 0);
-                    authenticated = count == 1;
-                }
-                await reader.CloseAsync();
-            }
+            bool authenticated = await Context.Keys.Where(g => g.GameId == gameId && g.GameKey == key).AnyAsync();
             return authenticated;
         }
 
         public async Task<bool> SetAuthenticationAsync(int gameId, string key)
         {
-            using (var conn = Context.GetSqlConnection())
+            var exsiting = await Context.Keys.FindAsync(gameId);
+
+            if (exsiting == null)
             {
-
-                var command = conn.CreateCommand();
-                command.CommandText =
-                    @"INSERT INTO [dbo].[HostKeys]
-                    (GameId, GameKey) 
-                    VALUES (@GameId, @GameKey)";
-
-                command.Parameters.AddWithValue("@GameId", gameId);
-                command.Parameters.AddWithValue("@GameKey", key);
-
-                await conn.OpenAsync();
-                await command.ExecuteNonQueryAsync();
-                await conn.CloseAsync();
+                await Context.Keys.AddAsync(new AuthenticationModels.AuthenticationModel{GameId = gameId, GameKey = key});
             }
+            else
+            {
+                exsiting.GameKey = key;
+            }
+            await Context.SaveChangesAsync();
             return true;
         }
 

@@ -16,245 +16,72 @@ namespace OccamsRazor.Web.Persistence.Repository
 {
     public class GameDataRepository : IGameDataRepository
     {
-        private OccamsRazorSqlClient Context;
-        public GameDataRepository(OccamsRazorSqlClient context)
+        private OccamsRazorEfSqlContext Context;
+        public GameDataRepository(OccamsRazorEfSqlContext context)
         {
             Context = context;
         }
 
-
-        public GameMetadata ReaderToGameMetadata(DbDataReader reader)
-        {
-            var game = new GameMetadata();
-            game.GameId = System.Convert.ToInt32(reader[0]);
-            game.Name = System.Convert.ToString(reader[1]);
-            game.CurrentRound = (RoundEnum)System.Convert.ToInt32(reader[2]);
-            game.CurrentQuestion = System.Convert.ToInt32(reader[3]);
-            game.State = (GameStateEnum)(System.Convert.ToInt32(reader[4] ?? 0));
-            return game;
-        }
-
-        public Question ReaderToQuestion(DbDataReader reader)
-        {
-            var question = new Question();
-            question.GameId = System.Convert.ToInt32(reader[0]);
-            question.Round = (RoundEnum)System.Convert.ToInt32(reader[1]);
-            question.Number = System.Convert.ToInt32(reader[2]);
-            question.Text = System.Convert.ToString(reader[3]);
-            question.Category = System.Convert.ToString(reader[4]);
-            question.AnswerText = System.Convert.ToString(reader[5] ?? "");
-            return question;
-        }
-
-
-
         public async Task<IEnumerable<GameMetadata>> GetExistingGamesAsync()
         {
-            var games = new List<GameMetadata>();
-            using (var conn = Context.GetSqlConnection())
-            {
-
-                var command = conn.CreateCommand();
-                command.CommandText =
-                    @"SELECT * FROM [dbo].[GameMetadata]";
-
-
-                await conn.OpenAsync();
-                var reader = await command.ExecuteReaderAsync();
-
-
-                while (await reader.ReadAsync())
-                {
-                    games.Add(ReaderToGameMetadata(reader));
-                }
-                await reader.CloseAsync();
-            }
-            return games;
+            return await Context.GameMetadata.ToListAsync();
         }
 
         public async Task<bool> UpdateExistingGameMetadataAsync(GameMetadata game)
         {
-            using (var conn = Context.GetSqlConnection())
-            {
-                var command = conn.CreateCommand();
-                command.CommandText =
-                    @"UPDATE [dbo].[GameMetadata]
-                              SET Name=@Name, CurrentRoundNum=@Round, CurrentQuestionNum=@Question, State=@State
-                              WHERE GameId=@Id";
+            var existing = await Context.GameMetadata.Where(g => g.GameId == game.GameId).FirstOrDefaultAsync();
+            existing.Name = game.Name;
+            existing.CurrentRound = game.CurrentRound;
+            existing.CurrentQuestion = game.CurrentQuestion;
+            existing.State = game.State;
 
-                command.Parameters.AddWithValue("@Name", game.Name);
-                command.Parameters.AddWithValue("@Round", game.CurrentRound);
-                command.Parameters.AddWithValue("@Question", game.CurrentQuestion);
-                command.Parameters.AddWithValue("@Id", game.GameId);
-                command.Parameters.AddWithValue("@State", game.State);
-
-                await conn.OpenAsync();
-                var reader = await command.ExecuteReaderAsync();
-                await reader.CloseAsync();
-            }
+            await Context.SaveChangesAsync();
             return true;
         }
         public async Task<GameMetadata> InsertGameMetadataAsync(GameMetadata game)
         {
-            using (var conn = Context.GetSqlConnection())
-            {
-
-                var command = conn.CreateCommand();
-                command.CommandText = @"INSERT INTO [dbo].[GameMetadata]
-                        (Name, CurrentRoundNum, CurrentQuestionNum, State)
-                        OUTPUT INSERTED.GameId
-                        VALUES (@Name, @Round, @Question, @State)";
-
-
-                command.Parameters.AddWithValue("@Name", game.Name);
-                command.Parameters.AddWithValue("@Round", game.CurrentRound);
-                command.Parameters.AddWithValue("@Question", game.CurrentQuestion);
-                command.Parameters.AddWithValue("@State", game.State);
-
-                await conn.OpenAsync();
-                var reader = await command.ExecuteReaderAsync();
-                await reader.ReadAsync();
-                game.GameId = System.Convert.ToInt32(reader[0]);
-                await reader.CloseAsync();
-            }
+            await Context.GameMetadata.AddAsync(game);
             return game;
         }
 
         public async Task<GameMetadata> GetGameMetadataAsync(int gameId)
         {
-            GameMetadata game = null;
-            using (var conn = Context.GetSqlConnection())
-            {
-
-                var command = conn.CreateCommand();
-                command.CommandText =
-                    @"SELECT * FROM [dbo].[GameMetadata] WHERE GameId=@Id";
-
-                command.Parameters.AddWithValue("@Id", gameId);
-                await conn.OpenAsync();
-                var reader = await command.ExecuteReaderAsync();
-
-
-                while (await reader.ReadAsync())
-                {
-                    game = ReaderToGameMetadata(reader);
-                }
-                await reader.CloseAsync();
-            }
-            return game;
+            return await Context.GameMetadata.Where(g => g.GameId == gameId).FirstOrDefaultAsync();
         }
         public async Task<IEnumerable<Question>> GetQuestionsForGameAsync(int gameId)
         {
-            var questions = new List<Question>();
-            using (var conn = Context.GetSqlConnection())
-            {
-
-                var command = conn.CreateCommand();
-                command.CommandText =
-                    @"SELECT * FROM [dbo].[Questions] WHERE GameId=@ID";
-
-                command.Parameters.AddWithValue("@Id", gameId);
-
-
-                await conn.OpenAsync();
-                var reader = await command.ExecuteReaderAsync();
-
-
-                while (await reader.ReadAsync())
-                {
-                    questions.Add(ReaderToQuestion(reader));
-                }
-                await reader.CloseAsync();
-            }
-            return questions;
+            return await Context.Questions.Where(g => g.GameId == gameId).ToListAsync();
         }
 
         public async Task<Question> GetCurrentQuestionAsync(int gameId)
         {
-            var question = new Question();
-            using (var conn = Context.GetSqlConnection())
-            {
-
-                var command = conn.CreateCommand();
-                command.CommandText =
-                    @"SELECT q.*, g.* FROM [dbo].[Questions] q, [dbo].[GameMetadata] g
-                    WHERE q.GameId=@ID AND g.GameId=@ID AND q.RoundNum=g.CurrentRoundNum AND q.QuestionNum=g.CurrentQuestionNum";
-
-                command.Parameters.AddWithValue("@Id", gameId);
-
-
-                await conn.OpenAsync();
-                var reader = await command.ExecuteReaderAsync();
-
-
-                while (await reader.ReadAsync())
-                {
-                    question = ReaderToQuestion(reader);
-                }
-                await reader.CloseAsync();
-            }
+            var currentGame = await Context.GameMetadata.Where(g => g.GameId == gameId).FirstOrDefaultAsync();
+            var question = await Context.Questions.Where(g => g.GameId == gameId && g.Round == currentGame.CurrentRound && g.Number == currentGame.CurrentQuestion).FirstOrDefaultAsync();
             return question;
         }
 
         public async Task UpdateExistingQuestionsAsync(int gameId, IList<Question> questions)
         {
-            using (var conn = Context.GetSqlConnection())
+            foreach(var question in questions)
             {
-
-                var command = conn.CreateCommand();
-                command.Parameters.AddWithValue("@GameId", gameId);
-                for (int i = 0; i < questions.Count(); i++)
-                {
-                    command.CommandText +=
-                        string.Format(@"UPDATE [dbo].[Questions] 
-                              SET QuestionText=@Text{0}, CategoryText=@Category{0}, AnswerText=@Answer{0}
-                              WHERE GameId=@GameId AND RoundNum=@Round{0} AND QuestionNum=@Question{0};", i);
-
-                    command.Parameters.AddWithValue($"@Round{i}", questions[i].Round);
-                    command.Parameters.AddWithValue($"@Question{i}", questions[i].Number);
-                    command.Parameters.AddWithValue($"@Text{i}", questions[i].Text);
-                    command.Parameters.AddWithValue($"@Category{i}", questions[i].Category);
-                    command.Parameters.AddWithValue($"@Answer{i}", questions[i].AnswerText);
-
-
-                }
-                await conn.OpenAsync();
-                await command.ExecuteNonQueryAsync();
-                await conn.CloseAsync();
+                var existing = await Context.Questions.Where(q => q.GameId == question.GameId && q.Round == question.Round && q.Number == question.Number).FirstOrDefaultAsync();
+                existing.AnswerText = question.AnswerText;
+                existing.Category = question.Category;
+                existing.Text = question.Text;
             }
+            await Context.SaveChangesAsync();
         }
         public async Task InsertQuestionsAsync(int gameId, IList<Question> questions)
         {
-            using (var conn = Context.GetSqlConnection())
-            {
-
-                var command = conn.CreateCommand();
-                    command.Parameters.AddWithValue("@GameId", gameId);
-                for (int i = 0; i < questions.Count(); i++)
-                {
-                    command.CommandText +=
-                        string.Format(@"INSERT INTO [dbo].[Questions]
-                              (GameId, RoundNum, QuestionNum, QuestionText, CategoryText, AnswerText)
-                              VALUES(@GameID, @Round{0}, @Question{0}, @Text{0}, @Category{0}, @Answer{0});", i);
-
-                    command.Parameters.AddWithValue($"@Round{i}", questions[i].Round);
-                    command.Parameters.AddWithValue($"@Question{i}", questions[i].Number);
-                    command.Parameters.AddWithValue($"@Text{i}", questions[i].Text);
-                    command.Parameters.AddWithValue($"@Category{i}", questions[i].Category);
-                    command.Parameters.AddWithValue($"@Answer{i}", questions[i].AnswerText);
-
-                }
-                await conn.OpenAsync();
-                await command.ExecuteNonQueryAsync();
-                await conn.CloseAsync();
-            }
+            await Context.Questions.AddRangeAsync(questions);
+            await Context.SaveChangesAsync();
         }
 
 
         public async Task<GameMetadata> StoreGameData(Game game)
         {
-            var existing = await GetExistingGamesAsync();
-            if (existing.Where(g => g.GameId == game.Metadata.GameId).Any())
+            var existing = await Context.GameMetadata.Where(g => g.GameId.ToString() == game.Id).FirstOrDefaultAsync();
+            if (existing != null)
             {
                 await UpdateExistingGameMetadataAsync(game.Metadata);
                 await UpdateExistingQuestionsAsync(game.Metadata.GameId, game.Questions);
@@ -270,50 +97,30 @@ namespace OccamsRazor.Web.Persistence.Repository
 
         public async Task<GameMetadata> UpdateCurrentQuestionAsync(GameMetadata game)
         {
-            using (var conn = Context.GetSqlConnection())
-            {
+            var currentGame = await Context.GameMetadata.Where(g => g.GameId == game.GameId).FirstOrDefaultAsync();
+            currentGame.CurrentRound = game.CurrentRound;
+            currentGame.CurrentQuestion = game.CurrentQuestion;
 
-                var command = conn.CreateCommand();
-
-
-                command.CommandText +=
-                    @"UPDATE [dbo].[GameMetadata]
-                              SET CurrentRoundNum=@Round, CurrentQuestionNum=@Question
-                              WHERE GameId=@GameId";
-
-                command.Parameters.AddWithValue("@Question", game.CurrentQuestion);
-                command.Parameters.AddWithValue("@Round", game.CurrentRound);
-                command.Parameters.AddWithValue("@GameId", game.GameId);
-                await conn.OpenAsync();
-                await command.ExecuteNonQueryAsync();
-                await conn.CloseAsync();
-            }
-            return game;
+            await Context.SaveChangesAsync();
+            return currentGame;
         }
 
         public async Task<bool> DeleteGame(int gameId)
         {
-            using (var conn = Context.GetSqlConnection())
-            {
+            var existingGame = await Context.GameMetadata.Where(g => g.GameId == gameId).FirstOrDefaultAsync();
+            var existingQuestions = await Context.Questions.Where(g => g.GameId == gameId).ToArrayAsync();
+            var exisitingAnswers = await Context.Answers.Where(g => g.GameId == gameId).ToArrayAsync();
 
-                var command = conn.CreateCommand();
+            Context.GameMetadata.Remove(existingGame);
+            Context.Questions.RemoveRange(existingQuestions);
+            Context.Answers.RemoveRange(exisitingAnswers);
 
-                command.CommandText += @"DELETE FROM [dbo].[GameMetadata] WHERE GameId=@GameId;";
-                command.CommandText += @"DELETE FROM [dbo].[Questions] WHERE GameID=@GameId;";
-                command.CommandText += @"DELETE FROM [dbo].[HostKeys] WHERE GameId=@GameId;";
-                command.CommandText += @"DELETE FROM [dbo].[PlayerAnswers] WHERE GameId=@GameId;";
-
-                command.Parameters.AddWithValue("@GameId", gameId);
-                await conn.OpenAsync();
-                await command.ExecuteNonQueryAsync();
-                await conn.CloseAsync();
-            }
             return true;
         }
 
         public async Task<GameMetadata> SetGameState(GameMetadata game)
         {
-            return game;
+            return await Task.FromResult(game);
         }
         public async Task<GameMetadata> GetGameState(int gameId)
         {
