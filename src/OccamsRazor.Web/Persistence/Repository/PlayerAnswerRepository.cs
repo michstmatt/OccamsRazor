@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,27 +29,22 @@ namespace OccamsRazor.Web.Persistence.Repository
         }
         public async Task<PlayerAnswer> GetAnswersForQuestionForPlayer(PlayerAnswer answer)
         {
-            var existing = Context.Answers.Where(a => a.Player == answer.Player && a.GameId == answer.GameId && a.QuestionNumber == answer.QuestionNumber && a.Round == answer.Round).FirstOrDefault();
+            var existing = Context.Answers.Where(a => a.Player.Name == answer.Player.Name && a.GameId == answer.GameId && a.QuestionNumber == answer.QuestionNumber && a.Round == answer.Round).FirstOrDefault();
             return existing;
         }
 
-        public async Task UpdateExistingAnswerAsync(PlayerAnswer answer)
+        public async Task UpdateExistingAnswerAsync(PlayerAnswer exsiting, PlayerAnswer answer)
         {
-            var existing = Context.Answers.Where(a => a.Player == answer.Player && a.GameId == answer.GameId && a.QuestionNumber == answer.QuestionNumber && a.Round == answer.Round).FirstOrDefault();
-
-            if (existing == null)
-            {
-
-            }
-            existing.Wager = answer.Wager;
-            existing.AnswerText = answer.AnswerText;
-            existing.PointsAwarded = answer.PointsAwarded;
+            exsiting.Wager = answer.Wager;
+            exsiting.AnswerText = answer.AnswerText;
+            exsiting.PointsAwarded = answer.PointsAwarded;
             await Context.SaveChangesAsync();
 
         }
         public async Task InsertAnswerAsync(PlayerAnswer answer)
         {
             await Context.Answers.AddAsync(answer);
+            await Context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<PlayerAnswer>> GetScoredAnswersForPlayerAsync(int gameId, string name)
@@ -76,13 +70,13 @@ namespace OccamsRazor.Web.Persistence.Repository
         {
 
             var existingAnswer = await GetAnswersForQuestionForPlayer(answer);
-            if (existingAnswer.AnswerText == null)
+            if (existingAnswer?.AnswerText == null)
             {
                 await InsertAnswerAsync(answer);
             }
             else
             {
-                await UpdateExistingAnswerAsync(answer);
+                await UpdateExistingAnswerAsync(existingAnswer, answer);
             }
             return true;
         }
@@ -96,7 +90,7 @@ namespace OccamsRazor.Web.Persistence.Repository
         {
             foreach(var answer in scoredAnswers)
             {
-                await UpdateExistingAnswerAsync(answer);
+                await SubmitAnswer(answer);
             }
             return true;
         }

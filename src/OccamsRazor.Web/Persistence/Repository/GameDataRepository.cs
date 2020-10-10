@@ -41,6 +41,7 @@ namespace OccamsRazor.Web.Persistence.Repository
         public async Task<GameMetadata> InsertGameMetadataAsync(GameMetadata game)
         {
             await Context.GameMetadata.AddAsync(game);
+            await Context.SaveChangesAsync();
             return game;
         }
 
