@@ -9,6 +9,7 @@ namespace OccamsRazor.Common.Models
     {
         [JsonPropertyName("gameId")]
         public int GameId { get; set; }
+
         [JsonPropertyName("name")]
         public string Name { get; set; } = "";
 

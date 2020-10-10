@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,8 +36,16 @@ namespace OccamsRazor.Web
                 configuration.RootPath = "ClientApp/build";
             });
 
+            var connString = System.Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
-            services.AddScoped<OccamsRazorSqlClient>();
+            services.AddDbContext<OccamsRazorEfSqlContext>( options =>
+                options.UseSqlServer(connString)
+            );
+            OccamsRazorEfSqlContext.ANSWER_TABLE = System.Environment.GetEnvironmentVariable("ANSWERS_TABLE");
+            OccamsRazorEfSqlContext.GAMEMETADATA_TABLE = System.Environment.GetEnvironmentVariable("GAMEMETADATA_TABLE");
+            OccamsRazorEfSqlContext.QUESTION_TABLE = System.Environment.GetEnvironmentVariable("QUESTIONS_TABLE");
+            OccamsRazorEfSqlContext.KEY_TABLE = System.Environment.GetEnvironmentVariable("KEYS_TABLE");
+
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             //services.AddSingleton<IGameDataRepository, GameTestDataRepository>();
