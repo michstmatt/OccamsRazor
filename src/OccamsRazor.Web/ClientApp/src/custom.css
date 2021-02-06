@@ -29,13 +29,16 @@ body {
   margin-bottom: 60px;
   background-color: transparent;
   color: #fefefe;
-
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 @media only screen and (max-width: 768px) {
   .cardLarge {
     width: 100%;
-    margin: auto;
+    min-width: 50%;
+    margin:  0 auto;
     background-color: #252525;
     box-shadow: 0px 30px 40px #00000073;
     border-radius: 5px;
@@ -43,6 +46,7 @@ body {
 
   .card {
     width: 100%;
+    min-width: 50%;
     margin-left: auto;
     margin-right: auto;
     margin-top: 25px;
@@ -55,12 +59,14 @@ body {
 
 @media only screen and (min-width: 768px) {
   .container {
+    min-width: 1000px;
     margin: 20px;
   }
 
 
   .cardLarge {
     width: 100%;
+    min-width: 50%;
     margin: auto;
     background-color: #252525;
     padding: 20px;
@@ -70,6 +76,7 @@ body {
 
   .card {
     width: 90%;
+    min-width: 90%;
     margin-left: auto;
     margin-right: auto;
     margin-top: 25px;
@@ -152,7 +159,7 @@ span.secondary {
 }
 
 .host-score-button {
-  margin: auto;
+  margin: auto 10px;
   width: 30%;
   border-radius: 5px;
   background-color: transparent;

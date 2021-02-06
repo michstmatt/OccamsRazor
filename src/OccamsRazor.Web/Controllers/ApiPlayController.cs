@@ -19,17 +19,20 @@ namespace OccamsRazor.Web.Controllers
         private readonly ILogger<ApiPlayController> _logger;
         private readonly IGameDataService _gameDataService;
         private readonly IPlayerAnswerService _playerAnswerService;
+        private readonly INotificationService _notificationService;
 
 
 
         public ApiPlayController(ILogger<ApiPlayController> logger,
             IGameDataService gameDataService,
-            IPlayerAnswerService answerService
+            IPlayerAnswerService answerService,
+            INotificationService notificationSvc
         )
         {
             _logger = logger;
             _gameDataService = gameDataService;
             _playerAnswerService = answerService;
+            _notificationService = notificationSvc;
         }
 
         [HttpGet]
@@ -69,6 +72,7 @@ namespace OccamsRazor.Web.Controllers
                 return BadRequest();
             }
             var result = await _playerAnswerService.SubmitPlayerAnswer(answer);
+            await _notificationService.UpdateHost("NEW_ANSWER");
             return Ok(result);
         }
 

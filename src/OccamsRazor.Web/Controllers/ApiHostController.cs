@@ -18,18 +18,21 @@ namespace OccamsRazor.Web.Controllers
         private readonly IAuthenticationService _authService;
         private readonly IGameDataService _gameDataService;
         private readonly IPlayerAnswerService _playerAnswerService;
+        private readonly INotificationService _notificationService;
         private readonly IHttpContextAccessor _accessor;
         public ApiHostController(ILogger<ApiHostController> logger,
             IHttpContextAccessor accessor,
             IAuthenticationService authService,
             IGameDataService gameDataService,
-            IPlayerAnswerService playerAnswerService)
+            IPlayerAnswerService playerAnswerService,
+            INotificationService notificationService)
         {
             _logger = logger;
             _accessor = accessor;
             _authService = authService;
             _gameDataService = gameDataService;
             _playerAnswerService = playerAnswerService;
+            _notificationService = notificationService;
         }
 
         [HttpGet]
@@ -126,6 +129,8 @@ namespace OccamsRazor.Web.Controllers
                 return Unauthorized();
             }
             var result = await _gameDataService.SetCurrentQuestion(game);
+
+            await _notificationService.SendPlayerMessage("NEW_QUESTION");
             return Ok(result);
         }
 
@@ -163,6 +168,7 @@ namespace OccamsRazor.Web.Controllers
                 return Unauthorized();
             }
             var response = await _gameDataService.SetGameState(game);
+            await _notificationService.SendPlayerMessage("STATE_CHANGED");
             return Ok(response);
         }
 
