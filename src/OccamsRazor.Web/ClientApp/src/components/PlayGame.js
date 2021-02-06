@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Toast } from './Toast';
 import { WaitPage } from './WaitPage';
 import { Results } from './Results';
+import { PreQuestion } from './PreQuestion';
+import { PostQuestion } from './PostQuestion';
 
 export class PlayGame extends Component {
     static displayName = PlayGame.name;
@@ -16,32 +18,47 @@ export class PlayGame extends Component {
             selectedGameId: storedState.gameId,
             wager: 1,
             answer: "",
-            gameState : 0
+            gameState: 0
         };
-        if (this.state.player === undefined || this.state.selectedGameId === undefined)
-        {
+        if (this.state.player === undefined || this.state.selectedGameId === undefined) {
             this.props.history.push("/play-setup");
         }
+
+        let socket = new WebSocket("wss://localhost:5001/notifications/player/" + this.state.player.name);
+        socket.onopen = e => {
+            alert("connected");
+            socket.send("connected");
+        };
+
+        socket.onmessage = e => {
+            this.checkState();
+        };
+
+        socket.onclose = function (e) {
+            alert("disconnected");
+        };
+            
+
     }
 
     componentDidMount() {
         this.checkState();
-        setInterval(()=> this.checkState(), 10000);
     }
+
 
     answerSumbitHandler = (event) => {
         event.preventDefault();
-        let answer = 
+        let answer =
         {
             player: this.state.player,
             answerText: this.state.answer,
-            wager: this.state.wager*1,
-            questionNumber: this.state.currentQuestion.number*1,
-            round: this.state.currentQuestion.round*1,
-            gameId: this.state.selectedGameId *1,
+            wager: this.state.wager * 1,
+            questionNumber: this.state.currentQuestion.number * 1,
+            round: this.state.currentQuestion.round * 1,
+            gameId: this.state.selectedGameId * 1,
         };
 
-        if (answer.answerText !== "" && answer.wager >0 && answer.wager <7)
+        if (answer.answerText !== "" && answer.wager > 0 && answer.wager < 7)
             this.submitAnswer(answer);
         else
             this.refs.toast.setText("You must fill out all fields!");
@@ -90,25 +107,23 @@ export class PlayGame extends Component {
         )
     }
 
-    renderPlay() 
-    {
+    renderPlay() {
         let question = this.state.loading
-        ? <p><em>Loading...</em></p>
-        : this.renderQuestion(this.state.currentQuestion);
+            ? <p><em>Loading...</em></p>
+            : this.renderQuestion(this.state.currentQuestion);
         return (
             <div className="card">
-            <h3>Playing as {this.state.player.name}</h3>
-            {question}
-            {this.renderForm()}
-            
-        </div>)
+                <h3>Playing as {this.state.player.name}</h3>
+                {question}
+                {this.renderForm()}
+
+            </div>)
     }
 
-    renderResults()
-    {
-        return(
+    renderResults() {
+        return (
             <div>
-                <Results gameId= {this.state.selectedGameId} />
+                <Results gameId={this.state.selectedGameId} />
             </div>
         )
     }
@@ -117,18 +132,21 @@ export class PlayGame extends Component {
 
 
         let content = {};
-        
-        if(this.state.gameState === 0)
-        {
+
+        if (this.state.gameState === 0)  {
             content = this.renderWait();
         }
-        else if(this.state.gameState === 1)
-        {
+        else if (this.state.gameState === 1) {
             content = this.renderPlay();
         }
-        else if(this.state.gameState === 2)
-        {
+        else if (this.state.gameState === 2) {
             content = this.renderResults();
+        }
+        else if (this.state.gameState === 3){
+            content = (<PreQuestion gameName={this.state.gameName}/>)
+        }
+        else if (this.state.gameState === 4){
+            content =(<PostQuestion gameName={this.state.gameName} question={this.state.currentQuestion}/>)
         }
 
         return (
@@ -140,29 +158,26 @@ export class PlayGame extends Component {
     }
 
     checkState() {
-        this.getState().then( () => {
-            if (this.state.gameState === 1)
-            {
+        this.getState().then(() => {
+            if (this.state.gameState === 1 || this.state.gameState === 4) {
                 this.loadQuestion();
             }
         });
     }
 
     async loadQuestion() {
-        const response = await fetch('/api/Play/GetCurrentQuestion?gameId='+ this.state.selectedGameId);
-        if (response.ok)
-        {
+        const response = await fetch('/api/Play/GetCurrentQuestion?gameId=' + this.state.selectedGameId);
+        if (response.ok) {
             const data = await response.json();
-            this.setState({ currentQuestion: data,loading: false });
+            this.setState({ currentQuestion: data, loading: false });
         }
     }
 
-    async getState(){
-        const response = await fetch('/api/Play/GetState?gameId='+ this.state.selectedGameId);
-        if (response.ok)
-        {
+    async getState() {
+        const response = await fetch('/api/Play/GetState?gameId=' + this.state.selectedGameId);
+        if (response.ok) {
             const data = await response.json();
-            this.setState({gameState: data.state});
+            this.setState({ gameState: data.state });
         }
     }
 
@@ -173,14 +188,12 @@ export class PlayGame extends Component {
             body: JSON.stringify(answer)
         };
         const response = await fetch('/api/Play/submitAnswer', requestOptions);
-        
-        if(response.ok)
-        {
+
+        if (response.ok) {
             this.refs.toast.setText("Your answer was received");
             this.setState({})
         }
-        else
-        {
+        else {
             this.refs.toast.setText("There was an error, please submit again");
         }
 

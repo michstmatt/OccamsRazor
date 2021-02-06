@@ -12,7 +12,6 @@ using OccamsRazor.Web.Repository;
 using OccamsRazor.Web.Service;
 using OccamsRazor.Web.Persistence.Repository;
 using OccamsRazor.Web.Persistence.Service;
-
 namespace OccamsRazor.Web
 {
     public class Startup
@@ -38,8 +37,8 @@ namespace OccamsRazor.Web
 
             var connString = System.Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
-            services.AddDbContext<OccamsRazorEfSqlContext>( options =>
-                options.UseSqlServer(connString)
+            services.AddDbContext<OccamsRazorEfSqlContext>(options =>
+               options.UseSqlServer(connString)
             );
             OccamsRazorEfSqlContext.ANSWER_TABLE = System.Environment.GetEnvironmentVariable("ANSWERS_TABLE");
             OccamsRazorEfSqlContext.GAMEMETADATA_TABLE = System.Environment.GetEnvironmentVariable("GAMEMETADATA_TABLE");
@@ -54,7 +53,9 @@ namespace OccamsRazor.Web
             //services.AddSingleton<IPlayerAnswerRepository, PlayerTestAnswerRepository>();
             services.AddScoped<IPlayerAnswerRepository, PlayerAnswerRepository>();
             services.AddScoped<IPlayerAnswerService, PlayerAnswerService>();
+            services.AddSingleton<INotificationService, NotificationService>((svc) => NotificationService.singleton);
             services.AddHttpContextAccessor();
+            services.AddConnections();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,12 +71,48 @@ namespace OccamsRazor.Web
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            var webSocketOptions = new WebSocketOptions()
+            {
+                KeepAliveInterval = System.TimeSpan.FromSeconds(120),
+                ReceiveBufferSize = 4 * 1024
+            };
 
+            app.UseWebSockets(webSocketOptions);
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
             app.UseRouting();
+            app.Use(async (context, next) =>
+            {
+                if (context.WebSockets.IsWebSocketRequest)
+                {
+                    if (context.Request.Path.Value.StartsWith("/notifications/player"))
+                    {
+                        var splits = context.Request.Path.Value.Split('/');
+                        var name = splits[splits.Length - 1];
+                        using (var webSocket = await context.WebSockets.AcceptWebSocketAsync())
+                        {
+                            var task = new System.Threading.Tasks.TaskCompletionSource<object>();
+                            await NotificationService.singleton.HandleConnected(new Common.Models.Player { Name = name }, webSocket, task);
+                            await task.Task;
+                        }
+                    }
+                    else if (context.Request.Path.Value.StartsWith("/notifications/host"))
+                    {
+                        using (var webSocket = await context.WebSockets.AcceptWebSocketAsync())
+                        {
+                            var task = new System.Threading.Tasks.TaskCompletionSource<object>();
+                            await NotificationService.singleton.HandleHostConnected(webSocket, task);
+                            await task.Task;
+                        }
+                    }
+                }
+                else
+                {
+                    await next();
+                }
+            });
 
             app.UseEndpoints(endpoints =>
             {
@@ -93,6 +130,8 @@ namespace OccamsRazor.Web
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+
+
         }
     }
 }

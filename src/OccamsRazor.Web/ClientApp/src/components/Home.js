@@ -16,7 +16,7 @@ export class Home extends Component {
 
     render() {
         return (
-            <div className="card">
+            <div className="cardLarge">
                 <h1 id="tabelLabel"><span className="secondary">Occams Razor Trivia</span></h1>
                 <div className="card">
                     <h3>Join a game</h3>

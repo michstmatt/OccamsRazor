@@ -18,7 +18,7 @@ namespace OccamsRazor.Web.Persistence.Repository
         }
         public async Task<IEnumerable<PlayerAnswer>> GetAnswersForGame(int gameId)
         {
-            var answers = Context.Answers.Where(a => a.GameId == gameId);
+            var answers = Context.Answers.Where(a => a.GameId == gameId).ToList();
             return answers;
         }
 
