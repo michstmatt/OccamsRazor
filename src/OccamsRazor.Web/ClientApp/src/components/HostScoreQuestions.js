@@ -132,9 +132,6 @@ export class HostScoreQuestions extends Component {
 
         return (
             <div >
-                <div className="card">
-                    <HostGameState password={this.state.password} gameId={this.state.selectedGame} />
-                </div>
 
                 <div className="card">
                     <HostCurrentQuestion password={this.state.password} gameId={this.state.selectedGame} newQuestionEvent={this.newCurrentQuestionEvent} />

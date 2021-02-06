@@ -48,7 +48,8 @@ namespace OccamsRazor.Web.Controllers
         public async Task<IActionResult> GetCurrentQuestion(int gameId, string host)
         {
             var question = await _gameDataService.GetCurrentQuestion(gameId);
-            if (string.IsNullOrEmpty(host) || host != gameId.ToString())
+            var state = await _gameDataService.GetGameState(gameId);
+            if (state.State != GameStateEnum.PostQuestion && (string.IsNullOrEmpty(host) || host != gameId.ToString()))
             {
                 question.AnswerText = "";
             }

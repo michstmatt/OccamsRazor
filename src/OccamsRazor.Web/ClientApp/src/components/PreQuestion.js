@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
-export class PreQuestionPage extends Component {
-    static displayName = PreQuestionPage.name;
+export class PreQuestion extends Component {
+    static displayName = PreQuestion.name;
 
     constructor(props) {
         super(props);

@@ -38,14 +38,18 @@ export class HostCurrentQuestion extends Component {
         this.submitCurrentQuestion(this.state.selectedQuestion);
     }
 
-    renderHostCurrentQuestion(questions, cQuestion) {
+    updateStateHandler = (event, state) => {
+        this.setGameState(state);
+    }
+
+    renderHostCurrentQuestion(questions, cQuestion, state) {
         return (
             <div>
                 <div>
-
-                    <button className="host-score-button"  >Show Pre Question</button>
-                    <button className="host-score-button"  >Show Question</button>
-                    <button className="host-score-button"  >Show Answer</button>
+                    <h4> <span className="secondary"> Currently Showing </span>{ state == 3 ? "Pre Question" : (state == 1 ? "Question" : (state == 4 ? "Answer" : "")) }</h4>
+                    <button className="host-score-button" onClick={e => this.updateStateHandler(e, 3)} >Show Pre Question</button>
+                    <button className="host-score-button" onClick={e => this.updateStateHandler(e, 1)}>Show Question</button>
+                    <button className="host-score-button" onClick={e => this.updateStateHandler(e, 4)}>Show Answer</button>
                 </div>
                 <h4> <span className="secondary"> Current Round</span>{cQuestion.round} </h4>
                 <h4> <span className="secondary"> Current Question</span>{cQuestion.number} </h4>
@@ -67,13 +71,28 @@ export class HostCurrentQuestion extends Component {
     render() {
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>
-            : this.renderHostCurrentQuestion(this.state.gameData.questions, this.state.gameData.questions[this.state.currentQuestionIndex]);
+            : this.renderHostCurrentQuestion(this.state.gameData.questions, this.state.gameData.questions[this.state.currentQuestionIndex], this.state.gameData.metadata.state);
 
         return (
             <div className="container">
                 {contents}
             </div>
         );
+    }
+    async setGameState(state) {
+        this.setState({ loading: true });
+        let body = this.state.gameData.metadata;
+        body.state = state;
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'gameKey': this.state.password },
+            body: JSON.stringify(body)
+        };
+        const response = await fetch(`/api/Host/SetState`, requestOptions);
+        let game = this.state.gameData;
+        game.metadata = await response.json();
+        this.setState({ loading: false, gameData: game });
     }
 
     async loadCurrentQuestion() {
@@ -86,7 +105,6 @@ export class HostCurrentQuestion extends Component {
         const data = await response.json();
         const questionIndex = data.questions.findIndex(q => q.round === data.metadata.currentRound && q.number === data.metadata.currentQuestion);
         this.setState({ gameData: data, loading: false, currentQuestionIndex: questionIndex });
-
     }
 
     async submitCurrentQuestion(question) {

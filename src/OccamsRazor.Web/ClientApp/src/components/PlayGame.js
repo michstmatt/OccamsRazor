@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Toast } from './Toast';
 import { WaitPage } from './WaitPage';
 import { Results } from './Results';
+import { PreQuestion } from './PreQuestion';
+import { PostQuestion } from './PostQuestion';
 
 export class PlayGame extends Component {
     static displayName = PlayGame.name;
@@ -131,7 +133,7 @@ export class PlayGame extends Component {
 
         let content = {};
 
-        if (this.state.gameState === 0) {
+        if (this.state.gameState === 0)  {
             content = this.renderWait();
         }
         else if (this.state.gameState === 1) {
@@ -139,6 +141,12 @@ export class PlayGame extends Component {
         }
         else if (this.state.gameState === 2) {
             content = this.renderResults();
+        }
+        else if (this.state.gameState === 3){
+            content = (<PreQuestion gameName={this.state.gameName}/>)
+        }
+        else if (this.state.gameState === 4){
+            content =(<PostQuestion gameName={this.state.gameName} question={this.state.currentQuestion}/>)
         }
 
         return (
@@ -151,7 +159,7 @@ export class PlayGame extends Component {
 
     checkState() {
         this.getState().then(() => {
-            if (this.state.gameState === 1) {
+            if (this.state.gameState === 1 || this.state.gameState === 4) {
                 this.loadQuestion();
             }
         });

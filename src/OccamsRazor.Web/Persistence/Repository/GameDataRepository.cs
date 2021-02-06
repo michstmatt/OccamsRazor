@@ -121,7 +121,10 @@ namespace OccamsRazor.Web.Persistence.Repository
 
         public async Task<GameMetadata> SetGameState(GameMetadata game)
         {
-            return await Task.FromResult(game);
+            var existingGame = await Context.GameMetadata.Where(g => g.GameId == game.GameId).FirstOrDefaultAsync();
+            existingGame.State = game.State;
+            await Context.SaveChangesAsync();
+            return await Task.FromResult(existingGame);
         }
         public async Task<GameMetadata> GetGameState(int gameId)
         {

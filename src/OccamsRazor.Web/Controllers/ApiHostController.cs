@@ -128,6 +128,8 @@ namespace OccamsRazor.Web.Controllers
             {
                 return Unauthorized();
             }
+            game.State = GameStateEnum.PreQuestion;
+            await _gameDataService.SetGameState(game);
             var result = await _gameDataService.SetCurrentQuestion(game);
 
             await _notificationService.SendPlayerMessage("NEW_QUESTION");
