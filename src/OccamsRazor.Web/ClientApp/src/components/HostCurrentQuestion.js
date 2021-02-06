@@ -46,10 +46,10 @@ export class HostCurrentQuestion extends Component {
         return (
             <div>
                 <div>
-                    <h4> <span className="secondary"> Currently Showing </span>{ state == 3 ? "Pre Question" : (state == 1 ? "Question" : (state == 4 ? "Answer" : "")) }</h4>
-                    <button className={state == 3? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 3)} >Show Pre Question</button>
-                    <button className={state == 1? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 1)}>Show Question</button>
-                    <button className={state == 4? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 4)}>Show Answer</button>
+                    <h4> <span className="secondary"> Currently Showing </span>{ state === 3 ? "Pre Question" : (state === 1 ? "Question" : (state === 4 ? "Answer" : "")) }</h4>
+                    <button className={state === 3? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 3)} >Show Pre Question</button>
+                    <button className={state === 1? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 1)}>Show Question</button>
+                    <button className={state === 4? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 4)}>Show Answer</button>
                 </div>
                 <h4> <span className="secondary"> Current Round</span>{cQuestion.round} </h4>
                 <h4> <span className="secondary"> Current Question</span>{cQuestion.number} </h4>
