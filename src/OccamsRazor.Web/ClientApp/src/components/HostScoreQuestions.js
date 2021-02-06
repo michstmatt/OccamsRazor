@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { HostCurrentQuestion } from './HostCurrentQuestion';
 import { HostScoreAdder } from './HostScoreAdder';
-import { HostGameState } from './HostGameState';
 
 export class HostScoreQuestions extends Component {
     static displayName = HostScoreQuestions.name;
