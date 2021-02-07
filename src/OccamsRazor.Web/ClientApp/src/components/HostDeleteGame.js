@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { ToastService } from '../services/toastService';
 
 export class HostDeleteGame extends Component {
     static displayName = HostDeleteGame.name;
@@ -21,7 +22,7 @@ export class HostDeleteGame extends Component {
         {
             this.deleteGame().then( () =>
             {
-                alert("This game has been deleted");
+                ToastService.sendMessage("This game has been deleted");
                 window.location = '/';
             })
         }

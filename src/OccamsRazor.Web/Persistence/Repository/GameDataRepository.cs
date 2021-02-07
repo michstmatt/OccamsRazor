@@ -74,7 +74,8 @@ namespace OccamsRazor.Web.Persistence.Repository
         }
         public async Task InsertQuestionsAsync(int gameId, IList<Question> questions)
         {
-            await Context.Questions.AddRangeAsync(questions);
+            var updatedId = questions.Select(s => { s.GameId = gameId; return s; });
+            await Context.Questions.AddRangeAsync(updatedId);
             await Context.SaveChangesAsync();
         }
 
@@ -115,6 +116,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             Context.GameMetadata.Remove(existingGame);
             Context.Questions.RemoveRange(existingQuestions);
             Context.Answers.RemoveRange(exisitingAnswers);
+            await Context.SaveChangesAsync();
 
             return true;
         }

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { HostService } from '../services/hostService';
 
 export class HostSetupCreate extends Component {
     static displayName = HostSetupCreate.name;
@@ -17,15 +18,18 @@ export class HostSetupCreate extends Component {
 
     joinSubmitHandler = (event) => {
         event.preventDefault();
-        this.createGame();
+        HostService.createGame(this.state.name, this.state.password).then((data) => {
+            localStorage.setItem('state', JSON.stringify({ password: this.state.password, gameId: data.gameId }));
+            this.props.navigate()
+        });
     }
 
     nameChangeHandler = (event) => {
-        this.setState({name : event.target.value});
+        this.setState({ name: event.target.value });
     }
-    
+
     passwordChangeHandler = (event) => {
-        this.setState({password : event.target.value});
+        this.setState({ password: event.target.value });
     }
 
     renderHostSetupCreate() {
@@ -33,11 +37,11 @@ export class HostSetupCreate extends Component {
             <form className="answer-container" onSubmit={this.joinSubmitHandler}>
                 <h3 className="host-join-label"><span className="secondary" >Create a Game</span></h3>
                 <span>Name</span>
-                <input className="answer-input" type="text" onChange={ this.nameChangeHandler } />
+                <input className="answer-input" type="text" onChange={this.nameChangeHandler} />
                 <br />
 
                 <span>Password</span>
-                <input className="answer-input" type="password" onChange={ this.passwordChangeHandler } />
+                <input className="answer-input" type="password" onChange={this.passwordChangeHandler} />
 
                 <br />
                 <br />
@@ -54,28 +58,6 @@ export class HostSetupCreate extends Component {
                 {contents}
             </div>
         );
-    }
-
-    async createGame()
-    {
-        let game = 
-        {
-            name: this.state.name
-        };
-
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'gameKey': this.state.password},
-            body: JSON.stringify(game)
-        };
-        const response = await fetch('/api/Host/createGame', requestOptions);
-        
-        if(response.ok)
-        {
-            let data = await response.json();
-            localStorage.setItem('state', JSON.stringify({password: this.state.password, gameId: data.gameId}));
-            this.props.navigate();
-        }
     }
 }
 

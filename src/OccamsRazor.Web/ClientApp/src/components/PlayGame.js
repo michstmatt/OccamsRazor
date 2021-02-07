@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { Toast } from './Toast';
 import { WaitPage } from './WaitPage';
 import { Results } from './Results';
 import { PreQuestion } from './PreQuestion';
 import { PostQuestion } from './PostQuestion';
+import { PlayService } from '../services/playService';
+import { NotificationService } from '../services/notificationService';
+import { ToastService } from '../services/toastService';
 
 export class PlayGame extends Component {
     static displayName = PlayGame.name;
@@ -24,9 +26,9 @@ export class PlayGame extends Component {
             this.props.history.push("/play-setup");
         }
 
-        let socket = new WebSocket("wss://localhost:5001/notifications/player/" + this.state.player.name);
+        let socket = new NotificationService(true, this.state.player.name).getSocket();
         socket.onopen = e => {
-            alert("connected");
+            ToastService.setConnected(true);
             socket.send("connected");
         };
 
@@ -35,9 +37,9 @@ export class PlayGame extends Component {
         };
 
         socket.onclose = function (e) {
-            alert("disconnected");
+            ToastService.setConnected(false);
         };
-            
+
 
     }
 
@@ -58,10 +60,17 @@ export class PlayGame extends Component {
             gameId: this.state.selectedGameId * 1,
         };
 
-        if (answer.answerText !== "" && answer.wager > 0 && answer.wager < 7)
-            this.submitAnswer(answer);
-        else
-            this.refs.toast.setText("You must fill out all fields!");
+        if (answer.answerText !== "" && answer.wager > 0 && answer.wager < 7) {
+            ToastService.sendMessage("Loading...");
+            PlayService.submitAnswer(answer).then(() => {
+                ToastService.sendMessage(`Your answer for R${answer.round} Q${answer.questionNumber} was received`);
+            }).catch((err) => {
+                ToastService.sendError("An error occured. Please submit again");
+            });
+        }
+        else {
+            ToastService.sendError("You must fill out all fields!");
+        }
     }
 
     wagerChangeHandler = (event) => {
@@ -133,7 +142,7 @@ export class PlayGame extends Component {
 
         let content = {};
 
-        if (this.state.gameState === 0)  {
+        if (this.state.gameState === 0) {
             content = this.renderWait();
         }
         else if (this.state.gameState === 1) {
@@ -142,61 +151,31 @@ export class PlayGame extends Component {
         else if (this.state.gameState === 2) {
             content = this.renderResults();
         }
-        else if (this.state.gameState === 3){
-            content = (<PreQuestion gameName={this.state.gameName}/>)
+        else if (this.state.gameState === 3) {
+            content = (<PreQuestion gameName={this.state.gameName} />)
         }
-        else if (this.state.gameState === 4){
-            content =(<PostQuestion gameName={this.state.gameName} question={this.state.currentQuestion}/>)
+        else if (this.state.gameState === 4) {
+            content = (<PostQuestion gameName={this.state.gameName} question={this.state.currentQuestion} />)
         }
 
         return (
             <div>
-                <Toast ref="toast" />
                 {content}
             </div>
         );
     }
 
     checkState() {
-        this.getState().then(() => {
+        this.setState({ loading: true });
+        PlayService.getState(this.state.selectedGameId).then((data) => {
+            this.setState({ gameState: data.state });
             if (this.state.gameState === 1 || this.state.gameState === 4) {
-                this.loadQuestion();
+                PlayService.loadQuestion(this.state.selectedGameId).then((data) => {
+                    this.setState({ currentQuestion: data, loading: false });
+                });
             }
         });
     }
 
-    async loadQuestion() {
-        const response = await fetch('/api/Play/GetCurrentQuestion?gameId=' + this.state.selectedGameId);
-        if (response.ok) {
-            const data = await response.json();
-            this.setState({ currentQuestion: data, loading: false });
-        }
-    }
-
-    async getState() {
-        const response = await fetch('/api/Play/GetState?gameId=' + this.state.selectedGameId);
-        if (response.ok) {
-            const data = await response.json();
-            this.setState({ gameState: data.state });
-        }
-    }
-
-    async submitAnswer(answer) {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(answer)
-        };
-        const response = await fetch('/api/Play/submitAnswer', requestOptions);
-
-        if (response.ok) {
-            this.refs.toast.setText("Your answer was received");
-            this.setState({})
-        }
-        else {
-            this.refs.toast.setText("There was an error, please submit again");
-        }
-
-    }
 }
 

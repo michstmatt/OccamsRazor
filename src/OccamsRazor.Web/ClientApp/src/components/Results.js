@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { HostService } from '../services/hostService';
 
 export class Results extends Component {
     static displayName = Results.name;
@@ -15,31 +16,35 @@ export class Results extends Component {
     }
 
     componentDidMount() {
-        this.loadResults();
+        this.setState({ loading: true });
+        HostService.loadResults(this.state.selectedGame, this.state.password).then((data) => {
+            this.setState({ loading: false, playerScores: data });
+        });
+
     }
 
 
     renderResults(results) {
         return (
             <div>
-            <div className="card">
-            <h3><span className="primary">Summary</span></h3>
-            <table className="playerScores">
-                <tr>
-                    <th className="playerScores">Name</th>
-                    <th className="playerScores">Score</th>
-                </tr>
-                {results.map(playerData =>
-                <tr>
-                    <td className="playerScores">{playerData.player.name}</td>
-                    <td className="playerScores">{playerData.totalScore}</td>
-                </tr>
-                )}
-            </table>
-        </div>
-        <br />
+                <div className="card">
+                    <h3><span className="primary">Summary</span></h3>
+                    <table className="playerScores">
+                        <tr>
+                            <th className="playerScores">Name</th>
+                            <th className="playerScores">Score</th>
+                        </tr>
+                        {results.map(playerData =>
+                            <tr>
+                                <td className="playerScores">{playerData.player.name}</td>
+                                <td className="playerScores">{playerData.totalScore}</td>
+                            </tr>
+                        )}
+                    </table>
+                </div>
+                <br />
 
-        </div>
+            </div>
         );
     }
 
@@ -55,17 +60,5 @@ export class Results extends Component {
         );
     }
 
-    async loadResults() {
-        const requestOptions = {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json', 'gameKey' : this.state.password },
-        };
-        const response = await fetch(`/api/Host/GetScoredResponses?gameId=${this.state.selectedGame}`, requestOptions);
-        if (response.ok)
-        {
-            const data = await response.json();
-            this.setState({ playerScores: data, loading: false});
-        }
-    }
 }
 

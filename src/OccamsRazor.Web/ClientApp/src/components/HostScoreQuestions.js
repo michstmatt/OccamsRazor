@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { HostService } from '../services/hostService';
+import { NotificationService } from '../services/notificationService';
+import { ToastService } from '../services/toastService';
 import { HostCurrentQuestion } from './HostCurrentQuestion';
 import { HostScoreAdder } from './HostScoreAdder';
 
@@ -10,7 +13,6 @@ export class HostScoreQuestions extends Component {
         this.state = {
             loading: true,
             selectedGame: this.props.gameId,
-            password: this.props.password,
             selectedRound: 1,
             selectedQuestion: 1,
             gameData: {},
@@ -26,24 +28,24 @@ export class HostScoreQuestions extends Component {
                 { name: 'Final', number: 8 },
             ]
         };
-        let socket = new WebSocket("wss://localhost:5001/notifications/host/");
+        let socket = new NotificationService(false, null).getSocket();
         socket.onopen = e => {
-            alert("connected");
+            ToastService.setConnected(true);
             socket.send("connected");
         };
 
         socket.onmessage = e => {
-            alert("new messages");
+            ToastService.sendMessage("New Responses!");
             this.refreshResponses();
         };
 
         socket.onclose = function (e) {
-            alert("disconnected");
+            ToastService.setConnected(false);
         };
     }
 
     componentDidMount() {
-        this.loadQuestions();
+        this.refreshResponses();
     }
 
     roundSelectedHandler = (event) => {
@@ -63,20 +65,30 @@ export class HostScoreQuestions extends Component {
     }
 
     submitPlayerScores = (event) => {
-        this.submitAnswers(this.state.answers);
+        this.setState({ loading: true });
+        HostService.updatePlayerScores(this.state.selectedGame, this.state.answers).then((response) => {
+            this.refreshResponses();
+        })
     }
 
-    refreshResponses = (event) => this.loadQuestions();
+    refreshResponses = (event) => {
+        this.setState({ loading: true });
+        HostService.getPlayerAnswers(this.state.selectedGame).then((answers) => {
+            this.setState({ loading: false, answers: answers });
+        })
+    }
 
     deleteAnswerHandler = (event, answer) => {
         let shouldDelete = window.confirm("Are you sure you want to delete this response?");
         if (shouldDelete) {
-            this.deleteAnswer(answer);
+            HostService.deleteAnswer(this.state.gameId, answer).then(() => { });
         }
     }
 
     handleComponentEvent = () => {
-        this.loadQuestions();
+        HostService.loadQuestions(this.state.gameId).then(() => {
+            this.refreshResponses();
+        });
     }
 
     newCurrentQuestionEvent = (currentQuestion) => {
@@ -133,7 +145,7 @@ export class HostScoreQuestions extends Component {
             <div >
 
                 <div className="card">
-                    <HostCurrentQuestion password={this.state.password} gameId={this.state.selectedGame} newQuestionEvent={this.newCurrentQuestionEvent} />
+                    <HostCurrentQuestion gameId={this.state.selectedGame} newQuestionEvent={this.newCurrentQuestionEvent} />
                 </div>
 
 
@@ -146,47 +158,14 @@ export class HostScoreQuestions extends Component {
 
                     {contents}
                     <hr />
-                    <HostScoreAdder password={this.state.password} gameId={this.state.selectedGame} cRound={this.state.selectedRound} cQuestion={this.state.selectedQuestion} refresh={this.handleComponentEvent} />
+                    <HostScoreAdder gameId={this.state.selectedGame} cRound={this.state.selectedRound} cQuestion={this.state.selectedQuestion} refresh={this.handleComponentEvent} />
                 </div>
             </div>
         );
     }
 
-    async loadQuestions() {
-        this.setState({ loading: true });
-        const requestOptions = {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json', 'gameKey': this.state.password }
-        };
-        const response = await fetch(`/api/Host/GetPlayerAnswers?gameId=${this.state.selectedGame}`, requestOptions);
-        if (response.ok) {
-            const data = await response.json();
-            this.setState({ answers: data, loading: false });
-        }
-    }
 
-    async submitAnswers(answers) {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'gameKey': this.state.password },
-            body: JSON.stringify(answers)
-        };
-        const response = await fetch(`/api/Host/UpdatePlayerScores?gameId=${this.state.selectedGame}`, requestOptions);
-        if (response.ok) {
-            this.loadQuestions();
-        }
-    }
 
-    async deleteAnswer(answer) {
-        const requestOptions = {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json', 'gameKey': this.state.password },
-            body: JSON.stringify(answer)
-        };
-        const response = await fetch(`/api/Host/DeletePlayerAnswer?gameId=${this.state.selectedGame}`, requestOptions);
-        if (response.ok) {
-            this.loadQuestions();
-        }
-    }
+
 }
 
