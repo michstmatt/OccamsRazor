@@ -9,6 +9,11 @@ on:
       - routing-fix
   workflow_dispatch:
 
+env:
+  NODE_APP_PATH: "./src/OccamsRazor.Frontend"
+  ASP_APP_PATH: "./src/OccamsRazor.Web"
+
+
 jobs:
   build-and-deploy:
     runs-on: windows-latest
@@ -23,10 +28,17 @@ jobs:
 
     - name: npm install, build, and test
       run: |
-        cd ./src/OccamsRazor.Frontend
         npm install
         npm run build --if-present
         npm run test --if-present
+      working-directory: ${{ env.NODE_APP_PATH }}
+
+    - name: Build with dotnet
+      run: dotnet build --configuration Release ${{ env.ASP_APP_PATH }}
+
+    - name: dotnet publish
+      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp ${{ env.ASP_APP_PATH }}
+
 
     - name: 'Deploy to Azure Web App'
       uses: azure/webapps-deploy@v2
@@ -34,13 +46,7 @@ jobs:
         app-name: 'occamsrazor'
         slot-name: 'test'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_f28d425f3d1f4bea92ecd78a12d3bab8 }}
-        package: ./src/OccamsRazor.Frontend
-
-    - name: Build with dotnet
-      run: dotnet build --configuration Release ./src/OccamsRazor.Web
-
-    - name: dotnet publish
-      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp ./src/OccamsRazor.Web
+        package: ${{ env.NODE_APP_PATH }}
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
