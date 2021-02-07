@@ -24,7 +24,7 @@ export default class App extends Component {
         <Route path='/host-game-questions' component={HostQuestions} />
         <Route path='/host-score-questions' component={HostScoreQuestions} />
         <Route path='/host-edit' component={HostPage} />
-        <Route path='/host' component={HostSetup} />
+        <Route path='/host-setup' component={HostSetup} />
         <Route path="/play-waiting" component={WaitPage} />
       </Layout>
     );

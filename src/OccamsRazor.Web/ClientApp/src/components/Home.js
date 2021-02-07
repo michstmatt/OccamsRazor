@@ -10,7 +10,7 @@ export class Home extends Component {
 
     host = (event) =>
     {
-        window.location = "/host";
+        window.location = "/host-setup";
     }
 
 
