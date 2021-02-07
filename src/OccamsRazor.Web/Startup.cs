@@ -80,8 +80,7 @@ namespace OccamsRazor.Web
 
             //app.UseWebSockets(webSocketOptions);
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseSpaStaticFiles();
+
 
             app.UseRouting();
 
@@ -116,19 +115,17 @@ namespace OccamsRazor.Web
                     await next();
                 }
             });*/
-/*
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
-            });*/
-
-            app.MapWhen(x => x.Request.Path.Value.StartsWith("/api"), builder =>
-            {
-                app.UseMvc();
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller}/{action=Index}/{id?}");
             });
 
             app.MapWhen(x => !x.Request.Path.Value.ToLower().StartsWith("/api"), builder =>
             {
+            app.UseStaticFiles();
+            app.UseSpaStaticFiles();
                 app.UseSpa(spa =>
                 {
                     spa.Options.SourcePath = "ClientApp";
