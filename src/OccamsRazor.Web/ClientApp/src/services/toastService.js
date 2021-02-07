@@ -1,4 +1,3 @@
-import {Toast} from '../components/Toast';
 class ToastService {
     constructor() {
     }
