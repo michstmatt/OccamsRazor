@@ -19,13 +19,13 @@ export default class App extends Component {
     return (
       <Layout>
         <Route exact path='/' component={Home} />
-        <Route path='/play-setup' component={PlaySetup} />
-        <Route path='/play-game' component={PlayGame} />
-        <Route path='/host-game-questions' component={HostQuestions} />
-        <Route path='/host-score-questions' component={HostScoreQuestions} />
-        <Route path='/host-edit' component={HostPage} />
-        <Route path='/host-setup' component={HostSetup} />
-        <Route path="/play-waiting" component={WaitPage} />
+        <Route exact path='/play-setup' component={PlaySetup} />
+        <Route exact path='/play-game' component={PlayGame} />
+        <Route exact path='/host-game-questions' component={HostQuestions} />
+        <Route exact path='/host-score-questions' component={HostScoreQuestions} />
+        <Route exact path='/host-edit' component={HostPage} />
+        <Route exact path='/host-setup' component={HostSetup} />
+        <Route exact path='/play-waiting' component={WaitPage} />
       </Layout>
     );
   }
