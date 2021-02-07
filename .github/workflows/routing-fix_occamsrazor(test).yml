@@ -35,3 +35,17 @@ jobs:
         slot-name: 'test'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_f28d425f3d1f4bea92ecd78a12d3bab8 }}
         package: .
+
+    - name: Build with dotnet
+      run: dotnet build --configuration Release ./src/OccamsRazor.Web
+
+    - name: dotnet publish
+      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp ./src/OccamsRazor.Web
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'occamsrazorapi'
+        slot-name: 'test'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_8d97c323a3e94a00bedb1c210a9ec519 }}
+        package: ${{env.DOTNET_ROOT}}/myapp
