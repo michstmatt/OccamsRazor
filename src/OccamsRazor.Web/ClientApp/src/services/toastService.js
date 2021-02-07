@@ -1,5 +1,6 @@
 class ToastService {
     constructor() {
+        this.toastDiv = undefined;
     }
 
     static register = (toastDiv) => {
