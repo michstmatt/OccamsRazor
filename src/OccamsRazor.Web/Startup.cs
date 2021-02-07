@@ -120,15 +120,17 @@ namespace OccamsRazor.Web
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
             });
-
-            app.UseSpa(spa =>
+            app.MapWhen(x => !x.Request.Path.Value.ToLower().StartsWith("/api"), builder =>
             {
-                spa.Options.SourcePath = "ClientApp";
-
-                if (env.IsDevelopment())
+                builder.UseSpa(spa =>
                 {
-                    spa.UseReactDevelopmentServer(npmScript: "start");
-                }
+                    spa.Options.SourcePath = "ClientApp";
+
+                    if (env.IsDevelopment())
+                    {
+                        spa.UseReactDevelopmentServer(npmScript: "start");
+                    }
+                });
             });
 
 
