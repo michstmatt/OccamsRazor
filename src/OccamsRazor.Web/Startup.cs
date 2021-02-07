@@ -56,7 +56,6 @@ namespace OccamsRazor.Web
             services.AddSingleton<INotificationService, NotificationService>((svc) => NotificationService.singleton);
             services.AddHttpContextAccessor();
             services.AddConnections();
-            services.AddMvc(option => option.EnableEndpointRouting = false);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -83,7 +82,7 @@ namespace OccamsRazor.Web
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
-            //app.UseRouting();
+            app.UseRouting();
 
             /*
             app.Use(async (context, next) =>
@@ -116,17 +115,12 @@ namespace OccamsRazor.Web
                     await next();
                 }
             });*/
-/*
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
-            });*/
-            app.MapWhen(x => x.Request.Path.Value.StartsWith("/api"), builder =>
-            {
-                app.UseMvc();
+                endpoints.MapControllers();
             });
+
             app.MapWhen(x => !x.Request.Path.Value.ToLower().StartsWith("/api"), builder =>
             {
                 builder.UseSpa(spa =>
