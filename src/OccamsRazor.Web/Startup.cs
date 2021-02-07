@@ -77,7 +77,7 @@ namespace OccamsRazor.Web
                 ReceiveBufferSize = 4 * 1024
             };
 
-            app.UseWebSockets(webSocketOptions);
+            //app.UseWebSockets(webSocketOptions);
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
