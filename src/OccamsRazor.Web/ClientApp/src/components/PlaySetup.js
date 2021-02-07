@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { PlayService } from '../services/playService';
+import { ToastService } from '../services/toastService';
 
 export class PlaySetup extends Component {
     static displayName = PlaySetup.name;
@@ -14,28 +16,28 @@ export class PlaySetup extends Component {
     }
 
     componentDidMount() {
-        this.loadGames();
+        PlayService.loadGames().then((data) => {
+            this.setState({ games: data, loading: false, selectedGame: data[0].gameId });
+        });
     }
 
     joinSubmitHandler = (event) => {
         event.preventDefault();
-        if(this.state.player !== "")
-        {
-            localStorage.setItem('state', JSON.stringify({player: {name: this.state.player}, gameId: this.state.selectedGame}));
+        if (this.state.player !== "") {
+            localStorage.setItem('state', JSON.stringify({ player: { name: this.state.player }, gameId: this.state.selectedGame }));
             this.props.history.push("/play-game");
         }
-        else
-        {
-            alert("Please type in a name");
+        else {
+            ToastService.sendMessage("Please type in a name");
         }
     }
 
-    gameSelectedHandler = (event) =>{
-        this.setState({ selectedGame : event.target.value });
+    gameSelectedHandler = (event) => {
+        this.setState({ selectedGame: event.target.value });
     }
-    
+
     nameChangeHandler = (event) => {
-        this.setState({player : event.target.value});
+        this.setState({ player: event.target.value });
     }
 
     renderPlaySetup(games) {
@@ -43,7 +45,7 @@ export class PlaySetup extends Component {
             <form className="answer-container" onSubmit={this.joinSubmitHandler}>
                 <h3 className="host-join-label">Choose a Game:</h3>
 
-                <select className="answer-input" onChange={ this.gameSelectedHandler }>
+                <select className="answer-input" onChange={this.gameSelectedHandler}>
                     {games.map(game =>
                         <option key={game.gameId} value={game.gameId} >{game.name}</option>
                     )};
@@ -51,7 +53,7 @@ export class PlaySetup extends Component {
                 <br />
 
                 <h3 className="host-join-label">Name: </h3>
-                <input className="answer-input" type="text" onChange={ this.nameChangeHandler } />
+                <input className="answer-input" type="text" onChange={this.nameChangeHandler} />
 
                 <br />
                 <br />
@@ -72,11 +74,4 @@ export class PlaySetup extends Component {
             </div>
         );
     }
-
-    async loadGames() {
-        const response = await fetch('/api/Play/LoadGames');
-        const data = await response.json();
-        this.setState({ games: data, loading: false, selectedGame: data[0].gameId});
-    }
 }
-

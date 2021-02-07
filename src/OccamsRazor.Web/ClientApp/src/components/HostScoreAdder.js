@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { HostService } from '../services/hostService';
 
 export class HostScoreAdder extends Component {
     static displayName = HostScoreAdder.name;
@@ -8,7 +9,6 @@ export class HostScoreAdder extends Component {
         this.state = {
             loading: true,
             selectedGame: this.props.gameId,
-            password: this.props.password,
             selectedRound: this.props.cRound,
             selectedQuestion: this.props.cQuestion,
             playerName: "",
@@ -17,8 +17,7 @@ export class HostScoreAdder extends Component {
         };
     }
 
-    componentWillReceiveProps(props)
-    {
+    componentWillReceiveProps(props) {
         this.setState(
             {
                 selectedRound: props.cRound,
@@ -32,57 +31,29 @@ export class HostScoreAdder extends Component {
     }
 
     playerNameChanged = (event) => {
-        this.setState({playerName: event.target.value})
+        this.setState({ playerName: event.target.value })
     }
 
     answerTextChanged = (event) => {
-        this.setState({answerText: event.target.value})
+        this.setState({ answerText: event.target.value })
     }
 
     wagerChanged = (event) => {
-        this.setState({wager: event.target.value*1})
+        this.setState({ wager: event.target.value * 1 })
     }
 
-    formSubmit = (event) => 
-    {
+    formSubmit = (event) => {
         event.preventDefault();
         let answer = {
-            player: {name: this.state.playerName},
+            player: { name: this.state.playerName },
             answerText: this.state.answerText,
-            questionNumber: this.state.selectedQuestion*1,
-            round: this.state.selectedRound *1,
-            gameId: this.state.selectedGame *1,
+            questionNumber: this.state.selectedQuestion * 1,
+            round: this.state.selectedRound * 1,
+            gameId: this.state.selectedGame * 1,
             wager: this.state.wager
         }
-        this.submitAnswer(answer);
-    }
-
-    render() {
-        return (
-            <div className="container">
-                <h3>Add a Player's Response</h3>
-            <form onSubmit={this.formSubmit}>
-                <label>Player Name</label>
-                <input className="host-question-input" onChange={this.playerNameChanged} value={this.state.playerName} />
-                <label>Answer Text</label>
-                <input className="host-question-input" onChange={this.answerTextChanged} value={this.state.answerText} />
-                <label>Wager</label>
-                <input className="host-question-input" onChange={this.wagerChanged} type="number" value={this.state.wager} />
-                <input type="submit" className="host-score-button" value="Add Answer" />
-            </form>
-            </div>
-        );
-    }
-    async submitAnswer(answer) {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'hostKey': this.state.password },
-            body: JSON.stringify(answer)
-        };
-        const response = await fetch('/api/Play/submitAnswer', requestOptions);
-        if (response.ok)
-        {
-
+        const ok = HostService.submitAnswer(answer);
+        if (ok) {
             this.setState({
                 playerName: "",
                 wager: 0,
@@ -91,8 +62,25 @@ export class HostScoreAdder extends Component {
 
             this.props.refresh();
         }
-
     }
+
+    render() {
+        return (
+            <div className="container">
+                <h3>Add a Player's Response</h3>
+                <form onSubmit={this.formSubmit}>
+                    <label>Player Name</label>
+                    <input className="host-question-input" onChange={this.playerNameChanged} value={this.state.playerName} />
+                    <label>Answer Text</label>
+                    <input className="host-question-input" onChange={this.answerTextChanged} value={this.state.answerText} />
+                    <label>Wager</label>
+                    <input className="host-question-input" onChange={this.wagerChanged} type="number" value={this.state.wager} />
+                    <input type="submit" className="host-score-button" value="Add Answer" />
+                </form>
+            </div>
+        );
+    }
+
 
 }
 

@@ -257,3 +257,6 @@ hr {
   width: 100%;
 
 }
+.toast-error {
+  color: red;
+}
