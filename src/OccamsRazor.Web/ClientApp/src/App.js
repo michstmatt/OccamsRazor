@@ -15,18 +15,24 @@ import { WaitPage } from './components/WaitPage';
 export default class App extends Component {
   static displayName = App.name;
 
-  render () {
-    return (
-      <Layout>
-        <Route exact path='/' component={Home} />
-        <Route path='/play-setup' component={PlaySetup} />
-        <Route path='/play-game' component={PlayGame} />
-        <Route path='/host-game-questions' component={HostQuestions} />
-        <Route path='/host-score-questions' component={HostScoreQuestions} />
-        <Route path='/host-edit' component={HostPage} />
-        <Route path='/host' component={HostSetup} />
-        <Route path="/play-waiting" component={WaitPage} />
-      </Layout>
-    );
+  render() {
+    const api_regex = /^\/api\/.*/
+    // if using "/api/" in the pathname, don't use React Router
+    if (api_regex.test(window.location.pathname)) {
+      return <div /> // must return at least an empty div
+    } else {
+      return (
+        <Layout>
+          <Route exact path='/' component={Home} />
+          <Route path='/play-setup' component={PlaySetup} />
+          <Route path='/play-game' component={PlayGame} />
+          <Route path='/host-game-questions' component={HostQuestions} />
+          <Route path='/host-score-questions' component={HostScoreQuestions} />
+          <Route path='/host-edit' component={HostPage} />
+          <Route path='/host' component={HostSetup} />
+          <Route path="/play-waiting" component={WaitPage} />
+        </Layout>
+      );
+    }
   }
 }
