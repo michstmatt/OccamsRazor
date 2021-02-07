@@ -83,6 +83,7 @@ namespace OccamsRazor.Web
             app.UseSpaStaticFiles();
 
             app.UseRouting();
+            
             app.Use(async (context, next) =>
             {
                 if (context.WebSockets.IsWebSocketRequest)
@@ -113,7 +114,6 @@ namespace OccamsRazor.Web
                     await next();
                 }
             });
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
