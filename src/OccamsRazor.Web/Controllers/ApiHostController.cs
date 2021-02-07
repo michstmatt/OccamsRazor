@@ -12,6 +12,8 @@ using OccamsRazor.Web.Service;
 
 namespace OccamsRazor.Web.Controllers
 {
+    [Route("api/Host")]
+    [ApiController]
     public class ApiHostController : Controller
     {
         private readonly ILogger<ApiHostController> _logger;
@@ -36,7 +38,7 @@ namespace OccamsRazor.Web.Controllers
         }
 
         [HttpGet]
-        [Route("/api/Host/Validate")]
+        [Route("Validate")]
         public async Task<IActionResult> Validate(int gameId, [FromHeader(Name="gameKey")]string gameKey)
         {
             if (await _authService.IsAuthenticated(gameId, gameKey ?? "") == false)
@@ -48,7 +50,7 @@ namespace OccamsRazor.Web.Controllers
         }
 
         [HttpPost]
-        [Route("/api/Host/CreateGame")]
+        [Route("CreateGame")]
         public async Task<IActionResult> CreateGame([FromBody] GameMetadata data, [FromHeader(Name="gameKey")] string gameKey)
         {
             var game = new Game();
@@ -59,7 +61,7 @@ namespace OccamsRazor.Web.Controllers
         }
 
         [HttpGet]
-        [Route("/api/Host/GetQuestions")]
+        [Route("GetQuestions")]
         public async Task<IActionResult> Questions([FromQuery] int? gameId, [FromHeader(Name="gameKey")] string gameKey)
         {
             if (await _authService.IsAuthenticated(gameId?? 0, gameKey ?? "") == false)
@@ -87,7 +89,7 @@ namespace OccamsRazor.Web.Controllers
             }
         }
 
-        [Route("/api/Host/SaveQuestions")]
+        [Route("SaveQuestions")]
         [HttpPost]
         public async Task<IActionResult> Questions([FromBody] Game game, [FromHeader(Name="gameKey")]string gameKey)
         {
@@ -108,7 +110,7 @@ namespace OccamsRazor.Web.Controllers
         }
 
         [HttpGet]
-        [Route("/api/Host/GetPlayerAnswers")]
+        [Route("GetPlayerAnswers")]
         public async Task<IActionResult> PlayerAnswers(int gameId, [FromHeader(Name="gameKey")]string gameKey)
         {
             if (await _authService.IsAuthenticated(gameId, gameKey ?? "") == false)
@@ -120,7 +122,7 @@ namespace OccamsRazor.Web.Controllers
             return Ok(results);
         }
 
-        [Route("/api/Host/SetCurrentQuestion")]
+        [Route("SetCurrentQuestion")]
         [HttpPost]
         public async Task<IActionResult> SetCurrentQuestion([FromBody] GameMetadata game, [FromHeader(Name="gameKey")] string gameKey)
         {
@@ -136,7 +138,7 @@ namespace OccamsRazor.Web.Controllers
             return Ok(result);
         }
 
-        [Route("/api/Host/UpdatePlayerScores")]
+        [Route("UpdatePlayerScores")]
         [HttpPost]
         public async Task<IActionResult> UpdatePlayerScores(int gameId, [FromBody] IEnumerable<PlayerAnswer> answers, [FromHeader(Name="gameKey")] string gameKey)
         {
@@ -148,7 +150,7 @@ namespace OccamsRazor.Web.Controllers
             return Ok(submitted);
         }
 
-        [Route("/api/Host/GetScoredResponses")]
+        [Route("GetScoredResponses")]
         [HttpGet]
         public async Task<IActionResult> GetScoredAnswers(int gameId, [FromHeader(Name="gameKey")] string gameKey)
         {
@@ -161,7 +163,7 @@ namespace OccamsRazor.Web.Controllers
             return Ok(results);
         }
 
-        [Route("/api/Host/SetState")]
+        [Route("SetState")]
         [HttpPost]
         public async Task<IActionResult> SetState([FromBody] GameMetadata game, [FromHeader(Name="gameKey")] string gameKey)
         {
@@ -174,7 +176,7 @@ namespace OccamsRazor.Web.Controllers
             return Ok(response);
         }
 
-        [Route("/api/Host/DeletePlayerAnswer")]
+        [Route("DeletePlayerAnswer")]
         [HttpDelete]
         public async Task<IActionResult> DeletePlayerAnswer(int gameId, [FromBody] PlayerAnswer answer, [FromHeader(Name="gameKey")] string gameKey)
         {
@@ -186,7 +188,7 @@ namespace OccamsRazor.Web.Controllers
             return Ok(result);
         }
 
-        [Route("/api/Host/DeleteGame")]
+        [Route("DeleteGame")]
         [HttpDelete]
         public async Task<IActionResult> DeleteGame(int gameId, [FromHeader(Name="gameKey")] string gameKey)
         {

@@ -14,6 +14,8 @@ using OccamsRazor.Common.Models;
 
 namespace OccamsRazor.Web.Controllers
 {
+    [Route("api/Play")]
+    [ApiController]
     public class ApiPlayController : Controller
     {
         private readonly ILogger<ApiPlayController> _logger;
@@ -36,7 +38,7 @@ namespace OccamsRazor.Web.Controllers
         }
 
         [HttpGet]
-        [Route("/api/Play/LoadGames")]
+        [Route("LoadGames")]
         public async Task<IActionResult> Index()
         {
             var results = await _gameDataService.LoadGames();
@@ -44,7 +46,7 @@ namespace OccamsRazor.Web.Controllers
         }
 
         [HttpGet]
-        [Route("/api/Play/GetCurrentQuestion")]
+        [Route("GetCurrentQuestion")]
         public async Task<IActionResult> GetCurrentQuestion(int gameId, string host)
         {
             var question = await _gameDataService.GetCurrentQuestion(gameId);
@@ -57,14 +59,14 @@ namespace OccamsRazor.Web.Controllers
         }
 
         [HttpGet]
-        [Route("/api/Play/GetState")]
+        [Route("GetState")]
         public async Task<IActionResult> GetState(int gameId)
         {
             var gameState = await _gameDataService.GetGameState(gameId);
             return Ok(gameState);
         }
 
-        [Route("/api/Play/SubmitAnswer")]
+        [Route("SubmitAnswer")]
         [HttpPost]
         public async Task<IActionResult> SubmitAnswer([FromBody] PlayerAnswer answer)
         {
@@ -77,7 +79,7 @@ namespace OccamsRazor.Web.Controllers
             return Ok(result);
         }
 
-        [Route("/api/Play/GetScoredResponsesForPlayer")]
+        [Route("GetScoredResponsesForPlayer")]
         [HttpGet]
         public async Task<IActionResult> GetScoredAnswersForPlayer(int gameId, string name)
         {
@@ -85,7 +87,7 @@ namespace OccamsRazor.Web.Controllers
             return Ok(answers);
         }
 
-        [Route("/api/Play/GetScoredResponses")]
+        [Route("GetScoredResponses")]
         [HttpGet]
         public async Task<IActionResult> GetScoredAnswers(int gameId)
         {
