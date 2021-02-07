@@ -4,7 +4,7 @@ class NotificationService {
         const port = 5001;
         const base = `wss://${domain}:${port}/notifications`;
         
-        const url = (player == true) ? `${base}/player/${name}` : `${base}/host`;
+        const url = (player === true) ? `${base}/player/${name}` : `${base}/host`;
         
         this.websocket = new WebSocket(url);
     }
