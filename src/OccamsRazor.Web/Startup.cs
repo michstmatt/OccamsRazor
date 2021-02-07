@@ -28,6 +28,7 @@ namespace OccamsRazor.Web
         {
 
             services.AddControllersWithViews();
+            services.AddControllers(options => options.EnableEndpointRouting = false);
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -115,15 +116,20 @@ namespace OccamsRazor.Web
                     await next();
                 }
             });*/
-
+/*
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });*/
+
+            app.MapWhen(x => x.Request.Path.Value.StartsWith("/api"), builder =>
+            {
+                app.UseMvc();
             });
 
             app.MapWhen(x => !x.Request.Path.Value.ToLower().StartsWith("/api"), builder =>
             {
-                builder.UseSpa(spa =>
+                app.UseSpa(spa =>
                 {
                     spa.Options.SourcePath = "ClientApp";
 
