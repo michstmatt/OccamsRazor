@@ -62,5 +62,5 @@ jobs:
         package: ${{ env.NODE_APP_PATH }}
 
     - name: logout
-          run: |
-            az logout
+      run: |
+        az logout
