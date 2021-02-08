@@ -20,6 +20,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@master
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Set up Node.js version
       uses: actions/setup-node@v1
@@ -44,7 +47,6 @@ jobs:
       with:
         app-name: 'occamsrazorapi'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_8d97c323a3e94a00bedb1c210a9ec519 }}
         package: ${{env.DOTNET_ROOT}}/myapp
 
     - name: 'Deploy to Azure Web App'
@@ -52,6 +54,5 @@ jobs:
       with:
         app-name: 'occamsrazor'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_f28d425f3d1f4bea92ecd78a12d3bab8 }}
         package: ${{ env.NODE_APP_PATH }}
 
