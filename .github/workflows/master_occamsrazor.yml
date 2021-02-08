@@ -7,6 +7,10 @@ on:
   push:
     branches:
       - master
+env:
+  NODE_APP_PATH: "./src/OccamsRazor.Frontend"
+  ASP_APP_PATH: "./src/OccamsRazor.Web"
+
 
 jobs:
   build-and-deploy:
@@ -14,22 +18,47 @@ jobs:
 
     steps:
     - uses: actions/checkout@master
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Set up Node.js version
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14.x'
 
     - name: Set up .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '3.1.102'
 
+    - name: npm install, build, and test
+      run: |
+        npm install
+        npm run build --if-present
+        npm run test --if-present
+      working-directory: ${{ env.NODE_APP_PATH }}
+
     - name: Build with dotnet
-      run: dotnet build --configuration Release ./src/OccamsRazor.Web
+      run: dotnet build --configuration Release ${{ env.ASP_APP_PATH }}
 
     - name: dotnet publish
-      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp ./src/OccamsRazor.Web
+      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp ${{ env.ASP_APP_PATH }}
 
     - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v1
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'occamsrazorapi'
+        slot-name: 'production'
+        package: ${{env.DOTNET_ROOT}}/myapp
+
+    - name: 'Deploy to Azure Web App'
+      uses: azure/webapps-deploy@v2
       with:
         app-name: 'occamsrazor'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_786a58fae27a46618f0ae213b3f3d5ea }}
-        package: ${{env.DOTNET_ROOT}}/myapp 
+        package: ${{ env.NODE_APP_PATH }}
+
+    - name: logout
+      run: |
+        az logout
