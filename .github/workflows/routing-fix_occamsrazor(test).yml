@@ -55,7 +55,7 @@ jobs:
         package: ${{env.DOTNET_ROOT}}/myapp
     - name: add process.json
       run: |
-        echo '{ script: "serve", env: { PM2_SERVE_SPA: "true", PM2_SERVE_HOMEPAGE: "/index.html" } }' >> ${{ env.NODE_APP_PATH }}build/process.json 
+        echo '{ script: "serve", env: { PM2_SERVE_SPA: "true", PM2_SERVE_HOMEPAGE: "/index.html" } }' >> ${{ env.NODE_APP_PATH }}/build/process.json 
 
     - name: 'Deploy to Azure Web App'
       uses: azure/webapps-deploy@v2
