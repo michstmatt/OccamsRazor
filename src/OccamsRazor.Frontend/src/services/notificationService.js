@@ -1,8 +1,8 @@
 class NotificationService {
     constructor(player, name){
-        const domain = window.location.hostname;
+        const host = process.env.API_URL;
         const port = 5001;
-        const base = `wss://${domain}:${port}/notifications`;
+        const base = `wss://${host}:${port}/notifications`;
         
         const url = (player === true) ? `${base}/player/${name}` : `${base}/host`;
         

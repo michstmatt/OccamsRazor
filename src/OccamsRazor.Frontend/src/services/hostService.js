@@ -3,6 +3,7 @@ import { Common } from './common';
 class HostService {
     constructor() {
         this.cookieName = "host-key";
+        this.host = "https://" + process.env.API_URL;
     }
 
 
@@ -23,7 +24,7 @@ class HostService {
             method: 'GET',
             headers: { 'Content-Type': 'application/json', 'gameKey': this.getKey() },
         };
-        const response = await fetch(`/api/Host/GetQuestions?gameId=${gameId}`, requestOptions);
+        const response = await fetch(`${this.host}/api/Host/GetQuestions?gameId=${gameId}`, requestOptions);
         if (response.ok) {
             return response.json();
         }
@@ -35,7 +36,7 @@ class HostService {
             headers: { 'Content-Type': 'application/json', 'gameKey': this.getKey() },
             body: JSON.stringify(game)
         };
-        return fetch('/api/Host/SaveQuestions', requestOptions);
+        return fetch(`${this.host}/api/Host/SaveQuestions`, requestOptions);
     };
 
     static async submitAnswer(answer) {
@@ -45,7 +46,7 @@ class HostService {
             headers: { 'Content-Type': 'application/json', 'hostKey': this.getKey() },
             body: JSON.stringify(answer)
         };
-        const response = await fetch('/api/Play/submitAnswer', requestOptions);
+        const response = await fetch(`${this.host}/api/Play/submitAnswer`, requestOptions);
         return response.ok;
     }
 
@@ -55,7 +56,7 @@ class HostService {
             headers: { 'Content-Type': 'application/json', 'gameKey': this.getKey() },
             body: JSON.stringify(answers)
         };
-        return fetch(`/api/Host/UpdatePlayerScores?gameId=${gameId}`, requestOptions);
+        return fetch(`${this.host}/api/Host/UpdatePlayerScores?gameId=${gameId}`, requestOptions);
     }
 
     static async deleteAnswer(gameId, answer) {
@@ -64,7 +65,7 @@ class HostService {
             headers: { 'Content-Type': 'application/json', 'gameKey': this.getKey() },
             body: JSON.stringify(answer)
         };
-        const response = await fetch(`/api/Host/DeletePlayerAnswer?gameId=${gameId}`, requestOptions);
+        const response = await fetch(`${this.host}/api/Host/DeletePlayerAnswer?gameId=${gameId}`, requestOptions);
         if (response.ok) {
             this.loadQuestions();
         }
@@ -74,7 +75,7 @@ class HostService {
             method: 'GET',
             headers: { 'Content-Type': 'application/json', 'gameKey': this.getKey() }
         };
-        const response = await fetch(`/api/Host/GetPlayerAnswers?gameId=${gameId}`, requestOptions);
+        const response = await fetch(`${this.host}/api/Host/GetPlayerAnswers?gameId=${gameId}`, requestOptions);
         if (response.ok) {
             return response.json();
         }
@@ -90,7 +91,7 @@ class HostService {
             headers: { 'Content-Type': 'application/json', 'gameKey': password },
             body: JSON.stringify(game)
         };
-        const response = await fetch('/api/Host/createGame', requestOptions);
+        const response = await fetch(`${this.host}/api/Host/createGame`, requestOptions);
 
         if (response.ok) {
             return await response.json();
@@ -102,7 +103,7 @@ class HostService {
             method: 'GET',
             headers: { 'Content-Type': 'application/json', 'gameKey': this.getKey() },
         };
-        const response = await fetch(`/api/Host/GetScoredResponses?gameId=${gameId}`, requestOptions);
+        const response = await fetch(`${this.host}/api/Host/GetScoredResponses?gameId=${gameId}`, requestOptions);
         if (response.ok) {
             return response.json();
         }
@@ -113,7 +114,7 @@ class HostService {
             headers: { 'Content-Type': 'application/json', 'gameKey': this.getKey() },
             body: JSON.stringify(newGameData)
         };
-        const response = await fetch('/api/Host/SetCurrentQuestion', requestOptions);
+        const response = await fetch(`${this.host}/api/Host/SetCurrentQuestion`, requestOptions);
         if (response.ok) {
 
         }
@@ -124,7 +125,7 @@ class HostService {
             headers: { 'Content-Type': 'application/json', 'gameKey': this.getKey() },
             body: JSON.stringify(gameData)
         };
-        const response = await fetch(`/api/Host/SetState`, requestOptions);
+        const response = await fetch(`${this.host}/api/Host/SetState`, requestOptions);
         return response.json();
     }
     static async checkAuth(gameId, password) {
@@ -132,7 +133,7 @@ class HostService {
             method: 'GET',
             headers: { 'Content-Type': 'application/json', 'gameKey': password },
         };
-        const response = await fetch(`/api/Host/Validate?gameId=${gameId}`, requestOptions);
+        const response = await fetch(`${this.host}/api/Host/Validate?gameId=${gameId}`, requestOptions);
         if (response.ok) {
             this.setKey(password);
         }
