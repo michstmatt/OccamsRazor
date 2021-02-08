@@ -12,17 +12,17 @@ using OccamsRazor.Web.Service;
 
 namespace OccamsRazor.Web.Controllers
 {
-    [Route("api/Host")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class ApiHostController : Controller
+    public class HostController: Controller
     {
-        private readonly ILogger<ApiHostController> _logger;
+        private readonly ILogger<HostController> _logger;
         private readonly IAuthenticationService _authService;
         private readonly IGameDataService _gameDataService;
         private readonly IPlayerAnswerService _playerAnswerService;
         private readonly INotificationService _notificationService;
         private readonly IHttpContextAccessor _accessor;
-        public ApiHostController(ILogger<ApiHostController> logger,
+        public HostController(ILogger<HostController> logger,
             IHttpContextAccessor accessor,
             IAuthenticationService authService,
             IGameDataService gameDataService,

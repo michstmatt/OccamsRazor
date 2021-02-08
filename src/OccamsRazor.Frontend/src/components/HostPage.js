@@ -19,7 +19,7 @@ export class HostPage extends Component {
 
         if(this.state.selectedGame === undefined || this.state.selectedGame === undefined)
         {
-            this.props.history.push("/host");
+            this.props.history.push("/host-setup");
         }
         
     }

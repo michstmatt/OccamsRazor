@@ -1,12 +1,14 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - occamsrazor
+name: Build and deploy Node.js app to Azure Web App - occamsrazor(test)
 
 on:
   push:
     branches:
-      - master
+      - routing-fix
+  workflow_dispatch:
+
 env:
   NODE_APP_PATH: "./src/OccamsRazor.Frontend"
   ASP_APP_PATH: "./src/OccamsRazor.Web"

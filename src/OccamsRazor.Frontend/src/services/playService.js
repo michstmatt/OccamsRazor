@@ -4,8 +4,10 @@ class PlayService {
         this.idKey = "player-id";
     }
 
+    static getHost = () => "https://" + process.env.REACT_APP_API_URL;
+
     static async loadGames() {
-        const response = await fetch('/api/Play/LoadGames');
+        const response = await fetch(`${this.getHost()}/api/Play/LoadGames`);
         if (response.ok) {
             return response.json();
         }
@@ -13,14 +15,14 @@ class PlayService {
     };
 
     static async loadQuestion(gameId) {
-        const response = await fetch('/api/Play/GetCurrentQuestion?gameId=' + gameId);
+        const response = await fetch(`${this.getHost()}/api/Play/GetCurrentQuestion?gameId=${gameId}`);
         if (response.ok) {
             return response.json();
         }
     }
 
     static async getState(gameId) {
-        const response = await fetch('/api/Play/GetState?gameId=' + gameId);
+        const response = await fetch(`${this.getHost()}/api/Play/GetState?gameId=${gameId}`);
         if (response.ok) {
             return response.json();
         }
@@ -32,7 +34,7 @@ class PlayService {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(answer)
         };
-        return await fetch('/api/Play/submitAnswer', requestOptions);
+        return await fetch(`${this.getHost()}/api/Play/submitAnswer`, requestOptions);
     }
 }
 

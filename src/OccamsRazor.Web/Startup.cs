@@ -29,12 +29,6 @@ namespace OccamsRazor.Web
 
             services.AddControllersWithViews();
 
-            // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/build";
-            });
-
             var connString = System.Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
             services.AddDbContext<OccamsRazorEfSqlContext>(options =>
@@ -79,10 +73,9 @@ namespace OccamsRazor.Web
 
             app.UseWebSockets(webSocketOptions);
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseSpaStaticFiles();
-
             app.UseRouting();
+
+            
             app.Use(async (context, next) =>
             {
                 if (context.WebSockets.IsWebSocketRequest)
@@ -113,6 +106,13 @@ namespace OccamsRazor.Web
                     await next();
                 }
             });
+            // global cors policy
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials()); // allow credentials
+
 
             app.UseEndpoints(endpoints =>
             {
@@ -120,19 +120,6 @@ namespace OccamsRazor.Web
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
             });
-            app.MapWhen(x => !x.Request.Path.Value.ToLower().StartsWith("/api"), builder =>
-            {
-                builder.UseSpa(spa =>
-                {
-                    spa.Options.SourcePath = "ClientApp";
-
-                    if (env.IsDevelopment())
-                    {
-                        spa.UseReactDevelopmentServer(npmScript: "start");
-                    }
-                });
-            });
-
 
         }
     }

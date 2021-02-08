@@ -14,18 +14,18 @@ using OccamsRazor.Common.Models;
 
 namespace OccamsRazor.Web.Controllers
 {
-    [Route("api/Play")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class ApiPlayController : Controller
+    public class PlayController: Controller
     {
-        private readonly ILogger<ApiPlayController> _logger;
+        private readonly ILogger<PlayController> _logger;
         private readonly IGameDataService _gameDataService;
         private readonly IPlayerAnswerService _playerAnswerService;
         private readonly INotificationService _notificationService;
 
 
 
-        public ApiPlayController(ILogger<ApiPlayController> logger,
+        public PlayController(ILogger<PlayController> logger,
             IGameDataService gameDataService,
             IPlayerAnswerService answerService,
             INotificationService notificationSvc
