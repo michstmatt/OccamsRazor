@@ -1,6 +1,6 @@
 class NotificationService {
     constructor(player, name){
-        const host = process.env.API_URL;
+        const host = process.env.REACT_APP_API_URL;
         const port = 5001;
         const base = `wss://${host}:${port}/notifications`;
         
