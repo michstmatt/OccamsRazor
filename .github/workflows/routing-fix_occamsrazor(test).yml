@@ -62,7 +62,7 @@ jobs:
       with:
         app-name: 'occamsrazor'
         slot-name: 'production'
-        package: ${{ env.NODE_APP_PATH }}
+        package: ${{ env.NODE_APP_PATH }}/build
 
     - name: logout
       run: |
