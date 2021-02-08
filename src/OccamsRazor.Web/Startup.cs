@@ -75,7 +75,7 @@ namespace OccamsRazor.Web
             app.UseHttpsRedirection();
             app.UseRouting();
 
-            /*
+            
             app.Use(async (context, next) =>
             {
                 if (context.WebSockets.IsWebSocketRequest)
@@ -105,7 +105,7 @@ namespace OccamsRazor.Web
                 {
                     await next();
                 }
-            });*/
+            });
             // global cors policy
             app.UseCors(x => x
                 .AllowAnyMethod()
