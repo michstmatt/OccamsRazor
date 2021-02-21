@@ -20,6 +20,7 @@ export class HostSetupCreate extends Component {
 
     joinSubmitHandler = (event) => {
         event.preventDefault();
+        if((this.state.name ?? "") === "" || (this.state.isMc && (this.state.player?.name ?? "") === "") || (this.state.password ?? "" ) === "") return;
         HostService.createGame(this.state.name, this.state.password, this.state.isMc).then((data) => {
             localStorage.setItem('state', JSON.stringify({ password: this.state.password, gameId: data.gameId, player: this.state.player}));
             this.props.navigate(data);
