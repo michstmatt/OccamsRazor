@@ -1,4 +1,4 @@
-namespace OccamsRazor.Web.AuthenticationModels
+namespace OccamsRazor.Common.AuthenticationModels
 {
     public class AuthenticationModel
     {

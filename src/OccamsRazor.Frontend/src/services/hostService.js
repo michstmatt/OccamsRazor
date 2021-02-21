@@ -80,10 +80,11 @@ class HostService {
             return response.json();
         }
     }
-    static async createGame(name, password) {
+    static async createGame(name, password, isMultipleChoice) {
         let game =
         {
-            name: name
+            name: name,
+            isMultipleChoice: isMultipleChoice
         };
 
         const requestOptions = {
@@ -94,6 +95,7 @@ class HostService {
         const response = await fetch(`${this.getHost()}/api/Host/createGame`, requestOptions);
 
         if (response.ok) {
+            this.setKey(password);
             return await response.json();
         }
     }

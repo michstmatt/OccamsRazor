@@ -12,13 +12,25 @@ namespace OccamsRazor.Web.Persistence.Service
     public class PlayerAnswerService : IPlayerAnswerService
     {
         public IPlayerAnswerRepository playerAnswerRepository;
-        public PlayerAnswerService(IPlayerAnswerRepository repository)
+        public IMultipleChoiceRepository questionRepository;
+        public IGameDataRepository gameDataRepository;
+        public PlayerAnswerService(IPlayerAnswerRepository paRepository, IMultipleChoiceRepository qRepository, IGameDataRepository gdRepository)
         {
-            playerAnswerRepository = repository;
+            playerAnswerRepository = paRepository;
+            questionRepository = qRepository;
+            gameDataRepository = gdRepository;
         }
 
-        public Task<bool> SubmitPlayerAnswer(PlayerAnswer answer)
-            => playerAnswerRepository.SubmitAnswer(answer);
+        public async Task<bool> SubmitPlayerAnswer(PlayerAnswer answer)
+        {
+            var game = await gameDataRepository.GetGameMetadataAsync(answer.GameId);
+            if(game.IsMultipleChoice)
+            {
+                var question = await questionRepository.GetQuestionAsync(game.Seed, game.CurrentQuestion);
+                answer.PointsAwarded = (question.AnswerId == answer.AnswerText) ? 1 : 0;
+            }
+            return await playerAnswerRepository.SubmitAnswer(answer);
+        }
 
         public Task<IEnumerable<PlayerAnswer>> GetAllAnswers(int gameId) => playerAnswerRepository.GetAllAnswers(gameId);
         public async Task<IEnumerable<GameResults>> GetScoresForGame(int gameId)

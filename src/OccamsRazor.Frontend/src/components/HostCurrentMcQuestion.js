@@ -1,14 +1,18 @@
 import React, { Component } from 'react';
 import { HostService } from '../services/hostService';
 
-export class HostCurrentQuestion extends Component {
-    static displayName = HostCurrentQuestion.name;
+export class HostCurrentMcQuestion extends Component {
+    static displayName = HostCurrentMcQuestion.name;
 
     constructor(props) {
         super(props);
         this.state = {
             loading: true,
-            selectedGame: this.props.gameId,
+            gameData:{
+                metadata: {
+                    gameId: this.props.gameId
+                }
+            },
             password: this.props.password,
             selectedQuestion: {},
             questions: [],
@@ -35,19 +39,25 @@ export class HostCurrentQuestion extends Component {
         this.setState({ selectedQuestion: this.state.gameData.questions[index] });
     }
 
-    updateCurrentQuestionHandler = (event) => {
-        this.submitCurrentQuestion(this.state.selectedQuestion);
+    updateCurrentQuestionHandler = (event, inc) => {
+        let newGameData = this.state.gameData.metadata;
+        newGameData.currentQuestion += inc;
+        if (newGameData.currentQuestion < 0) newGameData.currentQuestion = 0;
+        this.submitCurrentQuestion(newGameData);
     }
 
     updateStateHandler = (event, state) => {
         this.setGameState(state);
     }
 
+    renderPlayerStatus(answers) {
+        
+    }
+
     renderHostCurrentQuestion(questions, cQuestion, state) {
 
         let stateText = "";
 
-        if (state === 0) stateText = "Created";
         if (state === 1) stateText = "Question";
         if (state === 2) stateText = "Results";
         if (state === 3) stateText = "Pre Question";
@@ -59,23 +69,11 @@ export class HostCurrentQuestion extends Component {
                     <h4> <span className="secondary"> Currently Showing </span>{stateText}</h4>
                     <button className={state === 3 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 3)} >Show Pre Question</button>
                     <button className={state === 1 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 1)}>Show Question</button>
-                    <button className={state === 1 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 1)}>Show Question</button>
                     <button className={state === 4 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 4)}>Show Answer</button>
                     <button className={state === 2 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 2)}>Show Results</button>
                 </div>
-                <h4> <span className="secondary"> Current Round</span>{cQuestion.round} </h4>
-                <h4> <span className="secondary"> Current Question</span>{cQuestion.number} </h4>
-                <h4> <span className="primary"> Category </span>{cQuestion.category} </h4>
-                <h4> <span className="primary"> Question </span></h4>
-                <p>{cQuestion.text} </p>
-                <h4> <span className="primary"> Answer </span>{cQuestion.answerText} </h4>
-                <select className="host-score-input" onChange={this.questionSelectedHandler} defaultValue={this.state.currentQuestionIndex}>
-                    {questions.map((question, index) =>
-                        <option value={index}>R {this.state.rounds.find(q => q.number === question.round).name} Q {question.number}</option>
-                    )}
-                </select>
-                <button className="host-score-button" onClick={this.updateCurrentQuestionHandler} >Update Current Question</button>
-                This will set the state to Pre-Question
+                <button className="host-score-button" onClick={ (e) => this.updateCurrentQuestionHandler(e, -1)} >Previous Question</button>
+                <button className="host-score-button" onClick={ (e) => this.updateCurrentQuestionHandler(e, 1)} >Next Question</button>
             </div>
 
         );
@@ -104,21 +102,20 @@ export class HostCurrentQuestion extends Component {
 
     async loadCurrentQuestion() {
         this.setState({ loading: true });
-        if(this.state.selectedGame === undefined) return;
-        const data = await HostService.loadQuestions(this.state.selectedGame);
-        const questionIndex = data.questions.findIndex(q => q.round === data.metadata.currentRound && q.number === data.metadata.currentQuestion);
-        this.setState({ gameData: data, loading: false, currentQuestionIndex: questionIndex });
+        if(this.state.gameData === undefined) return;
+        const data = await HostService.loadQuestions(this.state.gameData.metadata.gameId);
+        if(data === undefined) return;
+        this.setState({ gameData: data, loading: false, currentQuestionIndex: data.metadata.currentQuestion});
     }
 
-    async submitCurrentQuestion(question) {
+    async loadAnswers(){
+
+    }
+
+    async submitCurrentQuestion(newGameData) {
         this.setState({ loading: true });
-        let newGameData = this.state.gameData.metadata;
-        newGameData.currentQuestion = question.number;
-        newGameData.currentRound = question.round;
         await HostService.submitCurrentQuestion(newGameData);
         this.loadCurrentQuestion();
-        this.props.newQuestionEvent(this.state.selectedQuestion);
     }
 
 }
-

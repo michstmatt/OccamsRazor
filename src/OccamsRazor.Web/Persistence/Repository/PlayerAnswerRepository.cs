@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using OccamsRazor.Common.Models;
 using OccamsRazor.Web.Repository;
-using OccamsRazor.Web.Context;
+using OccamsRazor.Common.Context;
 
 namespace OccamsRazor.Web.Persistence.Repository
 {
@@ -24,7 +24,7 @@ namespace OccamsRazor.Web.Persistence.Repository
 
         public async Task<IEnumerable<PlayerAnswer>> GetAnswersForQuestion(int gameId, RoundEnum round, int questionNum)
         {
-            var answers =  Context.Answers.Where(a => a.GameId == gameId && a.Round == round && a.QuestionNumber == questionNum);
+            var answers = Context.Answers.Where(a => a.GameId == gameId && a.Round == round && a.QuestionNumber == questionNum);
             return answers;
         }
         public async Task<PlayerAnswer> GetAnswersForQuestionForPlayer(PlayerAnswer answer)
@@ -68,7 +68,6 @@ namespace OccamsRazor.Web.Persistence.Repository
 
         public async Task<bool> SubmitAnswer(PlayerAnswer answer)
         {
-
             var existingAnswer = await GetAnswersForQuestionForPlayer(answer);
             if (existingAnswer?.AnswerText == null)
             {
@@ -88,7 +87,7 @@ namespace OccamsRazor.Web.Persistence.Repository
 
         public async Task<bool> SubmitPlayerScores(IEnumerable<PlayerAnswer> scoredAnswers)
         {
-            foreach(var answer in scoredAnswers)
+            foreach (var answer in scoredAnswers)
             {
                 await SubmitAnswer(answer);
             }

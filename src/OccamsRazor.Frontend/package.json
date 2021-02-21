@@ -35,6 +35,7 @@
   },
   "scripts": {
     "build": "react-scripts build",
+    "debug": "react-scripts start",
     "start": "node prodServer"
   },
   "browserslist": {

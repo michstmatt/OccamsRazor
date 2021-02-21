@@ -14,7 +14,7 @@ namespace OccamsRazor.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class HostController: Controller
+    public class HostController : Controller
     {
         private readonly ILogger<HostController> _logger;
         private readonly IAuthenticationService _authService;
@@ -39,7 +39,7 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpGet]
         [Route("Validate")]
-        public async Task<IActionResult> Validate(int gameId, [FromHeader(Name="gameKey")]string gameKey)
+        public async Task<IActionResult> Validate(int gameId, [FromHeader(Name = "gameKey")] string gameKey)
         {
             if (await _authService.IsAuthenticated(gameId, gameKey ?? "") == false)
             {
@@ -51,20 +51,26 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpPost]
         [Route("CreateGame")]
-        public async Task<IActionResult> CreateGame([FromBody] GameMetadata data, [FromHeader(Name="gameKey")] string gameKey)
+        public async Task<IActionResult> CreateGame([FromBody] GameMetadata data, [FromHeader(Name = "gameKey")] string gameKey)
         {
             var game = new Game();
             game.Metadata.Name = data.Name;
-            var stored = await _gameDataService.SaveQuestions(game);
+            game.Metadata.IsMultipleChoice = data.IsMultipleChoice;
+            if (game.Metadata.IsMultipleChoice)
+                game.Metadata.Seed = new Random().Next();
+            var stored = await _gameDataService.CreateGameAsync(game);
             await _authService.AddAuthentication(stored.GameId, gameKey);
             return Ok(stored);
         }
 
+
+
         [HttpGet]
         [Route("GetQuestions")]
-        public async Task<IActionResult> Questions([FromQuery] int? gameId, [FromHeader(Name="gameKey")] string gameKey)
+        public async Task<IActionResult> Questions([FromQuery] int? gameId, [FromHeader(Name = "gameKey")] string gameKey)
         {
-            if (await _authService.IsAuthenticated(gameId?? 0, gameKey ?? "") == false)
+
+            if (await _authService.IsAuthenticated(gameId ?? 0, gameKey ?? "") == false)
             {
                 return Unauthorized();
             }
@@ -74,7 +80,7 @@ namespace OccamsRazor.Web.Controllers
             }
             try
             {
-                var found = await _gameDataService.LoadQuestions(gameId.Value);
+                var found = await _gameDataService.LoadGameAsync(gameId.Value);
                 if (found == null)
                 {
                     return BadRequest();
@@ -99,7 +105,7 @@ namespace OccamsRazor.Web.Controllers
             }
             try
             {
-                var gameMetadata = await _gameDataService.SaveQuestions(game);
+                var gameMetadata = await _gameDataService.SaveGameAsync(game);
                 return Ok(true);
             }
             catch (Exception e)
@@ -131,8 +137,8 @@ namespace OccamsRazor.Web.Controllers
                 return Unauthorized();
             }
             game.State = GameStateEnum.PreQuestion;
-            await _gameDataService.SetGameState(game);
-            var result = await _gameDataService.SetCurrentQuestion(game);
+            await _gameDataService.SetGameStateAsync(game);
+            var result = await _gameDataService.SetCurrentQuestionAsync(game);
 
             await _notificationService.SendPlayerMessage("NEW_QUESTION");
             return Ok(result);
@@ -154,7 +160,7 @@ namespace OccamsRazor.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetScoredAnswers(int gameId, [FromHeader(Name="gameKey")] string gameKey)
         {
-            var game = await _gameDataService.GetGameState(gameId);
+            var game = await _gameDataService.GetGameStateAsync(gameId);
             if (game.State != GameStateEnum.Results && await _authService.IsAuthenticated(gameId, gameKey ?? "") == false)
             {
                 return Unauthorized();
@@ -171,7 +177,7 @@ namespace OccamsRazor.Web.Controllers
             {
                 return Unauthorized();
             }
-            var response = await _gameDataService.SetGameState(game);
+            var response = await _gameDataService.SetGameStateAsync(game);
             await _notificationService.SendPlayerMessage("STATE_CHANGED");
             return Ok(response);
         }
@@ -196,8 +202,20 @@ namespace OccamsRazor.Web.Controllers
             {
                 return Unauthorized();
             }
-            var result = await _gameDataService.DeleteGame(gameId);
+            var result = await _gameDataService.DeleteGameAsync(gameId);
             return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("CreateMcGame")]
+        public async Task<IActionResult> CreateMcGame([FromBody] GameMetadata data)
+        {
+            var game = new Game();
+            game.Metadata.Name = data.Name;
+            game.Metadata.Seed = new Random().Next();
+            game.Metadata.IsMultipleChoice = true;
+            var stored = await _gameDataService.CreateGameAsync(game);
+            return Ok(stored);
         }
 
     }
