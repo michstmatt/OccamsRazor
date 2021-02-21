@@ -36,8 +36,9 @@ export class HostSetup extends Component {
     joinSubmitHandler = (event) => {
         event.preventDefault();
         const game = this.state.games.filter(g => g.gameId === this.state.selectedGame)[0];
+        if(game === undefined || (game.isMultipleChoice && (this.state.player?.name ?? "") === "") || (this.state.password ?? "" ) === "") return;
         HostService.checkAuth(this.state.selectedGame, this.state.password).then((ok) => {
-            if (ok) {
+            if (ok && this.state.player?.name !== "") {
                 localStorage.setItem('state', JSON.stringify({ password: this.state.password, gameId: this.state.selectedGame, player: this.state.player }));
                 this.navigateToHostPage(game);
             }
@@ -45,7 +46,7 @@ export class HostSetup extends Component {
     }
 
     gameSelectedHandler = (event) => {
-        this.setState({ selectedGame: event.target.value });
+        this.setState({ selectedGame: event.target.value * 1});
     }
 
     passwordChangeHandler = (event) => {
@@ -70,7 +71,7 @@ export class HostSetup extends Component {
 
                 <span>Password</span>
                 <input className="answer-input" type="password" onChange={this.passwordChangeHandler} />
-                {games.filter(g => g.gameId === this.state.selectedGame).map(g => {
+                {games.filter(g => g.gameId === (this.state.selectedGame)).map(g => {
                     if (g.isMultipleChoice) {
                         return (
                             <div>
