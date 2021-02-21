@@ -58,6 +58,7 @@ namespace OccamsRazor.Web.Persistence.Service
         {
             Game game = new Game();
             var md = await gameDataRepository.GetGameMetadataAsync(gameId);
+            game.Metadata = md;
             if (md.IsMultipleChoice)
                 game.Questions.AddRange(await multipleChoiceRepository.LoadQuestionsAsync(game.Metadata.Seed, 12));
             else

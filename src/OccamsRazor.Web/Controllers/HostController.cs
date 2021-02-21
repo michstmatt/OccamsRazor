@@ -14,7 +14,7 @@ namespace OccamsRazor.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class HostController: Controller
+    public class HostController : Controller
     {
         private readonly ILogger<HostController> _logger;
         private readonly IAuthenticationService _authService;
@@ -39,7 +39,7 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpGet]
         [Route("Validate")]
-        public async Task<IActionResult> Validate(int gameId, [FromHeader(Name="gameKey")]string gameKey)
+        public async Task<IActionResult> Validate(int gameId, [FromHeader(Name = "gameKey")] string gameKey)
         {
             if (await _authService.IsAuthenticated(gameId, gameKey ?? "") == false)
             {
@@ -51,10 +51,13 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpPost]
         [Route("CreateGame")]
-        public async Task<IActionResult> CreateGame([FromBody] GameMetadata data, [FromHeader(Name="gameKey")] string gameKey)
+        public async Task<IActionResult> CreateGame([FromBody] GameMetadata data, [FromHeader(Name = "gameKey")] string gameKey)
         {
             var game = new Game();
             game.Metadata.Name = data.Name;
+            game.Metadata.IsMultipleChoice = data.IsMultipleChoice;
+            if (game.Metadata.IsMultipleChoice)
+                game.Metadata.Seed = new Random().Next();
             var stored = await _gameDataService.CreateGameAsync(game);
             await _authService.AddAuthentication(stored.GameId, gameKey);
             return Ok(stored);
@@ -64,10 +67,10 @@ namespace OccamsRazor.Web.Controllers
 
         [HttpGet]
         [Route("GetQuestions")]
-        public async Task<IActionResult> Questions([FromQuery] int? gameId, [FromHeader(Name="gameKey")] string gameKey)
+        public async Task<IActionResult> Questions([FromQuery] int? gameId, [FromHeader(Name = "gameKey")] string gameKey)
         {
-            
-            if (await _authService.IsAuthenticated(gameId?? 0, gameKey ?? "") == false)
+
+            if (await _authService.IsAuthenticated(gameId ?? 0, gameKey ?? "") == false)
             {
                 return Unauthorized();
             }

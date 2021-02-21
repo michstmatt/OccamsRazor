@@ -35,7 +35,7 @@ namespace OccamsRazor.Web.Persistence.Repository
             existing.CurrentQuestion = game.CurrentQuestion;
             existing.State = game.State;
 
-            await Context.SaveChangesAsync();
+            Context.SaveChanges();
             return existing;
         }
         public async Task<GameMetadata> InsertGameMetadataAsync(GameMetadata game)
@@ -47,7 +47,8 @@ namespace OccamsRazor.Web.Persistence.Repository
 
         public async Task<GameMetadata> GetGameMetadataAsync(int gameId)
         {
-            return await Context.GameMetadata.Where(g => g.GameId == gameId).FirstOrDefaultAsync();
+            var existing = await Context.GameMetadata.Where(g => g.GameId == gameId).FirstOrDefaultAsync();
+            return existing;
         }
 
         public async Task DeleteGameMetadataAsync(int gameId)

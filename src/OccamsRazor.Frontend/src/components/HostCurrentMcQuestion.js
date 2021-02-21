@@ -10,7 +10,11 @@ export class HostCurrentMcQuestion extends Component {
         super(props);
         this.state = {
             loading: true,
-            selectedGame: this.props.gameId,
+            gameData:{
+                metadata: {
+                    gameId: this.props.gameId
+                }
+            },
             password: this.props.password,
             selectedQuestion: {},
             questions: [],
@@ -37,8 +41,11 @@ export class HostCurrentMcQuestion extends Component {
         this.setState({ selectedQuestion: this.state.gameData.questions[index] });
     }
 
-    updateCurrentQuestionHandler = (event) => {
-        this.submitCurrentQuestion(this.state.selectedQuestion);
+    updateCurrentQuestionHandler = (event, inc) => {
+        let newGameData = this.state.gameData.metadata;
+        newGameData.currentQuestion += inc;
+        if (newGameData.currentQuestion < 0) newGameData.currentQuestion = 0;
+        this.submitCurrentQuestion(newGameData);
     }
 
     updateStateHandler = (event, state) => {
@@ -67,8 +74,8 @@ export class HostCurrentMcQuestion extends Component {
                     <button className={state === 4 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 4)}>Show Answer</button>
                     <button className={state === 2 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 2)}>Show Results</button>
                 </div>
-                <button className="host-score-button" onClick={this.updateCurrentQuestionHandler} >Update Current Question</button>
-                This will set the state to Pre-Question
+                <button className="host-score-button" onClick={ (e) => this.updateCurrentQuestionHandler(e, -1)} >Previous Question</button>
+                <button className="host-score-button" onClick={ (e) => this.updateCurrentQuestionHandler(e, 1)} >Next Question</button>
             </div>
 
         );
@@ -97,8 +104,8 @@ export class HostCurrentMcQuestion extends Component {
 
     async loadCurrentQuestion() {
         this.setState({ loading: true });
-        if(this.state.selectedGame === undefined) return;
-        const data = await HostService.loadQuestions(this.state.selectedGame);
+        if(this.state.gameData === undefined) return;
+        const data = await HostService.loadQuestions(this.state.gameData.metadata.gameId);
         if(data === undefined) return;
         this.setState({ gameData: data, loading: false, currentQuestionIndex: data.metadata.currentQuestion});
     }
@@ -107,14 +114,10 @@ export class HostCurrentMcQuestion extends Component {
 
     }
 
-    async submitCurrentQuestion(question) {
+    async submitCurrentQuestion(newGameData) {
         this.setState({ loading: true });
-        let newGameData = this.state.gameData.metadata;
-        newGameData.currentQuestion = question.number;
-        newGameData.currentRound = question.round;
         await HostService.submitCurrentQuestion(newGameData);
         this.loadCurrentQuestion();
-        this.props.newQuestionEvent(this.state.selectedQuestion);
     }
 
 }

@@ -24,7 +24,7 @@ export class McAnswerModule extends Component {
         let answer =
         {
             player: this.state.player,
-            answerId: this.state.answer,
+            answerText: this.state.answer,
             questionNumber: this.state.currentQuestion.number * 1,
             round: this.state.currentQuestion.round * 1,
             gameId: this.state.game.gameId * 1,
@@ -53,7 +53,7 @@ export class McAnswerModule extends Component {
                 <form method="POST" className="answer-container" onSubmit={this.mcAnswerSumbitHandler}>
                     {Object.keys(possibleAnswers).map(k =>
                         <label class="answer-input" for={k}>
-                            <input type="radio" id={k} name="answerOption" value={k} onChange={this.mcAnswerChangeHandler}></input>
+                            <input type="radio" id={k} name="answerOption" value={k} onChange={this.answerChangeHandler}></input>
                             {possibleAnswers[k]}
                             <br />
                         </label>

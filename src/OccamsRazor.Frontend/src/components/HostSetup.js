@@ -12,7 +12,8 @@ export class HostSetup extends Component {
             games: [],
             loading: true,
             password: "",
-            selectedGame: 20
+            selectedGame: 20,
+            player: {name: ""}
         };
     }
 
@@ -23,16 +24,22 @@ export class HostSetup extends Component {
         });
     }
 
-    navigateToHostPage = () => {
-        this.props.history.push("/host-edit");
+    navigateToHostPage = (game) => {
+        if (game.isMultipleChoice) {
+            this.props.history.push("/host-play");
+        }
+        else {
+            this.props.history.push("/host-edit");
+        }
     }
 
     joinSubmitHandler = (event) => {
         event.preventDefault();
-        HostService.checkAuth(this.state.selectedGame, this.state.password).then((ok) =>{
-            if (ok){
-                localStorage.setItem('state', JSON.stringify({ password: this.state.password, gameId: this.state.selectedGame }));
-                this.navigateToHostPage();
+        const game = this.state.games.filter(g => g.gameId == this.state.selectedGame)[0];
+        HostService.checkAuth(this.state.selectedGame, this.state.password).then((ok) => {
+            if (ok) {
+                localStorage.setItem('state', JSON.stringify({ password: this.state.password, gameId: this.state.selectedGame, player: this.state.player }));
+                this.navigateToHostPage(game);
             }
         })
     }
@@ -43,6 +50,10 @@ export class HostSetup extends Component {
 
     passwordChangeHandler = (event) => {
         this.setState({ password: event.target.value });
+    }
+
+    playerNameChangeHandler = (event) => {
+        this.setState({ player: {name: event.target.value}});
     }
 
     renderHostSetup(games) {
@@ -59,6 +70,15 @@ export class HostSetup extends Component {
 
                 <span>Password</span>
                 <input className="answer-input" type="password" onChange={this.passwordChangeHandler} />
+                {games.filter(g => g.gameId == this.state.selectedGame).map(g => {
+                    if (g.isMultipleChoice) {
+                        return (
+                            <div>
+                                <span>Player Name</span>
+                                <input className="answer-input" onChange={this.playerNameChangeHandler}/>
+                            </div>);
+                    }
+                })}
 
                 <br />
                 <br />

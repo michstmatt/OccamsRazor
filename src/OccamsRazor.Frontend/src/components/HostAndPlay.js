@@ -110,7 +110,7 @@ export class HostAndPlay extends Component {
             <div>
                 {content}
                 <div className="card">
-                    <HostCurrentMcQuestion gameId={54} />
+                    <HostCurrentMcQuestion gameId={this.state.selectedGameId} />
                 </div>
             </div>
         );
