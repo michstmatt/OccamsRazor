@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { isReturnStatement } from 'typescript';
 import { HostService } from '../services/hostService';
-import { PlayService } from '../services/playService';
 
 export class HostCurrentMcQuestion extends Component {
     static displayName = HostCurrentMcQuestion.name;

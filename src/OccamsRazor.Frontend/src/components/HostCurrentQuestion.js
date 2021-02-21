@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { HostService } from '../services/hostService';
-import { PlayService } from '../services/playService';
 
 export class HostCurrentQuestion extends Component {
     static displayName = HostCurrentQuestion.name;
@@ -48,6 +47,7 @@ export class HostCurrentQuestion extends Component {
 
         let stateText = "";
 
+        if (state === 0) stateText = "Created";
         if (state === 1) stateText = "Question";
         if (state === 2) stateText = "Results";
         if (state === 3) stateText = "Pre Question";
@@ -58,6 +58,7 @@ export class HostCurrentQuestion extends Component {
                 <div>
                     <h4> <span className="secondary"> Currently Showing </span>{stateText}</h4>
                     <button className={state === 3 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 3)} >Show Pre Question</button>
+                    <button className={state === 1 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 1)}>Show Question</button>
                     <button className={state === 1 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 1)}>Show Question</button>
                     <button className={state === 4 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 4)}>Show Answer</button>
                     <button className={state === 2 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 2)}>Show Results</button>
