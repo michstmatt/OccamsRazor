@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
+import { isReturnStatement } from 'typescript';
 import { HostService } from '../services/hostService';
 import { PlayService } from '../services/playService';
 
-export class HostCurrentQuestion extends Component {
-    static displayName = HostCurrentQuestion.name;
+export class HostCurrentMcQuestion extends Component {
+    static displayName = HostCurrentMcQuestion.name;
 
     constructor(props) {
         super(props);
@@ -44,6 +45,10 @@ export class HostCurrentQuestion extends Component {
         this.setGameState(state);
     }
 
+    renderPlayerStatus(answers) {
+        
+    }
+
     renderHostCurrentQuestion(questions, cQuestion, state) {
 
         let stateText = "";
@@ -62,17 +67,6 @@ export class HostCurrentQuestion extends Component {
                     <button className={state === 4 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 4)}>Show Answer</button>
                     <button className={state === 2 ? "host-score-button-alt" : "host-score-button"} onClick={e => this.updateStateHandler(e, 2)}>Show Results</button>
                 </div>
-                <h4> <span className="secondary"> Current Round</span>{cQuestion.round} </h4>
-                <h4> <span className="secondary"> Current Question</span>{cQuestion.number} </h4>
-                <h4> <span className="primary"> Category </span>{cQuestion.category} </h4>
-                <h4> <span className="primary"> Question </span></h4>
-                <p>{cQuestion.text} </p>
-                <h4> <span className="primary"> Answer </span>{cQuestion.answerText} </h4>
-                <select className="host-score-input" onChange={this.questionSelectedHandler} defaultValue={this.state.currentQuestionIndex}>
-                    {questions.map((question, index) =>
-                        <option value={index}>R {this.state.rounds.find(q => q.number === question.round).name} Q {question.number}</option>
-                    )}
-                </select>
                 <button className="host-score-button" onClick={this.updateCurrentQuestionHandler} >Update Current Question</button>
                 This will set the state to Pre-Question
             </div>
@@ -105,8 +99,12 @@ export class HostCurrentQuestion extends Component {
         this.setState({ loading: true });
         if(this.state.selectedGame === undefined) return;
         const data = await HostService.loadQuestions(this.state.selectedGame);
-        const questionIndex = data.questions.findIndex(q => q.round === data.metadata.currentRound && q.number === data.metadata.currentQuestion);
-        this.setState({ gameData: data, loading: false, currentQuestionIndex: questionIndex });
+        if(data === undefined) return;
+        this.setState({ gameData: data, loading: false, currentQuestionIndex: data.metadata.currentQuestion});
+    }
+
+    async loadAnswers(){
+
     }
 
     async submitCurrentQuestion(question) {
@@ -120,4 +118,3 @@ export class HostCurrentQuestion extends Component {
     }
 
 }
-

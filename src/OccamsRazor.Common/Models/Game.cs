@@ -7,19 +7,17 @@ namespace OccamsRazor.Common.Models
 {
     public class Game
     {
-        [JsonPropertyName("id")]
-        public string Id { get => this.Metadata.GameId.ToString(); set { } }
-
         [JsonPropertyName("questions")]
-        public List<Question> Questions { get; set; }
+        public List<AbstractQuestion> Questions { get; set; }
 
         [JsonPropertyName("metadata")]
         public GameMetadata Metadata { get; set; }
-
+        [JsonIgnore]
+        public Dictionary<RoundEnum, int> Format { get; set; }
         public Game()
         {
-            Metadata = new GameMetadata(){State = GameStateEnum.Created};
-            var format = new Dictionary<RoundEnum, int>
+            Metadata = new GameMetadata() { State = GameStateEnum.Created };
+            Format = new Dictionary<RoundEnum, int>
             {
                 {RoundEnum.One, 3},
                 {RoundEnum.Two, 3},
@@ -30,18 +28,20 @@ namespace OccamsRazor.Common.Models
                 {RoundEnum.Six, 3},
                 {RoundEnum.Final, 1},
             };
+            Questions = new List<AbstractQuestion>();
+            /*
+                        Questions = new List<Question>();
 
-            Questions = new List<Question>();
+                        foreach (var pair in format)
+                        {
+                            var round = pair.Key;
+                            for (int i = 0; i < pair.Value; i++)
+                            {
+                                Questions.Add(new Question { Round = pair.Key, Number = i + 1, Text = "", AnswerText = "", Category = "" });
+                            }
 
-            foreach (var pair in format)
-            {
-                var round = pair.Key;
-                for (int i = 0; i < pair.Value; i++)
-                {
-                    Questions.Add(new Question { Round = pair.Key, Number = i + 1, Text = "", AnswerText = "", Category=""});
-                }
-                
-            }
+                        }*/
         }
+
     }
 }

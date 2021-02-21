@@ -9,9 +9,10 @@ import { ToastService } from '../services/toastService';
 import { QuestionModule } from '../modules/QuestionModule';
 import { AnswerModule } from '../modules/AnswerModule';
 import { McAnswerModule } from '../modules/McAnswerModule';
+import { HostCurrentMcQuestion } from './HostCurrentMcQuestion';
 
-export class PlayGame extends Component {
-    static displayName = PlayGame.name;
+export class HostAndPlay extends Component {
+    static displayName = HostAndPlay.name;
 
     constructor(props) {
         super(props);
@@ -63,8 +64,8 @@ export class PlayGame extends Component {
     renderPlay() {
 
         let form = this.state.game.isMultipleChoice
-            ? <McAnswerModule game={this.state.game} player={this.state.player} currentQuestion={this.state.currentQuestion} loading={this.state.loading}/>
-            : <AnswerModule game={this.state.game} player={this.state.player} currentQuestion={this.state.currentQuestion} loading={this.state.loading}/>;
+            ? <McAnswerModule game={this.state.game} player={this.state.player} currentQuestion={this.state.currentQuestion} loading={this.state.loading} />
+            : <AnswerModule game={this.state.game} player={this.state.player} currentQuestion={this.state.currentQuestion} loading={this.state.loading} />;
 
         let question = <QuestionModule game={this.state.game} currentQuestion={this.state.currentQuestion} loading={this.state.loading} />;
         return (
@@ -108,6 +109,9 @@ export class PlayGame extends Component {
         return (
             <div>
                 {content}
+                <div className="card">
+                    <HostCurrentMcQuestion gameId={54} />
+                </div>
             </div>
         );
     }

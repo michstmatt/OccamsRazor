@@ -13,5 +13,6 @@ app.listen(port, function (err) {
   if (err) {
     console.log(err)
   }
+  console.info('pointing to %s', process.env.REACT_APP_API_URL)
   console.info('==> 🌎 Listening on port %s.', port)
 })

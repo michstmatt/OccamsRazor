@@ -11,6 +11,7 @@ import { HostScoreQuestions } from './components/HostScoreQuestions';
 import { HostPage } from './components/HostPage';
 import { HostSetup } from './components/HostSetup';
 import { WaitPage } from './components/WaitPage';
+import { HostAndPlay } from './components/HostAndPlay';
 
 export default class App extends Component {
   static displayName = App.name;
@@ -25,6 +26,7 @@ export default class App extends Component {
         <Route exact path='/host-score-questions' component={HostScoreQuestions} />
         <Route exact path='/host-edit' component={HostPage} />
         <Route exact path='/host-setup' component={HostSetup} />
+        <Route exact path='/host-play' component={HostAndPlay} />
         <Route exact path='/play-waiting' component={WaitPage} />
       </Layout>
     );

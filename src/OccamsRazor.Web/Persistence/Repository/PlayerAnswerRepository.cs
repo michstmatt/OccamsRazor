@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using OccamsRazor.Common.Models;
 using OccamsRazor.Web.Repository;
-using OccamsRazor.Web.Context;
+using OccamsRazor.Common.Context;
 
 namespace OccamsRazor.Web.Persistence.Repository
 {

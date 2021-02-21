@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using OccamsRazor.Web.Context;
+using OccamsRazor.Common.Context;
 using OccamsRazor.Web.Repository;
 using OccamsRazor.Web.Service;
 using OccamsRazor.Web.Persistence.Repository;
@@ -38,10 +38,13 @@ namespace OccamsRazor.Web
             OccamsRazorEfSqlContext.GAMEMETADATA_TABLE = System.Environment.GetEnvironmentVariable("GAMEMETADATA_TABLE");
             OccamsRazorEfSqlContext.QUESTION_TABLE = System.Environment.GetEnvironmentVariable("QUESTIONS_TABLE");
             OccamsRazorEfSqlContext.KEY_TABLE = System.Environment.GetEnvironmentVariable("KEYS_TABLE");
+            OccamsRazorEfSqlContext.MC_QUESTION_TABLE = System.Environment.GetEnvironmentVariable("MC_QUESTIONS_TABLE");
 
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             //services.AddSingleton<IGameDataRepository, GameTestDataRepository>();
+            services.AddScoped<IQuestionRepository, QuestionRepository>();
+            services.AddScoped<IMultipleChoiceRepository, MultipleChoiceQuestionRepository>();
             services.AddScoped<IGameDataRepository, GameDataRepository>();
             services.AddScoped<IGameDataService, GameDataService>();
             //services.AddSingleton<IPlayerAnswerRepository, PlayerTestAnswerRepository>();

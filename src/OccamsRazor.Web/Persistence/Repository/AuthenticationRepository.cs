@@ -7,9 +7,9 @@ using System.Data.SqlClient;
 
 using Microsoft.EntityFrameworkCore;
 
-using OccamsRazor.Common.Models;
+using OccamsRazor.Common.AuthenticationModels;
 
-using OccamsRazor.Web.Context;
+using OccamsRazor.Common.Context;
 using OccamsRazor.Web.Repository;
 
 namespace OccamsRazor.Web.Persistence.Repository
@@ -34,7 +34,7 @@ namespace OccamsRazor.Web.Persistence.Repository
 
             if (exsiting == null)
             {
-                await Context.Keys.AddAsync(new AuthenticationModels.AuthenticationModel{GameId = gameId, GameKey = key});
+                await Context.Keys.AddAsync(new AuthenticationModel{GameId = gameId, GameKey = key});
             }
             else
             {
