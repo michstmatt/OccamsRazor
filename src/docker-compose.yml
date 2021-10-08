@@ -25,7 +25,7 @@ services:
     build:
       context: .
       dockerfile: OccamsRazorWeb.Dockerfile
-    image: occamsrazorweb
+    image: ${IMAGE_REGISTRY}occamsrazorweb
     container_name: web
     environment:
       - CONNECTION_STRING=data source=databases,1433;Database=master;User Id=sa;Password=mssq!Password3;
@@ -41,7 +41,7 @@ services:
     build:
       context: .
       dockerfile: ./OccamsRazorFrontend.Dockerfile
-    image: occamsrazorfrontend
+    image: ${IMAGE_REGISTRY}occamsrazorfrontend
     container_name: frontend
     ports:
       - "3000:3000"

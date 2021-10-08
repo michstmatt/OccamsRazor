@@ -32,27 +32,15 @@ jobs:
         WEB="occamsrazorweb"
         FE="occamsrazorfrontend"
 
-        docker-compose build
-        az acr login -n $ARC -g OccamsRazor
-        docker tag "$WEB:latest" "$ACR_URL/$WEB"
-        docker tag "$FE:latest" "$ACR_URL/$FE"
+        docker-compose build --build-arg "IMAGE_REGISTRY=$ACR_URL"
+        az acr login -n $ARC
 
         docker push "$ACR_URL/$WEB"
         docker push "$ACR_URL/$FE"
 
     - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'occamsrazorapi'
-        slot-name: 'production'
-        package: ${{env.DOTNET_ROOT}}/myapp
-
-    - name: 'Deploy to Azure Web App'
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'occamsrazor'
-        slot-name: 'production'
-        package: ${{ env.NODE_APP_PATH }}
+      run: |
+        az webapp create
 
     - name: logout
       run: |
