@@ -47,7 +47,7 @@ jobs:
       run: |
         user=$(az acr credential show -n occamsrazor --query username -o tsv)
         pass=$(az acr credential show -n occamsrazor --query passwords[0].value -o tsv)
-        az webapp create -g occamsrazortrivia --plan occams-razor-plan \
+        az webapp create -g occamsrazortrivia --plan occamsrazorplan \
           -n occamsrazor \
           --multicontainer-config-type compose \
           --multicontainer-config-file docker-compose.yml \
