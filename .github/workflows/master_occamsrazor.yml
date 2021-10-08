@@ -27,7 +27,18 @@ jobs:
     - name: build docker
       working-directory: ./src
       run: |
+        ACR="occamsrazor"
+        ACR_URL="$ACR.azurecr.io"
+        WEB="occamsrazorweb"
+        FE="occamsrazorfrontend"
+
         docker-compose build
+        az acr login -n $ARC -g OccamsRazor
+        docker tag "$WEB:latest" "$ACR_URL/$WEB"
+        docker tag "$FE:latest" "$ACR_URL/$FE"
+
+        docker push "$ACR_URL/$WEB"
+        docker push "$ACR_URL/$FE"
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
