@@ -39,8 +39,16 @@ jobs:
         docker push "$FE_IMAGE"
 
     - name: Deploy to Azure Web App
+      working-directory: ./src
       run: |
-        az webapp create
+        user=$(az acr credential show -n occamsrazor --query username -o tsv)
+        pass=$(az acr credential show -n occamsrazor --query passwords[0].value -o tsv)
+        az webapp create -g OccamsRazor --plan occams-razor-plan \
+          -n occamsrazor \
+          --multicontainer-config-type compose \
+          --multicontainer-config-file docker-compose.yml \
+          --docker-registry-server-user $user \
+          --docker-registry-server-password $pass
 
     - name: logout
       run: |
