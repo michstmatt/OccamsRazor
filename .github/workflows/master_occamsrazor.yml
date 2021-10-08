@@ -48,6 +48,13 @@ jobs:
     - name: dotnet publish
       run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp ${{ env.ASP_APP_PATH }}
 
+    - name: build docker
+      working_directory: ./src
+      run: |
+        docker build . -t occamsrazorweb -f OccamsRazorWeb.dockerfile
+        docker build . -t occamsrazorfrontend -f OccamsRazorFrontend.dockerfile
+
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
