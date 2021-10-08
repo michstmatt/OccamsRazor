@@ -32,8 +32,12 @@ jobs:
         export WEB_IMAGE="$ACR_URL/occamsrazorweb"
         export FE_IMAGE="$ACR_URL/occamsrazorfrontend"
 
-        docker-compose build
         az acr login -n $ACR
+
+        docker pull "$WEB_IMAGE"
+        docker pull "$FE_IMAGE"
+
+        docker-compose build
 
         docker push "$WEB_IMAGE"
         docker push "$FE_IMAGE"
