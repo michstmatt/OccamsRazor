@@ -24,36 +24,10 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Set up Node.js version
-      uses: actions/setup-node@v1
-      with:
-        node-version: '14.x'
-
-    - name: Set up .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '3.1.102'
-
-    - name: npm install, build, and test
-      run: |
-        npm install
-        export REACT_APP_API_URL="occamsrazorapi.azurewebsites.net"
-        npm run build --if-present
-        npm run test --if-present
-      working-directory: ${{ env.NODE_APP_PATH }}
-
-    - name: Build with dotnet
-      run: dotnet build --configuration Release ${{ env.ASP_APP_PATH }}
-
-    - name: dotnet publish
-      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp ${{ env.ASP_APP_PATH }}
-
     - name: build docker
       working-directory: ./src
       run: |
-        docker build . -t occamsrazorweb -f OccamsRazorWeb.dockerfile
-        docker build . -t occamsrazorfrontend -f OccamsRazorFrontend.dockerfile
-
+        docker-compose build docker-compose.yml
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2

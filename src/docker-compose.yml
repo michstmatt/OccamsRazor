@@ -22,6 +22,9 @@ services:
 
 
   web:
+    build:
+      context: .
+      dockerfile: OccamsRazorWeb.Dockerfile
     image: occamsrazorweb
     container_name: web
     environment:
@@ -35,6 +38,9 @@ services:
       - databases
 
   frontend:
+    build:
+      context: .
+      dockerfile: ./OccamsRazorFrontend.Dockerfile
     image: occamsrazorfrontend
     container_name: frontend
     ports:
