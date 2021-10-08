@@ -49,7 +49,7 @@ jobs:
       run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp ${{ env.ASP_APP_PATH }}
 
     - name: build docker
-      working_directory: ./src
+      working-directory: ./src
       run: |
         docker build . -t occamsrazorweb -f OccamsRazorWeb.dockerfile
         docker build . -t occamsrazorfrontend -f OccamsRazorFrontend.dockerfile
