@@ -18,11 +18,13 @@ WORKDIR /app
 COPY --from=build-env /app/out .
 
 ENV CONNECTION_STRING=""
-ENV ANSWER_TABLE="answers"
-ENV GAMEMETADATA_TABLE="gamedata"
-ENV QUESTIONS_TABLE="questions"
-ENV KEYS_TABLE="keys"
-ENV MC_QUESTIONS_TABLE="mcquestions"
+
+ENV ANSWERS_TABLE="PlayerAnswers"
+ENV GAMEMETADATA_TABLE="GameMetadata"
+ENV KEYS_TABLE="GameKeys"
+ENV MC_ANSWERS_TABLE="MultipleChoiceAnswers"
+ENV MC_QUESTIONS_TABLE="MultipleChoiceQuestions"
+ENV QUESTIONS_TABLE="Questions"
 
 EXPOSE 80
 ENTRYPOINT ["dotnet", "OccamsRazor.Web.dll"]

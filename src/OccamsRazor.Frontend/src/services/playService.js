@@ -4,7 +4,7 @@ class PlayService {
         this.idKey = "player-id";
     }
 
-    static getHost = () => "https://" + process.env.REACT_APP_API_URL;
+    static getHost = () => process.env.REACT_APP_API_URL;
 
     static async loadGames() {
         const response = await fetch(`${this.getHost()}/api/Play/LoadGames`);

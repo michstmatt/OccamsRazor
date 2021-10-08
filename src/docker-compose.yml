@@ -12,15 +12,20 @@ services:
   databases:
     image: mcr.microsoft.com/mssql/server:2019-latest
     ports:
-      - "3306:3306"
+      - "1433:1433"
     environment:
       - ACCEPT_EULA=true
+      - SA_PASSWORD=mssq!Password3
     depends_on:
       - nginx
+        #    entrypoint: ["/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "mssq!Password3", "-Q", "CREATE DATABASE OccamsRazor; GO"]
+
 
   web:
     image: occamsrazorweb
     container_name: web
+    environment:
+      - CONNECTION_STRING=data source=databases,1433;Database=master;User Id=sa;Password=mssq!Password3;
     ports:
       - "5000:5000"
     expose:
@@ -29,3 +34,14 @@ services:
       - nginx
       - databases
 
+  frontend:
+    image: occamsrazorfrontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    depends_on:
+      - nginx
+      - databases
+      - web
