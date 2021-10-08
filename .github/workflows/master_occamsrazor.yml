@@ -29,14 +29,14 @@ jobs:
       run: |
         ACR="occamsrazor"
         ACR_URL="$ACR.azurecr.io"
-        WEB="$ACR_URL/occamsrazorweb"
-        FE="$ACR_URL/occamsrazorfrontend"
+        export WEB_IMAGE="$ACR_URL/occamsrazorweb"
+        export FE_IMAGE="$ACR_URL/occamsrazorfrontend"
 
-        docker-compose build --build-arg "WEB_IMAGE=$WEB" --build-arg "FE_IMAGE=$FE"
+        docker-compose build
         az acr login -n $ACR
 
-        docker push "$WEB"
-        docker push "$FE"
+        docker push "$WEB_IMAGE"
+        docker push "$FE_IMAGE"
 
     - name: Deploy to Azure Web App
       run: |
