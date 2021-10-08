@@ -50,9 +50,7 @@ jobs:
         az webapp create -g occamsrazortrivia --plan occamsrazorplan \
           -n occamsrazor \
           --multicontainer-config-type compose \
-          --multicontainer-config-file docker-compose.yml \
-          --docker-registry-server-user $user \
-          --docker-registry-server-password $pass
+          --multicontainer-config-file docker-compose.yml 
 
     - name: logout
       run: |
