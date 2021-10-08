@@ -51,7 +51,9 @@ jobs:
         az webapp create -g occamsrazor --plan occamsrazorplan \
           -n occamsrazortrivia \
           --multicontainer-config-type compose \
-          --multicontainer-config-file docker-compose.yml 
+          --multicontainer-config-file docker-compose.yml \
+          -s $user \
+          -w $pass
 
     - name: logout
       run: |
