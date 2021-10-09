@@ -43,17 +43,12 @@ jobs:
         docker push "$FE_IMAGE"
 
     - name: Deploy to Azure Web App
-      working-directory: ./src
       run: |
-        az account show
-        user=$(az acr credential show -n occamsrazor --query username -o tsv)
-        pass=$(az acr credential show -n occamsrazor --query passwords[0].value -o tsv)
-        az webapp create -g occamsrazor --plan occamsrazorplan \
-          -n occamsrazortrivia \
-          --multicontainer-config-type compose \
-          --multicontainer-config-file docker-compose.yml \
-          -s $user \
-          -w $pass
+        COMPOSE=$(cat ./src/docker-compose.yml)
+        az deployment group create -g OccamsRazor \
+          -f ./deploy/infra/main.bicep \
+          -p "linuxFxVersion=COMPOSE|$COMPOSE" \
+          -p "webAppName=occamsrazortrivia"
 
     - name: logout
       run: |
