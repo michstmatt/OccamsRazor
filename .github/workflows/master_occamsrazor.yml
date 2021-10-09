@@ -46,7 +46,7 @@ jobs:
 
     - name: Deploy to Azure Web App
       run: |
-        COMPOSE=$(cat ./src/docker-compose.yml)
+        COMPOSE=$(cat ./src/docker-compose.yml | base64 -w0)
         az deployment group create -g OccamsRazor \
           -f ./deploy/infra/main.bicep \
           -p "linuxFxVersion=COMPOSE|$COMPOSE" \
