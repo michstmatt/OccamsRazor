@@ -4,7 +4,7 @@ services:
   nginx:
     build:
       context: .
-      dockerFile: Ingress.DockerFile
+      dockerfile: Ingress.DockerFile
     image: occamsrazor.azurecr.io/occamsrazoringress
     ports:
       - "8080:80"
