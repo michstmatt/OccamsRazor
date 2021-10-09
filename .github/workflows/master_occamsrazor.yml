@@ -31,6 +31,7 @@ jobs:
         ACR_URL="$ACR.azurecr.io"
         export WEB_IMAGE="$ACR_URL/occamsrazorweb"
         export FE_IMAGE="$ACR_URL/occamsrazorfrontend"
+        export ING_IMAGE="$ACR_URL/occamsrazoringress"
 
         az acr login -n $ACR
 
@@ -41,6 +42,7 @@ jobs:
 
         docker push "$WEB_IMAGE"
         docker push "$FE_IMAGE"
+        docker push "$ING_IMAGE"
 
     - name: Deploy to Azure Web App
       run: |
