@@ -24,43 +24,32 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Set up Node.js version
-      uses: actions/setup-node@v1
-      with:
-        node-version: '14.x'
-
-    - name: Set up .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '3.1.102'
-
-    - name: npm install, build, and test
+    - name: build docker
+      working-directory: ./src
       run: |
-        npm install
-        export REACT_APP_API_URL="occamsrazorapi.azurewebsites.net"
-        npm run build --if-present
-        npm run test --if-present
-      working-directory: ${{ env.NODE_APP_PATH }}
+        ACR="occamsrazor"
+        ACR_URL="$ACR.azurecr.io"
+        export WEB_IMAGE="$ACR_URL/occamsrazorweb"
+        export FE_IMAGE="$ACR_URL/occamsrazorfrontend"
+        export ING_IMAGE="$ACR_URL/occamsrazoringress"
 
-    - name: Build with dotnet
-      run: dotnet build --configuration Release ${{ env.ASP_APP_PATH }}
+        docker-compose build --parallel
 
-    - name: dotnet publish
-      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp ${{ env.ASP_APP_PATH }}
+    - name: Deploy Infra
+      run: |
+        COMPOSE=$(cat ./src/docker-compose.yml | base64 -w0)
+        az deployment group create -g OccamsRazor \
+          -f ./deploy/infra/main.bicep \
+          -p "linuxFxVersion=COMPOSE|$COMPOSE" \
+          -p "webAppName=occamsrazortrivia"
+    
+    - name: Deploy Apps
+      run: |
+        az acr login -n $ACR
 
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'occamsrazorapi'
-        slot-name: 'production'
-        package: ${{env.DOTNET_ROOT}}/myapp
-
-    - name: 'Deploy to Azure Web App'
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'occamsrazor'
-        slot-name: 'production'
-        package: ${{ env.NODE_APP_PATH }}
+        docker push "$WEB_IMAGE"
+        docker push "$FE_IMAGE"
+        docker push "$ING_IMAGE"
 
     - name: logout
       run: |

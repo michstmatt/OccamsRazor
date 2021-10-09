@@ -5,7 +5,7 @@ class HostService {
         this.cookieName = "host-key";
     }
 
-    static getHost = () => "https://" + process.env.REACT_APP_API_URL;
+    static getHost = () => process.env.REACT_APP_API_URL;
 
     static setKey(key) {
         Common.setCookie(this.cookieName, key);
