@@ -33,7 +33,7 @@ jobs:
         export FE_IMAGE="$ACR_URL/occamsrazorfrontend"
         export ING_IMAGE="$ACR_URL/occamsrazoringress"
 
-        docker-compose build
+        docker-compose build --parallel
 
     - name: Deploy Infra
       run: |
