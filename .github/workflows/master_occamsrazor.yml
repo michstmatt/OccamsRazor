@@ -33,24 +33,23 @@ jobs:
         export FE_IMAGE="$ACR_URL/occamsrazorfrontend"
         export ING_IMAGE="$ACR_URL/occamsrazoringress"
 
-        az acr login -n $ACR
-
-        docker pull "$WEB_IMAGE"
-        docker pull "$FE_IMAGE"
-
         docker-compose build
 
-        docker push "$WEB_IMAGE"
-        docker push "$FE_IMAGE"
-        docker push "$ING_IMAGE"
-
-    - name: Deploy to Azure Web App
+    - name: Deploy Infra
       run: |
         COMPOSE=$(cat ./src/docker-compose.yml | base64 -w0)
         az deployment group create -g OccamsRazor \
           -f ./deploy/infra/main.bicep \
           -p "linuxFxVersion=COMPOSE|$COMPOSE" \
           -p "webAppName=occamsrazortrivia"
+    
+    - name: Deploy Apps
+      run: |
+        az acr login -n $ACR
+
+        docker push "$WEB_IMAGE"
+        docker push "$FE_IMAGE"
+        docker push "$ING_IMAGE"
 
     - name: logout
       run: |
