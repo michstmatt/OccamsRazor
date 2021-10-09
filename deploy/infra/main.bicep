@@ -36,16 +36,20 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
       linuxFxVersion: linuxFxVersion
       appSettings:[
         {
-          name:  'dockerRegistryUrl'
+          name:  'DOCKER_REGISTRY_SERVER_URL'
           value: 'https://${acrResource.properties.loginServer}'
         }
         {
-          name:  'dockerRegistryUserName'
+          name:  'DOCKER_REGISTRY_SERVER_USERNAME'
           value: acrResource.listCredentials().username
         }
         {
-          name:  'dockerRegistryPassword'
+          name:  'DOCKER_REGISTRY_SERVER_PASSWORD'
           value: acrResource.listCredentials().passwords[0].value
+        }
+        {
+          name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
+          value: true
         }
       ]
     }
