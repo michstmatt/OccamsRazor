@@ -57,8 +57,12 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
           value: '8080'
         }
         {
-          name: 'SQL_PASSWORD'
+          name: 'SA_PASSWORD'
           value: sqlPassword
+        }
+        {
+          name: 'CONNECTION_STRING'
+          value: 'data source=databases,1433;Database=master;User Id=sa;Password=${sqlPassword};'
         }
       ]
     }

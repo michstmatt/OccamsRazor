@@ -10,8 +10,6 @@ services:
       - "1433:1433"
     environment:
       - ACCEPT_EULA=true
-      - SA_PASSWORD=${SQL_PASSWORD}
-
 
   web:
     build:
@@ -19,8 +17,6 @@ services:
       dockerfile: OccamsRazorWeb.Dockerfile
     image: occamsrazor.azurecr.io/occamsrazorweb
     container_name: web
-    environment:
-      - CONNECTION_STRING=data source=databases,1433;Database=master;User Id=sa;Password=${SQL_PASSWORD};
     ports:
       - "5000:5000"
     expose:
