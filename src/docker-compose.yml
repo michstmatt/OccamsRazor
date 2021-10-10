@@ -7,7 +7,7 @@ services:
       - "1433:1433"
     environment:
       - ACCEPT_EULA=true
-      - SA_PASSWORD=mssq!Password3
+      - SA_PASSWORD=${SQL_PASSWORD}
         #    entrypoint: ["/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "mssq!Password3", "-Q", "CREATE DATABASE OccamsRazor; GO"]
 
 
@@ -18,7 +18,7 @@ services:
     image: occamsrazor.azurecr.io/occamsrazorweb
     container_name: web
     environment:
-      - CONNECTION_STRING=data source=databases,1433;Database=master;User Id=sa;Password=mssq!Password3;
+      - CONNECTION_STRING=data source=databases,1433;Database=master;User Id=sa;Password=${SQL_PASSWORD}
     ports:
       - "5000:5000"
     expose:

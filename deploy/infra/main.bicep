@@ -1,4 +1,5 @@
 param webAppName string = '' // Generate unique String for web app name
+param sqlPassword string
 param sku string = 'F1' // The SKU of App Service Plan
 param linuxFxVersion string = '' // The runtime stack of web app
 param location string = resourceGroup().location // Location for all resources
@@ -50,6 +51,10 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
         {
           name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
           value: true
+        }
+        {
+          name: 'SQL_PASSWORD'
+          value: sqlPassword
         }
       ]
     }
