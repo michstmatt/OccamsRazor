@@ -1,15 +1,6 @@
 version: '3'
 
 services:
-  nginx:
-    build:
-      context: .
-      dockerfile: Ingress.Dockerfile
-    image: occamsrazor.azurecr.io/occamsrazoringress
-    ports:
-      - "8080:80"
-    restart: unless-stopped
-
   databases:
     image: mcr.microsoft.com/mssql/server:2019-latest
     ports:
@@ -17,8 +8,6 @@ services:
     environment:
       - ACCEPT_EULA=true
       - SA_PASSWORD=mssq!Password3
-    depends_on:
-      - nginx
         #    entrypoint: ["/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "mssq!Password3", "-Q", "CREATE DATABASE OccamsRazor; GO"]
 
 
@@ -35,7 +24,6 @@ services:
     expose:
       - "5000"
     depends_on:
-      - nginx
       - databases
 
   frontend:
@@ -45,10 +33,9 @@ services:
     image: occamsrazor.azurecr.io/occamsrazorfrontend
     container_name: frontend
     ports:
-      - "3000:3000"
+      - "8080:80"
     expose:
-      - "3000"
+      - "8080"
     depends_on:
-      - nginx
       - databases
       - web
