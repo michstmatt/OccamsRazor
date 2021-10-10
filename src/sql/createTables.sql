@@ -2,9 +2,11 @@ IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Game
 		BEGIN
 				CREATE TABLE GameMetadata(gameId int DEFAULT 0, 
 						name varchar(255),
-						currentRound int DEFAULT 0,
-						currentQuestion int DEFAULT 0,
-						state int default 0);
+						currentRoundNum int DEFAULT 0,
+						currentQuestionNum int DEFAULT 0,
+						state int default 0,
+						mc int default 0,
+						seed int default 0);
 END
 
 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MultipleChoiceGameMetadata')

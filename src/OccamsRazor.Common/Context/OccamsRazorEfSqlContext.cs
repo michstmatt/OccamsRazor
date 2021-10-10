@@ -19,7 +19,7 @@ namespace OccamsRazor.Common.Context
         public DbSet<PlayerAnswer> Answers { get; set; }
         public DbSet<AuthenticationModel> Keys { get; set; }
 
-        public OccamsRazorEfSqlContext(DbContextOptions<OccamsRazorEfSqlContext> options): base(options) { this.Database.EnsureCreated();}
+        public OccamsRazorEfSqlContext(DbContextOptions<OccamsRazorEfSqlContext> options): base(options) {}
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<GameMetadata>().ToTable(GAMEMETADATA_TABLE).HasKey(q => q.GameId);
