@@ -53,6 +53,10 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
           value: true
         }
         {
+          name: 'WEBSITES_PORT'
+          value: '8080'
+        }
+        {
           name: 'SQL_PASSWORD'
           value: sqlPassword
         }

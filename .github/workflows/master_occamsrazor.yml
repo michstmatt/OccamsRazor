@@ -32,7 +32,7 @@ jobs:
       working-directory: ./src
       env:
         WEB_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.WEB_IMAGE }}"
-        FE_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.WEB_IMAGE }}"
+        FE_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.FE_IMAGE }}"
       run: |
         docker-compose build --parallel
 
@@ -49,7 +49,7 @@ jobs:
       env:
         ACR: ${{ env.ACR }}
         WEB_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.WEB_IMAGE }}"
-        FE_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.WEB_IMAGE }}"
+        FE_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.FE_IMAGE }}"
       run: |
         az acr login -n $ACR
 
