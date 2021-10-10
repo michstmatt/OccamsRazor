@@ -37,7 +37,6 @@ jobs:
         docker-compose build --parallel
 
     - name: Deploy Infra
-      env:
       run: |
         COMPOSE=$(cat ./src/docker-compose.yml | base64 -w0)
         az deployment group create -g OccamsRazor \
