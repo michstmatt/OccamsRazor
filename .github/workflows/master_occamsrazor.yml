@@ -54,7 +54,6 @@ jobs:
 
         docker push "$WEB_IMAGE"
         docker push "$FE_IMAGE"
-        docker push "$ING_IMAGE"
 
     - name: logout
       run: |
