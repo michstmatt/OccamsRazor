@@ -45,6 +45,7 @@ jobs:
     
     - name: Deploy Apps
       run: |
+        ACR="occamsrazor"
         az acr login -n $ACR
 
         docker push "$WEB_IMAGE"
