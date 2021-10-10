@@ -21,6 +21,7 @@ jobs:
       ACR: "occamsrazor"
       WEB_IMAGE: "occamsrazorweb"
       FE_IMAGE: "occamsrazorfrontend"
+      SQL_IMAGE: "occamsrazorsql"
 
     steps:
     - uses: actions/checkout@master
@@ -33,6 +34,7 @@ jobs:
       env:
         WEB_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.WEB_IMAGE }}"
         FE_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.FE_IMAGE }}"
+        SQL_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.SQL_IMAGE }}"
       run: |
         docker-compose build --parallel
 
@@ -50,11 +52,13 @@ jobs:
         ACR: ${{ env.ACR }}
         WEB_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.WEB_IMAGE }}"
         FE_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.FE_IMAGE }}"
+        SQL_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.SQL_IMAGE }}"
       run: |
         az acr login -n $ACR
 
         docker push "$WEB_IMAGE"
         docker push "$FE_IMAGE"
+        docker push "$SQL_IMAGE"
 
     - name: logout
       run: |
