@@ -14,9 +14,3 @@ FROM mcr.microsoft.com/mssql/server:2019-latest AS release
 ENV ACCEPT_EULA=Y
 ENV SA_PASSWORD=''
 COPY --from=build /var/opt/mssql/data /var/opt/mssql/data
-
-COPY ./sql/updateUser.sh .
-
-EXPOSE 1433
-
-CMD ./updateUser.sh 'tmpSQLPassword1234!' ${SA_PASSWORD}

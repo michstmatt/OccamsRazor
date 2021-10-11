@@ -5,12 +5,12 @@ using System.Text.Json.Serialization;
 
 namespace OccamsRazor.Common.Models
 {
-    public class Game: AbstractGame
+    public class MultipleChoiceGame : AbstractGame
     {
         [JsonPropertyName("questions")]
-        public List<Question> Questions { get; set; }
+        public List<MultipleChoiceQuestion> Questions { get; set; }
 
-        public Game()
+        public MultipleChoiceGame()
         {
             Metadata = new GameMetadata() { State = GameStateEnum.Created };
             Format = new Dictionary<RoundEnum, int>
@@ -24,7 +24,7 @@ namespace OccamsRazor.Common.Models
                 {RoundEnum.Six, 3},
                 {RoundEnum.Final, 1},
             };
-            Questions = new List<Question>();
+            Questions = new List<MultipleChoiceQuestion>();
         }
 
     }

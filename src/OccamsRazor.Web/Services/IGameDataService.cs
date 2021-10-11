@@ -11,7 +11,7 @@ namespace OccamsRazor.Web.Service
     {
         Task<GameMetadata> CreateGameAsync(Game game);
         Task<GameMetadata> SaveGameAsync(Game game);
-        Task<Game> LoadGameAsync(int gameId);
+        Task<AbstractGame> LoadGameAsync(int gameId);
         Task<IEnumerable<GameMetadata>> LoadGamesAsync();
         Task<AbstractQuestion> GetCurrentQuestionAsync(int gameId);
         Task<AbstractQuestion> SetCurrentQuestionAsync(GameMetadata game);

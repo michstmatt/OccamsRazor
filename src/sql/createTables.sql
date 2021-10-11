@@ -39,15 +39,16 @@ IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Mult
 						answerId varchar (10) DEFAULT '');
 END
 
-IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Answers')
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'PlayerAnswers')
 		BEGIN
-				CREATE TABLE Answers(gameId int DEFAULT 0,
+				CREATE TABLE PlayerAnswers(gameId int DEFAULT 0,
 						playerName varchar(1024) DEFAULT '',
 						id int DEFAULT 0,
 						roundNum int DEFAULT 0,
 						questionNum int DEFAULT 0,
 						wager int DEFAULT 0,
-						answerText varchar(1024) DEFAULT '');
+						answerText varchar(1024) DEFAULT '',
+						pointsAwarded int DEFAULT 0);
 END
 
 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'MultipleChoiceAnswers')

@@ -26,7 +26,8 @@ namespace OccamsRazor.Web.Controllers
         [HttpGet]
         public IActionResult Index() 
         {
-            return Ok(DateTime.UtcNow);
+            return Ok(System.Environment.GetEnvironmentVariable("CONNECTION_STRING"));
+            //return Ok(DateTime.UtcNow);
         }
 
     }
