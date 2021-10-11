@@ -14,7 +14,7 @@ using OccamsRazor.Common.Models;
 
 namespace OccamsRazor.Web.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class PlayController: Controller
     {
