@@ -22,7 +22,7 @@ services:
     environment:
       - CONNECTION_STRING=data source=databases,1433;Database=master;User Id=sa;Password=${SA_PASSWORD};
     ports:
-      - "8080:5000"
+      - "5000:5000"
     depends_on:
       - databases
 
