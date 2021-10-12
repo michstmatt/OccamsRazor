@@ -35,6 +35,7 @@ jobs:
         WEB_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.WEB_IMAGE }}"
         FE_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.FE_IMAGE }}"
         SQL_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.SQL_IMAGE }}"
+        SA_PASSWORD: ${{ secrets.SQL_DB_PASS }}
       run: |
         docker-compose build --parallel
 
