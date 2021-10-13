@@ -4,6 +4,9 @@ param sku string = 'F1' // The SKU of App Service Plan
 param linuxFxVersion string = '' // The runtime stack of web app
 param location string = resourceGroup().location // Location for all resources
 param acrName string = 'occamsrazor'
+param sqlName string = 'occamsrazormaria'
+param dbName string = 'trivia'
+param sqlUser string = 'mariadbadmin'
 var appServicePlanName = toLower('ASP-${webAppName}')
 resource acrResource 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
   name: acrName
@@ -14,6 +17,37 @@ resource acrResource 'Microsoft.ContainerRegistry/registries@2021-06-01-preview'
   properties: {
     adminUserEnabled: true
   }
+}
+
+resource symbolicname 'Microsoft.DBforMariaDB/servers@2018-06-01' = {
+  name: sqlName
+  location: location
+  sku: {
+    capacity: 2
+    family: 'Gen5'
+    name: 'GP_Gen5_2'
+    size: '4096'
+    tier: 'GeneralPurpose'
+  }
+  properties: {
+    minimalTlsVersion: 'TLS1_2'
+    publicNetworkAccess: 'Enabled'
+    sslEnforcement: 'Enabled'
+    storageProfile: {
+      backupRetentionDays: 0
+      geoRedundantBackup: 'Disabled'
+      storageAutogrow: 'Enabled'
+      storageMB: 2048
+    }
+    version: '10.2'
+    createMode: 'Default'
+    administratorLogin: sqlUser
+    administratorLoginPassword: sqlPassword
+  }
+}
+
+resource database 'Microsoft.DBforMariaDB/servers/databases@2018-06-01' = {
+  name: '${sqlName}/${dbName}'
 }
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
@@ -62,7 +96,7 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'CONNECTION_STRING'
-          value: 'server=databases,3306;Database=trivia;user=root;Password=${sqlPassword};'
+          value: 'server=${sqlName}.mariadb.database.azure.com; Port=3306;Database=${database};user=${sqlUser}@${sqlName};Password=${sqlPassword};'
         }
       ]
     }

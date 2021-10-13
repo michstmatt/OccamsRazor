@@ -1,18 +1,6 @@
 version: '3'
 
 services:
-  databases:
-    build:
-      context: .
-      dockerfile: ./OccamsRazorSQL.Dockerfile
-    image: occamsrazor.azurecr.io/occamsrazorsql
-    ports:
-      - "3306:3306"
-    environment:
-      - ACCEPT_EULA=true
-      - MARIADB_ROOT_PASSWORD=${SA_PASSWORD}
-
-
   web:
     build:
       context: .
@@ -24,8 +12,6 @@ services:
       - MARIADB_VERSION=10.6.4
     ports:
       - "5000:5000"
-    depends_on:
-      - databases
 
   frontend:
     build:
@@ -36,5 +22,4 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - databases
       - web
