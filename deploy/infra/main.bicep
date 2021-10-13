@@ -8,7 +8,7 @@ param sqlName string = 'occamsrazormaria'
 param dbName string = 'trivia'
 param sqlUser string = 'mariadbadmin'
 var appServicePlanName = toLower('ASP-${webAppName}')
-var dbSize = '6000'
+var dbSize = '6144'
 resource acrResource 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
   name: acrName
   location: location
