@@ -8,13 +8,7 @@ param sqlName string = 'occamsrazormaria'
 param dbName string = 'trivia'
 param sqlUser string = 'mariadbadmin'
 var appServicePlanName = toLower('ASP-${webAppName}')
-var dbSize = '6144'
-var vnetName = 'occamsrazorvnet'
-var vnetAddressPrefix = '10.0.0.0/16'
-var waSubnetName = '${webAppName}sn'
-var waSubnetAddressPrefix = '10.0.0.0/24'
-var sqlSubnetName = '${sqlName}sn'
-var sqlSubnetAddressPrefix = '10.0.1.0/24'
+var dbSize = 6144
 
 resource acrResource 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
   name: acrName
@@ -27,45 +21,6 @@ resource acrResource 'Microsoft.ContainerRegistry/registries@2021-06-01-preview'
   }
 }
 
-resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
-  name: vnetName
-  location: location
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        vnetAddressPrefix
-      ]
-    }
-    subnets: [
-      {
-        name: waSubnetName
-        properties: {
-          addressPrefix: waSubnetAddressPrefix
-          delegations: [
-            {
-              name: 'delegation'
-              properties: {
-                serviceName: 'Microsoft.Web/serverFarms'
-              }
-            }
-          ]
-        }
-      }
-      {
-        name: sqlSubnetName
-        properties: {
-          addressPrefix: sqlSubnetAddressPrefix
-          serviceEndpoints: [
-            {
-              service: 'Microsoft.SQL'
-            }
-          ]
-        }
-      }
-    ]
-  }
-}
-
 resource maria 'Microsoft.DBforMariaDB/servers@2018-06-01' = {
   name: sqlName
   location: location
@@ -73,7 +28,7 @@ resource maria 'Microsoft.DBforMariaDB/servers@2018-06-01' = {
     capacity: 2
     family: 'Gen5'
     name: 'GP_Gen5_2'
-    size: dbSize
+    size: '${dbSize}'
     tier: 'GeneralPurpose'
   }
   properties: {
@@ -97,17 +52,6 @@ resource database 'Microsoft.DBforMariaDB/servers/databases@2018-06-01' = {
   name: '${sqlName}/${dbName}'
   dependsOn: [
     maria
-  ]
-}
-
-resource databaseVnetFw 'Microsoft.DBforMariaDB/servers/virtualNetworkRules@2018-06-01' = {
-  name: '${sqlName}/fwrule'
-  properties: {
-    virtualNetworkSubnetId: vnet.properties.subnets[1].id
-  }
-  dependsOn:[
-    maria
-    vnet
   ]
 }
 
@@ -145,7 +89,7 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
-          value: true
+          value: 'true'
         }
         {
           name: 'WEBSITES_PORT'
@@ -164,18 +108,5 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
   }
   dependsOn:[
     appServicePlan
-  ]
-}
-
-resource webappVnet 'Microsoft.Web/sites/networkConfig@2020-06-01' = {
-  parent: appService
-  name: 'virtualNetwork'
-  properties: {
-    subnetResourceId: vnet.properties.subnets[0].id
-    swiftSupported: true
-  }
-  dependsOn:[
-    appServicePlan
-    appService
   ]
 }
