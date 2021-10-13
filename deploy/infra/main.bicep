@@ -26,7 +26,7 @@ resource symbolicname 'Microsoft.DBforMariaDB/servers@2018-06-01' = {
     capacity: 2
     family: 'Gen5'
     name: 'GP_Gen5_2'
-    size: '4096'
+    size: '5120'
     tier: 'GeneralPurpose'
   }
   properties: {
