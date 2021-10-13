@@ -8,6 +8,7 @@ param sqlName string = 'occamsrazormaria'
 param dbName string = 'trivia'
 param sqlUser string = 'mariadbadmin'
 var appServicePlanName = toLower('ASP-${webAppName}')
+var dbSize = '6000'
 resource acrResource 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
   name: acrName
   location: location
@@ -26,7 +27,7 @@ resource symbolicname 'Microsoft.DBforMariaDB/servers@2018-06-01' = {
     capacity: 2
     family: 'Gen5'
     name: 'GP_Gen5_2'
-    size: '5120'
+    size: dbSize
     tier: 'GeneralPurpose'
   }
   properties: {
