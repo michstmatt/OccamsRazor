@@ -14,7 +14,7 @@ var vnetAddressPrefix = '10.0.0.0/16'
 var waSubnetName = '${webAppName}sn'
 var waSubnetAddressPrefix = '10.0.0.0/24'
 var sqlSubnetName = '${sqlName}sn'
-var sqlSubnetAddressPrefix = '10.0.0.1/24'
+var sqlSubnetAddressPrefix = '10.0.1.0/24'
 
 resource acrResource 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
   name: acrName
