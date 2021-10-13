@@ -55,14 +55,6 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
         name: sqlSubnetName
         properties: {
           addressPrefix: sqlSubnetAddressPrefix
-          delegations: [
-            {
-              name: 'delegation'
-              properties: {
-                serviceName: 'Microsoft.Web/serverFarms'
-              }
-            }
-          ]
         }
       }
     ]
