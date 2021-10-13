@@ -78,7 +78,6 @@ namespace OccamsRazor.Web
             };
 
             app.UseWebSockets(webSocketOptions);
-            app.UseHttpsRedirection();
             app.UseRouting();
 
             
