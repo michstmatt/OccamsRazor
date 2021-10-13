@@ -62,7 +62,7 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'CONNECTION_STRING'
-          value: 'data source=databases,1433;Database=master;User Id=sa;Password=${sqlPassword};'
+          value: 'server=databases,3306;Database=master;User Id=sa;Password=${sqlPassword};'
         }
       ]
     }

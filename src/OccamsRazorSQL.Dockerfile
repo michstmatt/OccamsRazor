@@ -1,4 +1,4 @@
-FROM mariadb:latest as build
+FROM mariadb:10.6.4 as build
 
 ENV MARIADB_ROOT_PASSWORD='tmpSQLPassword1234!'
 

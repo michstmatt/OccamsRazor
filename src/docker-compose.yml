@@ -21,6 +21,7 @@ services:
     container_name: web
     environment:
       - CONNECTION_STRING=Server=databases,3306;Database=trivia;User=root;Password=${SA_PASSWORD};
+      - MARIADB_VERSION=10.6.4
     ports:
       - "5000:5000"
     depends_on:

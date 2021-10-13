@@ -31,9 +31,10 @@ namespace OccamsRazor.Web
             services.AddControllersWithViews();
 
             var connString = System.Environment.GetEnvironmentVariable("CONNECTION_STRING");
+            var mariaDbVersion = System.Environment.GetEnvironmentVariable("MARIADB_VERSION");
 
             services.AddDbContext<OccamsRazorEfSqlContext>(options =>
-               options.UseMySql(connString, new MariaDbServerVersion(new System.Version(10, 6, 4)))
+               options.UseMySql(connString, new MariaDbServerVersion(new System.Version(mariaDbVersion)))
             );
 
             OccamsRazorEfSqlContext.ANSWER_TABLE = System.Environment.GetEnvironmentVariable("ANSWERS_TABLE");
