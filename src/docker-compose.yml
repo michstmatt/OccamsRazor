@@ -7,10 +7,10 @@ services:
       dockerfile: ./OccamsRazorSQL.Dockerfile
     image: occamsrazor.azurecr.io/occamsrazorsql
     ports:
-      - "1433:1433"
+      - "3306:3306"
     environment:
       - ACCEPT_EULA=true
-      - SA_PASSWORD=${SA_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${SA_PASSWORD}
 
 
   web:
@@ -20,7 +20,7 @@ services:
     image: occamsrazor.azurecr.io/occamsrazorweb
     container_name: web
     environment:
-      - CONNECTION_STRING=data source=databases,1433;Database=master;User Id=sa;Password=${SA_PASSWORD};
+      - CONNECTION_STRING=Server=databases,3306;Database=trivia;User=root;Password=${SA_PASSWORD};
     ports:
       - "5000:5000"
     depends_on:
@@ -33,7 +33,7 @@ services:
     image: occamsrazor.azurecr.io/occamsrazorfrontend
     container_name: frontend
     ports:
-      - "80:80"
+      - "8080:80"
     depends_on:
       - databases
       - web

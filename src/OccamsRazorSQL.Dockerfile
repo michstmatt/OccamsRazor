@@ -1,16 +1,7 @@
-FROM mcr.microsoft.com/mssql/server:2019-latest as build
+FROM mariadb:latest as build
 
-ENV SA_PASSWORD='tmpSQLPassword1234!'
-ENV ACCEPT_EULA=true
+ENV MARIADB_ROOT_PASSWORD='tmpSQLPassword1234!'
 
 WORKDIR /tmp
 
-COPY ./sql/ .
-
-
-RUN /tmp/createTables.sh ${SA_PASSWORD} /tmp/createTables.sql
-
-FROM mcr.microsoft.com/mssql/server:2019-latest AS release
-ENV ACCEPT_EULA=Y
-ENV SA_PASSWORD=''
-COPY --from=build /var/opt/mssql/data /var/opt/mssql/data
+COPY ./sql/createMariaSchema.sql /docker-entrypoint-initdb.d

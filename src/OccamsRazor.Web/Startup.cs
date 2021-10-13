@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Pomelo.EntityFrameworkCore.MySql;
 
 using OccamsRazor.Common.Context;
 using OccamsRazor.Web.Repository;
@@ -32,8 +33,9 @@ namespace OccamsRazor.Web
             var connString = System.Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
             services.AddDbContext<OccamsRazorEfSqlContext>(options =>
-               options.UseSqlServer(connString)
+               options.UseMySql(connString, new MariaDbServerVersion(new System.Version(10, 6, 4)))
             );
+
             OccamsRazorEfSqlContext.ANSWER_TABLE = System.Environment.GetEnvironmentVariable("ANSWERS_TABLE");
             OccamsRazorEfSqlContext.GAMEMETADATA_TABLE = System.Environment.GetEnvironmentVariable("GAMEMETADATA_TABLE");
             OccamsRazorEfSqlContext.QUESTION_TABLE = System.Environment.GetEnvironmentVariable("QUESTIONS_TABLE");
