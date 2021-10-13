@@ -20,7 +20,7 @@ resource acrResource 'Microsoft.ContainerRegistry/registries@2021-06-01-preview'
   }
 }
 
-resource symbolicname 'Microsoft.DBforMariaDB/servers@2018-06-01' = {
+resource maria 'Microsoft.DBforMariaDB/servers@2018-06-01' = {
   name: sqlName
   location: location
   sku: {
@@ -49,6 +49,9 @@ resource symbolicname 'Microsoft.DBforMariaDB/servers@2018-06-01' = {
 
 resource database 'Microsoft.DBforMariaDB/servers/databases@2018-06-01' = {
   name: '${sqlName}/${dbName}'
+  dependsOn: [
+    maria
+  ]
 }
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
