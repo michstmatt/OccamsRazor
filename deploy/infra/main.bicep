@@ -9,6 +9,13 @@ param dbName string = 'trivia'
 param sqlUser string = 'mariadbadmin'
 var appServicePlanName = toLower('ASP-${webAppName}')
 var dbSize = '6144'
+var vnetName = 'occamsrazorvnet'
+var vnetAddressPrefix = '10.0.0.0/16'
+var waSubnetName = '${webAppName}sn'
+var waSubnetAddressPrefix = '10.0.0.0/24'
+var sqlSubnetName = '${sqlname}sn'
+var sqlSubnetAddressPrefix = '10.0.0.1/24'
+
 resource acrResource 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
   name: acrName
   location: location
@@ -17,6 +24,48 @@ resource acrResource 'Microsoft.ContainerRegistry/registries@2021-06-01-preview'
   }
   properties: {
     adminUserEnabled: true
+  }
+}
+
+resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
+  name: vnetName
+  location: location
+  properties: {
+    addressSpace: {
+      addressPrefixes: [
+        vnetAddressPrefix
+      ]
+    }
+    subnets: [
+      {
+        name: waSubnetName
+        properties: {
+          addressPrefix: waSubnetAddressPrefix
+          delegations: [
+            {
+              name: 'delegation'
+              properties: {
+                serviceName: 'Microsoft.Web/serverFarms'
+              }
+            }
+          ]
+        }
+      }
+      {
+        name: sqlSubnetName
+        properties: {
+          addressPrefix: sqlSubnetAddressPrefix
+          delegations: [
+            {
+              name: 'delegation'
+              properties: {
+                serviceName: 'Microsoft.Web/serverFarms'
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }
 
@@ -52,6 +101,13 @@ resource database 'Microsoft.DBforMariaDB/servers/databases@2018-06-01' = {
   dependsOn: [
     maria
   ]
+}
+
+resource databaseVnetFw 'Microsoft.DBforMariaDB/servers/virtualNetworkRules@2018-06-01' = {
+  name: '${database.name}/fwrule'
+  properties: {
+    virtualNetworkSubnetId: vnet.properties.subnets[1].id
+  }
 }
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
@@ -104,5 +160,14 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
         }
       ]
     }
+  }
+}
+
+resource webappVnet 'Microsoft.Web/sites/networkConfig@2020-06-01' = {
+  parent: appService
+  name: 'virtualNetwork'
+  properties: {
+    subnetResourceId: vnet.properties.subnets[0].id
+    swiftSupported: true
   }
 }
