@@ -153,7 +153,7 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'CONNECTION_STRING'
-          value: 'server=${sqlName}.mariadb.database.azure.com; Port=3306;Database=${dbName};user=${sqlUser}@${sqlName};Password=${sqlPassword};'
+          value: 'server=${sqlName}.mariadb.database.azure.com;Port=3306;Database=${dbName};user=${sqlUser}@${sqlName};Password=${sqlPassword};'
         }
         {
           name: 'MARIA_DB_VERSION'
