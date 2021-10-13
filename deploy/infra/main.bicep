@@ -1,6 +1,6 @@
 param webAppName string = '' // Generate unique String for web app name
 param sqlPassword string
-param sku string = 'S1' // The SKU of App Service Plan
+param sku string = 'P1V2' // The SKU of App Service Plan
 param linuxFxVersion string = '' // The runtime stack of web app
 param location string = 'eastus2' // Location for all resources
 param acrName string = 'occamsrazor'
