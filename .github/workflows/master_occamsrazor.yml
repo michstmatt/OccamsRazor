@@ -45,6 +45,12 @@ jobs:
           -p "webAppName=occamsrazortrivia" \
           -p "sqlPassword=${{ secrets.SQL_DB_PASS }}"
     
+    - name: Deploy SQL Schema
+      env:
+        PASSWORD: ${{ secrets.SQL_DB_PASS }}
+      run: |
+        mysql -h occamsrazormaria.mariadb.database.azure.com -u mariadbadmin -p'$PASSWORD' --ssl < ./deploy/sql/createMariaSchema.sql
+    
     - name: Deploy Apps
       env:
         ACR: ${{ env.ACR }}
