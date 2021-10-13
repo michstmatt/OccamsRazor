@@ -104,10 +104,14 @@ resource database 'Microsoft.DBforMariaDB/servers/databases@2018-06-01' = {
 }
 
 resource databaseVnetFw 'Microsoft.DBforMariaDB/servers/virtualNetworkRules@2018-06-01' = {
-  name: '${database.name}/fwrule'
+  name: '${sqlName}/fwrule'
   properties: {
     virtualNetworkSubnetId: vnet.properties.subnets[1].id
   }
+  dependsOn:[
+    maria
+    vnet
+  ]
 }
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
@@ -161,6 +165,9 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
       ]
     }
   }
+  dependsOn:[
+    appServicePlan
+  ]
 }
 
 resource webappVnet 'Microsoft.Web/sites/networkConfig@2020-06-01' = {
@@ -170,4 +177,7 @@ resource webappVnet 'Microsoft.Web/sites/networkConfig@2020-06-01' = {
     subnetResourceId: vnet.properties.subnets[0].id
     swiftSupported: true
   }
+  dependsOn:[
+    appServicePlan
+  ]
 }
