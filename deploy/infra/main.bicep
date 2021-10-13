@@ -38,7 +38,7 @@ resource symbolicname 'Microsoft.DBforMariaDB/servers@2018-06-01' = {
       backupRetentionDays: 0
       geoRedundantBackup: 'Disabled'
       storageAutogrow: 'Enabled'
-      storageMB: 2048
+      storageMB: dbSize
     }
     version: '10.2'
     createMode: 'Default'
