@@ -49,7 +49,8 @@ jobs:
       env:
         PASSWORD: ${{ secrets.SQL_DB_PASS }}
       run: |
-        mysql -h occamsrazormaria.mariadb.database.azure.com -u mariadbadmin -p'$PASSWORD' --ssl < ./deploy/sql/createMariaSchema.sql
+        # mysql -h occamsrazormaria.mariadb.database.azure.com -u mariadbadmin -p'$PASSWORD' --ssl < ./deploy/sql/createMariaSchema.sql
+        echo "TODO"
     
     - name: Deploy Apps
       env:

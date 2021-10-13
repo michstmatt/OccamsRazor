@@ -176,5 +176,6 @@ resource webappVnet 'Microsoft.Web/sites/networkConfig@2020-06-01' = {
   }
   dependsOn:[
     appServicePlan
+    appService
   ]
 }
