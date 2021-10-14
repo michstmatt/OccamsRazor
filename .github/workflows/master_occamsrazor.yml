@@ -65,7 +65,7 @@ jobs:
         [client]
         user = "mariadbadmin"
         password = "$PASSWORD"
-        host = "$MARIA_DB"
+        host = "$MARIA_DB.mariadb.database.azure.com"
         EOF
 
         mysql --defaults-extra-file=$FILE < ./deploy/sql/createMariaSchema.sql
