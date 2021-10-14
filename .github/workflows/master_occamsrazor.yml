@@ -63,7 +63,7 @@ jobs:
         FILE=/tmp/creds
         cat << EOF > $FILE
         [client]
-        user = "mariadbadmin"
+        user = "mariadbadmin@$MARIA_DB"
         password = "$PASSWORD"
         host = "$MARIA_DB.mariadb.database.azure.com"
         EOF
