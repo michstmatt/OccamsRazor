@@ -21,6 +21,7 @@ jobs:
       ACR: "occamsrazor"
       WEB_IMAGE: "occamsrazorweb"
       FE_IMAGE: "occamsrazorfrontend"
+      RESOURCE_GROUP: "OccamsRazor"
 
     steps:
     - uses: actions/checkout@master
@@ -39,7 +40,7 @@ jobs:
     - name: Deploy Infra
       run: |
         COMPOSE=$(cat ./src/docker-compose.yml | base64 -w0)
-        az deployment group create -g OccamsRazor \
+        az deployment group create -g $RESOURCE_GROUP \
           -f ./deploy/infra/main.bicep \
           -p "linuxFxVersion=COMPOSE|$COMPOSE" \
           -p "webAppName=occamsrazortrivia" \
@@ -48,9 +49,21 @@ jobs:
     - name: Deploy SQL Schema
       env:
         PASSWORD: ${{ secrets.SQL_DB_PASS }}
+        MARIA_DB: occamsrazormaria
       run: |
-        # mysql -h occamsrazormaria.mariadb.database.azure.com -u mariadbadmin -p'$PASSWORD' --ssl < ./deploy/sql/createMariaSchema.sql
-        echo "TODO"
+        IP=$(dig @resolver4.opendns.com myip.opendns.com +short)
+        RULE="GH_ACTION"
+        az mariadb server firewall-rule create -n $RULE \
+          -g $RESOURCE_GROUP \
+          -s $MARIA_DB \
+          --start-ip-address $IP \
+          --end-ip-address $IP
+
+        mysql -h $MARIA_DB.mariadb.database.azure.com -u mariadbadmin -p'$PASSWORD' --ssl < ./deploy/sql/createMariaSchema.sql
+
+        az mariadb server firewall-rule delete -n $RULE \
+          -g $RESOURCE_GROUP \
+          -s $MARIA_DB
     
     - name: Deploy Apps
       env:
