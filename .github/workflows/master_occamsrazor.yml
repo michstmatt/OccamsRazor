@@ -59,7 +59,16 @@ jobs:
           --start-ip-address $IP \
           --end-ip-address $IP
 
-        mysql -h $MARIA_DB.mariadb.database.azure.com -u mariadbadmin@$MARIA_DB -p$PASSWORD --yes < ./deploy/sql/createMariaSchema.sql
+        mysql --help
+        FILE=/tmp/creds
+        cat << EOF > $FILE
+        [client]
+        user = "mariadbadmin"
+        password = "$PASSWORD"
+        host = "$MARIA_DB"
+        EOF
+
+        mysql --defaults-extra-file=$FILE < ./deploy/sql/createMariaSchema.sql
 
         az mariadb server firewall-rule delete -n $RULE \
           -g $RESOURCE_GROUP \
