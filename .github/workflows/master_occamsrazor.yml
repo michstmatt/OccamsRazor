@@ -59,7 +59,9 @@ jobs:
           --start-ip-address $IP \
           --end-ip-address $IP
 
-        mysql -h $MARIA_DB.mariadb.database.azure.com -u mariadbadmin@$MARIA_DB -p'$PASSWORD' < ./deploy/sql/createMariaSchema.sql
+        apt install mariadb-client-core-10.3
+
+        mysql -h $MARIA_DB.mariadb.database.azure.com -u mariadbadmin@$MARIA_DB -p$PASSWORD < ./deploy/sql/createMariaSchema.sql
 
         az mariadb server firewall-rule delete -n $RULE \
           -g $RESOURCE_GROUP \
