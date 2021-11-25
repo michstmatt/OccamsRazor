@@ -34,8 +34,8 @@
     "extends": "react-app"
   },
   "scripts": {
-    "build": "react-scripts build",
-    "debug": "react-scripts start",
+    "build": "react-scripts --openssl-legacy-provider build",
+    "debug": "react-scripts --openssl-legacy-provider start",
     "start": "node prodServer"
   },
   "browserslist": {
