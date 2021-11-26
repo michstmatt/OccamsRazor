@@ -66,6 +66,8 @@ jobs:
         host = "$MARIA_DB.mariadb.database.azure.com"
         EOF
 
+        chmod 600 $FILE
+
         mysql < ./deploy/sql/createMariaSchema.sql
 
         az mariadb server firewall-rule delete -n $RULE \
