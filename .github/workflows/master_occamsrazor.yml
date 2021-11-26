@@ -58,7 +58,6 @@ jobs:
           --start-ip-address $IP \
           --end-ip-address $IP
 
-        mysql --help
         FILE=/tmp/creds
         cat << EOF > $FILE
         [client]
