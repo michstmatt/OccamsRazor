@@ -32,6 +32,7 @@ COPY --from=build-env /app/out .
 COPY --from=build /app/build web
 
 ENV CONNECTION_STRING=""
+ENV MARIADB_VERSION="10.2.1"
 
 ENV ANSWERS_TABLE="PlayerAnswers"
 ENV GAMEMETADATA_TABLE="GameMetadata"

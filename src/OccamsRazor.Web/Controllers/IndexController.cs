@@ -12,7 +12,7 @@ using OccamsRazor.Web.Service;
 
 namespace OccamsRazor.Web.Controllers
 {
-    [Route("health")]
+    [Route("api")]
     [ApiController]
     public class IndexController: Controller
     {
@@ -26,8 +26,7 @@ namespace OccamsRazor.Web.Controllers
         [HttpGet]
         public IActionResult Index() 
         {
-            return Ok(System.Environment.GetEnvironmentVariable("CONNECTION_STRING"));
-            //return Ok(DateTime.UtcNow);
+            return Ok(DateTime.UtcNow);
         }
 
     }

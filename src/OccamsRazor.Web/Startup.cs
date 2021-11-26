@@ -19,9 +19,11 @@ namespace OccamsRazor.Web
 {
     public class Startup
     {
+        private readonly string WWW_ROOT;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            WWW_ROOT = System.Environment.GetEnvironmentVariable("WWW_ROOT") ?? "web";
         }
 
         public IConfiguration Configuration { get; }
@@ -44,6 +46,8 @@ namespace OccamsRazor.Web
             OccamsRazorEfSqlContext.QUESTION_TABLE = System.Environment.GetEnvironmentVariable("QUESTIONS_TABLE");
             OccamsRazorEfSqlContext.KEY_TABLE = System.Environment.GetEnvironmentVariable("KEYS_TABLE");
             OccamsRazorEfSqlContext.MC_QUESTION_TABLE = System.Environment.GetEnvironmentVariable("MC_QUESTIONS_TABLE");
+
+            services.AddSpaStaticFiles(spa => spa.RootPath = WWW_ROOT);
 
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -83,7 +87,7 @@ namespace OccamsRazor.Web
             app.UseHttpsRedirection();
             app.UseRouting();
 
-            
+
             app.Use(async (context, next) =>
             {
                 if (context.WebSockets.IsWebSocketRequest)
@@ -121,23 +125,26 @@ namespace OccamsRazor.Web
                 .SetIsOriginAllowed(origin => true) // allow any origin
                 .AllowCredentials()); // allow credentials
 
-            var www = System.Environment.GetEnvironmentVariable("WWW_ROOT") ?? "web";
-
             app.UseDefaultFiles();
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(env.ContentRootPath, www)  
-                ),
-                RequestPath = ""
-            });
+            app.UseSpaStaticFiles();
+            app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                    pattern: "api/{controller}/{action=Index}/{id?}");
             });
+            app.MapWhen(context => !(context.Request.Path.Value.StartsWith("/api") || context.Request.Path.Value.StartsWith("/notifications")),
+            config =>
+            {
+                System.Console.WriteLine("HERE");
+                config.UseSpa(spa =>
+                {
+                    spa.Options.SourcePath = WWW_ROOT;
+                });
+            });
+
 
         }
     }

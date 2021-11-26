@@ -12,7 +12,7 @@ using OccamsRazor.Web.Service;
 
 namespace OccamsRazor.Web.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class HostController : Controller
     {
