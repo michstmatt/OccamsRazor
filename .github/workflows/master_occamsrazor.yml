@@ -58,6 +58,7 @@ jobs:
           --start-ip-address $IP \
           --end-ip-address $IP
 
+        mysql --help
         FILE=/tmp/creds
         cat << EOF > $FILE
         [client]
@@ -67,8 +68,7 @@ jobs:
         EOF
 
         chmod 600 $FILE
-
-        mysql < ./deploy/sql/createMariaSchema.sql
+        mysql --defaults-extra-file=$FILE < ./deploy/sql/createMariaSchema.sql
 
         az mariadb server firewall-rule delete -n $RULE \
           -g $RESOURCE_GROUP \
