@@ -67,7 +67,7 @@ jobs:
         EOF
 
         chmod 600 $FILE
-        mysql --defaults-extra-file=$FILE -e "source ./deploy/sql/createMariaSchema.sql"
+        mysql --defaults-extra-file=$FILE < ./deploy/sql/createMariaSchema.sql
 
         az mariadb server firewall-rule delete -n $RULE \
           -g $RESOURCE_GROUP \
