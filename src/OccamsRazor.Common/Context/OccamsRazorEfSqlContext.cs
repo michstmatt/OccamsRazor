@@ -19,11 +19,11 @@ namespace OccamsRazor.Common.Context
         public DbSet<PlayerAnswer> Answers { get; set; }
         public DbSet<AuthenticationModel> Keys { get; set; }
 
-        public OccamsRazorEfSqlContext(DbContextOptions<OccamsRazorEfSqlContext> options): base(options) { this.Database.EnsureCreated();}
+        public OccamsRazorEfSqlContext(DbContextOptions<OccamsRazorEfSqlContext> options): base(options) {}
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<GameMetadata>().ToTable(GAMEMETADATA_TABLE).HasKey(q => q.GameId);
-            builder.Entity<GameMetadata>().Property(g => g.GameId).HasColumnName("GameId");
+            builder.Entity<GameMetadata>().Property(g => g.GameId).HasColumnName("GameId").ValueGeneratedOnAdd();
             builder.Entity<GameMetadata>().Property(g => g.Name).HasColumnName("Name");
             builder.Entity<GameMetadata>().Property(g => g.CurrentRound).HasColumnName("CurrentRoundNum");
             builder.Entity<GameMetadata>().Property(g => g.CurrentQuestion).HasColumnName("CurrentQuestionNum");
@@ -57,6 +57,8 @@ namespace OccamsRazor.Common.Context
             builder.Entity<PlayerAnswer>().Property(a => a.Round).HasColumnName("RoundNum");
             builder.Entity<PlayerAnswer>().Property(a => a.QuestionNumber).HasColumnName("QuestionNum");
             builder.Entity<PlayerAnswer>().Property(a => a.AnswerText).HasColumnName("AnswerText");
+            builder.Entity<PlayerAnswer>().Property(a => a.Wager).HasColumnName("Wager");
+            builder.Entity<PlayerAnswer>().Property(a => a.PointsAwarded).HasColumnName("PointsAwarded");
 
             builder.Entity<AuthenticationModel>().ToTable(KEY_TABLE).HasKey(k => k.GameId);
             builder.Entity<AuthenticationModel>().Property(a => a.GameId).HasColumnName("GameId");

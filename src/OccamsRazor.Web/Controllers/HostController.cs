@@ -12,7 +12,7 @@ using OccamsRazor.Web.Service;
 
 namespace OccamsRazor.Web.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class HostController : Controller
     {
@@ -55,6 +55,7 @@ namespace OccamsRazor.Web.Controllers
         {
             var game = new Game();
             game.Metadata.Name = data.Name;
+            game.Metadata.GameId = new Random().Next();
             game.Metadata.IsMultipleChoice = data.IsMultipleChoice;
             if (game.Metadata.IsMultipleChoice)
                 game.Metadata.Seed = new Random().Next();

@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -5,7 +6,9 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Pomelo.EntityFrameworkCore.MySql;
 
 using OccamsRazor.Common.Context;
 using OccamsRazor.Web.Repository;
@@ -16,9 +19,11 @@ namespace OccamsRazor.Web
 {
     public class Startup
     {
+        private readonly string WWW_ROOT;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            WWW_ROOT = System.Environment.GetEnvironmentVariable("WWW_ROOT") ?? "web";
         }
 
         public IConfiguration Configuration { get; }
@@ -30,15 +35,19 @@ namespace OccamsRazor.Web
             services.AddControllersWithViews();
 
             var connString = System.Environment.GetEnvironmentVariable("CONNECTION_STRING");
+            var mariaDbVersion = System.Environment.GetEnvironmentVariable("MARIADB_VERSION");
 
             services.AddDbContext<OccamsRazorEfSqlContext>(options =>
-               options.UseSqlServer(connString)
+               options.UseMySql(connString, new MariaDbServerVersion(new System.Version(mariaDbVersion)))
             );
+
             OccamsRazorEfSqlContext.ANSWER_TABLE = System.Environment.GetEnvironmentVariable("ANSWERS_TABLE");
             OccamsRazorEfSqlContext.GAMEMETADATA_TABLE = System.Environment.GetEnvironmentVariable("GAMEMETADATA_TABLE");
             OccamsRazorEfSqlContext.QUESTION_TABLE = System.Environment.GetEnvironmentVariable("QUESTIONS_TABLE");
             OccamsRazorEfSqlContext.KEY_TABLE = System.Environment.GetEnvironmentVariable("KEYS_TABLE");
             OccamsRazorEfSqlContext.MC_QUESTION_TABLE = System.Environment.GetEnvironmentVariable("MC_QUESTIONS_TABLE");
+
+            services.AddSpaStaticFiles(spa => spa.RootPath = WWW_ROOT);
 
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -78,7 +87,7 @@ namespace OccamsRazor.Web
             app.UseHttpsRedirection();
             app.UseRouting();
 
-            
+
             app.Use(async (context, next) =>
             {
                 if (context.WebSockets.IsWebSocketRequest)
@@ -116,13 +125,26 @@ namespace OccamsRazor.Web
                 .SetIsOriginAllowed(origin => true) // allow any origin
                 .AllowCredentials()); // allow credentials
 
+            app.UseDefaultFiles();
+            app.UseSpaStaticFiles();
+            app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                    pattern: "api/{controller}/{action=Index}/{id?}");
             });
+            app.MapWhen(context => !(context.Request.Path.Value.StartsWith("/api") || context.Request.Path.Value.StartsWith("/notifications")),
+            config =>
+            {
+                System.Console.WriteLine("HERE");
+                config.UseSpa(spa =>
+                {
+                    spa.Options.SourcePath = WWW_ROOT;
+                });
+            });
+
 
         }
     }

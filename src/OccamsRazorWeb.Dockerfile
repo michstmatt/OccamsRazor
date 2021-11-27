@@ -1,3 +1,16 @@
+FROM node:latest AS build
+WORKDIR /app
+
+COPY ./OccamsRazor.Frontend/package*.json ./
+
+RUN npm install
+ARG REACT_APP_API_URL=""
+
+COPY ./OccamsRazor.Frontend/public ./public
+COPY ./OccamsRazor.Frontend/src ./src
+
+RUN npm run build
+
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /app
 
@@ -16,8 +29,10 @@ RUN dotnet publish -c Release -o out ./OccamsRazor.Web/OccamsRazor.Web.csproj
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 WORKDIR /app
 COPY --from=build-env /app/out .
+COPY --from=build /app/build web
 
 ENV CONNECTION_STRING=""
+ENV MARIADB_VERSION="10.2.1"
 
 ENV ANSWERS_TABLE="PlayerAnswers"
 ENV GAMEMETADATA_TABLE="GameMetadata"
@@ -26,5 +41,5 @@ ENV MC_ANSWERS_TABLE="MultipleChoiceAnswers"
 ENV MC_QUESTIONS_TABLE="MultipleChoiceQuestions"
 ENV QUESTIONS_TABLE="Questions"
 
-EXPOSE 80
+EXPOSE 5000
 ENTRYPOINT ["dotnet", "OccamsRazor.Web.dll"]

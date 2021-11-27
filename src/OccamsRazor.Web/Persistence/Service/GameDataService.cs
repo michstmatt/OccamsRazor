@@ -22,12 +22,25 @@ namespace OccamsRazor.Web.Persistence.Service
             multipleChoiceRepository = mcqr;
         }
 
+        private void InitBlankQuestions(Game game)
+        {
+            foreach (var pair in game.Format)
+            {
+                var round = pair.Key;
+                for (int i = 0; i < pair.Value; i++)
+                {
+                    game.Questions.Add(new Question { Round = pair.Key, Number = i + 1, Text = "", AnswerText = "", Category = "" });
+                }
+            }
+        }
+
         public async Task<GameMetadata> CreateGameAsync(Game game)
         {
             var response = await gameDataRepository.InsertGameMetadataAsync(game.Metadata);
 
             if (game.Metadata.IsMultipleChoice == false)
             {
+                InitBlankQuestions(game);
                 var typedQuestions = game.Questions.Select(q => (Question)q).ToList();
                 await questionRepository.InsertQuestionsAsync(game.Metadata.GameId, typedQuestions);
             }
@@ -37,7 +50,7 @@ namespace OccamsRazor.Web.Persistence.Service
         public async Task<GameMetadata> SaveGameAsync(Game game)
         {
             GameMetadata response;
-            bool exists = (await gameDataRepository.GetGameMetadataAsync(game.Metadata.GameId)) == null;
+            bool exists = (await gameDataRepository.GetGameMetadataAsync(game.Metadata.GameId)) != null;
 
             if (exists)
             {
@@ -54,19 +67,27 @@ namespace OccamsRazor.Web.Persistence.Service
 
             return response;
         }
-        public async Task<Game> LoadGameAsync(int gameId)
+        public async Task<AbstractGame> LoadGameAsync(int gameId)
         {
-            Game game = new Game();
+            AbstractGame abstractGame;
             var md = await gameDataRepository.GetGameMetadataAsync(gameId);
-            game.Metadata = md;
             if (md.IsMultipleChoice)
-                game.Questions.AddRange(await multipleChoiceRepository.LoadQuestionsAsync(game.Metadata.Seed, 12));
+            {
+                var game = new MultipleChoiceGame();
+                game.Questions = (await multipleChoiceRepository.LoadQuestionsAsync(md.Seed, 12)).ToList();
+                abstractGame = game;
+            }
             else
-                game.Questions.AddRange(await questionRepository.LoadQuestionsAsync(game.Metadata.GameId));
+            {
+                var game = new Game();
+                game.Questions = (await questionRepository.LoadQuestionsAsync(md.GameId)).ToList();
+                abstractGame = game;
+            }
 
-            return game;
-
+            abstractGame.Metadata = md;
+            return abstractGame;
         }
+
         public async Task<IEnumerable<GameMetadata>> LoadGamesAsync() => await gameDataRepository.GetExistingGamesAsync();
 
         public async Task<AbstractQuestion> GetCurrentQuestionAsync(int gameId)

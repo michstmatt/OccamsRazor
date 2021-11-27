@@ -17,6 +17,10 @@ env:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      ACR: "occamsrazor"
+      WEB_IMAGE: "occamsrazorweb"
+      RESOURCE_GROUP: "OccamsRazor"
 
     steps:
     - uses: actions/checkout@master
@@ -26,30 +30,57 @@ jobs:
 
     - name: build docker
       working-directory: ./src
+      env:
+        WEB_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.WEB_IMAGE }}"
       run: |
-        ACR="occamsrazor"
-        ACR_URL="$ACR.azurecr.io"
-        export WEB_IMAGE="$ACR_URL/occamsrazorweb"
-        export FE_IMAGE="$ACR_URL/occamsrazorfrontend"
-        export ING_IMAGE="$ACR_URL/occamsrazoringress"
-
-        docker-compose build --parallel
+        docker build . -t $WEB_IMAGE -f OccamsRazorWeb.Dockerfile
 
     - name: Deploy Infra
+      env:
+        WEB_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.WEB_IMAGE }}"
       run: |
-        COMPOSE=$(cat ./src/docker-compose.yml | base64 -w0)
-        az deployment group create -g OccamsRazor \
+        az deployment group create -g $RESOURCE_GROUP \
           -f ./deploy/infra/main.bicep \
-          -p "linuxFxVersion=COMPOSE|$COMPOSE" \
-          -p "webAppName=occamsrazortrivia"
+          -p "linuxFxVersion=DOCKER|$WEB_IMAGE" \
+          -p "webAppName=occamsrazortrivia" \
+          -p "sqlPassword=${{ secrets.SQL_DB_PASS }}"
+    
+    - name: Deploy SQL Schema
+      env:
+        PASSWORD: ${{ secrets.SQL_DB_PASS }}
+        MARIA_DB: occamsrazormaria
+      run: |
+        IP=$(dig @resolver4.opendns.com myip.opendns.com +short)
+        RULE="GH_ACTION"
+        az mariadb server firewall-rule create -n $RULE \
+          -g $RESOURCE_GROUP \
+          -s $MARIA_DB \
+          --start-ip-address $IP \
+          --end-ip-address $IP
+
+        FILE=/tmp/creds
+        cat << EOF > $FILE
+        [client]
+        user = "mariadbadmin@$MARIA_DB"
+        password = "$PASSWORD"
+        host = "$MARIA_DB.mariadb.database.azure.com"
+        EOF
+
+        chmod 600 $FILE
+        mysql --defaults-extra-file=$FILE < ./deploy/sql/createMariaSchema.sql
+
+        az mariadb server firewall-rule delete -n $RULE \
+          -g $RESOURCE_GROUP \
+          -s $MARIA_DB
     
     - name: Deploy Apps
+      env:
+        ACR: ${{ env.ACR }}
+        WEB_IMAGE: "${{ env.ACR }}.azurecr.io/${{ env.WEB_IMAGE }}"
       run: |
         az acr login -n $ACR
 
         docker push "$WEB_IMAGE"
-        docker push "$FE_IMAGE"
-        docker push "$ING_IMAGE"
 
     - name: logout
       run: |
