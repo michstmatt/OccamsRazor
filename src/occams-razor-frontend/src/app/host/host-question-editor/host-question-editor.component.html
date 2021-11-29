@@ -1,0 +1,28 @@
+    <h2>Game Name </h2>
+    <input class="host-question-input" [(ngModel)]="game.metadata.name"/>
+    <hr />
+    <br />
+    <table class="hostScore">
+        <thead>
+            <tr>
+                <th>Round</th>
+                <th>Number</th>
+                <th>Category</th>
+                <th>Question</th>
+                <th>Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let question of game.questions; let i = index;">
+                <td>{{question.round | RoundConvert}}</td>
+                <td>{{question.number}}</td>
+                <td><input class="host-question-input" [(ngModel)]="game.questions[i].category"/></td>
+                <td><input class="host-question-input" [(ngModel)]="game.questions[i].text"/></td>
+                <td><input class="host-question-input" [(ngModel)]="game.questions[i].answerText"/></td>
+            </tr>
+        </tbody>
+
+
+    </table>
+    <br />
+    <input type="button" value="Save" class="button" (click)="saveGameData()"/>

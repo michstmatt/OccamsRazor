@@ -1,0 +1,103 @@
+/* You can add global styles to this file, and also import other style files */
+:root {
+  --black: #222222;
+  --red: #dc662e;
+  --green: #008eab;
+  --yellow: #feaf3c;
+  --blue: #2f737d;
+  --magenta: #78dcf4;
+  --cyan: #60b2c2;
+  --lightBlack: #545e65;
+  --lightRed: #dd9a8a;
+  --lightGreen: #749ea9;
+  --lightYellow: #fedaae;
+  --lightBlue: #0cc7e4;
+  --white: #c7e8f2;
+  --lightCyan: #98b9c1;
+  --lightWhite: #ffe9d7;
+  --darkGray: #252525;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+  background-color: var(--black);
+  color: var(--white);
+}
+
+.cardLarge {
+  width: auto;
+  margin: 10px;
+  background-color: var(--darkGray);
+  padding: 20px;
+  box-shadow: 0px 30px 40px #00000073;
+  border-radius: 5px;
+}
+
+.card {
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  background-color: var(--darkGray);
+  padding: 20px;
+  box-shadow: 0px 30px 40px #00000073;
+  border-radius: 5px;
+}
+
+
+.button {
+  border: none;
+  border-radius: 4px;
+  background-color: var(--blue);
+  color: var(--white);
+  font-weight: 600;
+  min-width: 30%;
+  position: relative;
+  transition: all 0.2s ease-in-out;
+  height: 40px;
+  width: 200px;
+  margin: 0 8px 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+}
+
+.button:hover {
+  opacity: 80%;
+  cursor: pointer;
+}
+
+span.primary {
+  color: var(--green);
+  text-transform: uppercase;
+}
+
+span.secondary {
+  color: var(--red);
+  text-transform: uppercase;
+}
+
+.content {
+  display: block;
+  max-width: 960px;
+  align-items: center;
+  margin-top: 60px;
+  padding: 10px;
+}
+
+@media screen and (max-width: 767px) {
+  .content {
+    padding: 0px;
+    width: 100%;
+  }
+  .cardLarge{
+    margin: 10px 0px 10px 0px;
+  }
+  body{
+    margin: 0px;
+  }
+}

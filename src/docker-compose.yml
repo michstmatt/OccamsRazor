@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  databases:
+    image: occamsrazorsql
+    ports:
+      - "3306:3306"
+
+  frontend:
+    image: occamsrazorweb
+    container_name: frontend
+    environment:
+      - CONNECTION_STRING=data source=databases,3306;Database=master;user=root;Password=tmpSQLPassword1234;
+    ports:
+      - "5000:5000"
+    expose:
+      - "5000"
+    depends_on:
+      - databases

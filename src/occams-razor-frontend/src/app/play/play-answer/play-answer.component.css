@@ -1,0 +1,12 @@
+input {
+    background-color: var(--black);
+    color: var(--white);
+    position: relative;
+    transition: all 0.2s ease-in-out;
+    margin: 0 8px 16px;
+    width: 200px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}

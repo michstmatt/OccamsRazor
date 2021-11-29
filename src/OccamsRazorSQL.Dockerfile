@@ -1,5 +1,6 @@
 FROM mariadb:10.6.4 as build
 
+ENV MARIADB_USER='sa'
 ENV MARIADB_ROOT_PASSWORD='tmpSQLPassword1234!'
 
 WORKDIR /tmp

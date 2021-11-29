@@ -1,13 +1,12 @@
 FROM node:latest AS build
 WORKDIR /app
 
-COPY ./OccamsRazor.Frontend/package*.json ./
+COPY ./occams-razor-frontend/*.json ./
 
 RUN npm install
 ARG REACT_APP_API_URL=""
 
-COPY ./OccamsRazor.Frontend/public ./public
-COPY ./OccamsRazor.Frontend/src ./src
+COPY ./occams-razor-frontend/src ./src
 
 RUN npm run build
 
@@ -29,7 +28,7 @@ RUN dotnet publish -c Release -o out ./OccamsRazor.Web/OccamsRazor.Web.csproj
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 WORKDIR /app
 COPY --from=build-env /app/out .
-COPY --from=build /app/build web
+COPY --from=build /app/dist/occams-razor-frontend web
 
 ENV CONNECTION_STRING=""
 ENV MARIADB_VERSION="10.2.1"

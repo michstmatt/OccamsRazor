@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS `GameMetadata` (gameId int DEFAULT 0,
 		currentQuestionNum int DEFAULT 0,
 		state int default 0,
 		mc int default 0,
-		seed int default 0);
+		seed int default 0,
+		PRIMARY KEY(gameId));
 
 CREATE TABLE IF NOT EXISTS `MultipleChoiceGameMetadata` (gameId int DEFAULT 0, 
 		name varchar(255),
