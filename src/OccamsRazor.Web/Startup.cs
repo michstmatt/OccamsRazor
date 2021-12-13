@@ -13,8 +13,10 @@ using Pomelo.EntityFrameworkCore.MySql;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 
+using OccamsRazor.Common.Configuration;
 using OccamsRazor.Common.Context;
 using OccamsRazor.Web.Configuration;
+using OccamsRazor.Web.Middleware;
 using OccamsRazor.Web.Repository;
 using OccamsRazor.Web.Service;
 using OccamsRazor.Web.Persistence.Repository;
@@ -39,18 +41,13 @@ namespace OccamsRazor.Web
 
             services.AddControllersWithViews();
 
-            var connString = System.Environment.GetEnvironmentVariable("CONNECTION_STRING");
-            var mariaDbVersion = System.Environment.GetEnvironmentVariable("MARIADB_VERSION");
+
+            var dbConfig = Configuration.GetSection("DB").Get<DbConfiguration>();
+            services.AddScoped<DbConfiguration>(_ => dbConfig);
 
             services.AddDbContext<OccamsRazorEfSqlContext>(options =>
-               options.UseMySql(connString, new MariaDbServerVersion(new System.Version(mariaDbVersion)))
+               options.UseMySql(dbConfig.ConnectionString, new MariaDbServerVersion(new System.Version(dbConfig.MariaDbVersion)))
             );
-
-            OccamsRazorEfSqlContext.ANSWER_TABLE = System.Environment.GetEnvironmentVariable("ANSWERS_TABLE");
-            OccamsRazorEfSqlContext.GAMEMETADATA_TABLE = System.Environment.GetEnvironmentVariable("GAMEMETADATA_TABLE");
-            OccamsRazorEfSqlContext.QUESTION_TABLE = System.Environment.GetEnvironmentVariable("QUESTIONS_TABLE");
-            OccamsRazorEfSqlContext.KEY_TABLE = System.Environment.GetEnvironmentVariable("KEYS_TABLE");
-            OccamsRazorEfSqlContext.MC_QUESTION_TABLE = System.Environment.GetEnvironmentVariable("MC_QUESTIONS_TABLE");
 
             var jwtConfig = Configuration.GetSection("JWT").Get<JwtConfiguration>();
             services.AddScoped<JwtConfiguration>(_ => jwtConfig);
@@ -114,6 +111,7 @@ namespace OccamsRazor.Web
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             var webSocketOptions = new WebSocketOptions()
             {
                 KeepAliveInterval = System.TimeSpan.FromSeconds(120),
@@ -123,43 +121,8 @@ namespace OccamsRazor.Web
 
             app.UseWebSockets(webSocketOptions);
             app.UseHttpsRedirection();
+            app.UseMiddleware<NotificationMiddleware>();
 
-
-            app.Use(async (context, next) =>
-            {
-                if (context.WebSockets.IsWebSocketRequest)
-                {
-                    if (context.Request.Path.Value.StartsWith("/notifications/player"))
-                    {
-                        var splits = context.Request.Path.Value.Split('/');
-                        if (!int.TryParse(splits[splits.Length - 2], out int gameId))
-                            return;
-                        var name = splits[splits.Length - 1];
-                        using (var webSocket = await context.WebSockets.AcceptWebSocketAsync())
-                        {
-                            var task = new System.Threading.Tasks.TaskCompletionSource<object>();
-                            await NotificationService.singleton.HandleConnected(gameId, new Common.Models.Player { Name = name }, webSocket, task);
-                            await task.Task;
-                        }
-                    }
-                    else if (context.Request.Path.Value.StartsWith("/notifications/host"))
-                    {
-                        using (var webSocket = await context.WebSockets.AcceptWebSocketAsync())
-                        {
-                            var task = new System.Threading.Tasks.TaskCompletionSource<object>();
-                            var splits = context.Request.Path.Value.Split('/');
-                            if (!int.TryParse(splits[splits.Length - 1], out int gameId))
-                                return;
-                            await NotificationService.singleton.HandleHostConnected(gameId, webSocket, task);
-                            await task.Task;
-                        }
-                    }
-                }
-                else
-                {
-                    await next();
-                }
-            });
             // global cors policy
             app.UseCors(x => x
                 .AllowAnyMethod()
