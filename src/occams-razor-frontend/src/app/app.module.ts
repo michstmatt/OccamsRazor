@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { PlayJoinComponent } from './play/play-join/play-join.component';
@@ -14,6 +14,7 @@ import { HostCreateComponent } from './host/host-create/host-create.component';
 import { HostQuestionEditorComponent } from './host/host-question-editor/host-question-editor.component';
 import { RoundConverter } from './databind/round-converter';
 import { HostManageComponent } from './host/host-manage/host-manage.component';
+import { StateConverter } from './databind/state-converter';
 
 @NgModule({
   declarations: [
@@ -27,12 +28,14 @@ import { HostManageComponent } from './host/host-manage/host-manage.component';
     HostCreateComponent,
     HostQuestionEditorComponent,
     RoundConverter,
+    StateConverter,
     HostManageComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

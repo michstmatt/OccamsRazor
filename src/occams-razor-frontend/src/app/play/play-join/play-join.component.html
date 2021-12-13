@@ -1,4 +1,7 @@
-<form>
+<form [formGroup]="joinForm" (ngSubmit)="onSubmit()" class="card">
+    <span>Name</span>
+    <input type="text" formControlName="name" />
     <span>Game Code</span>
-    <input type="text"/>
+    <input type="text" formControlName="code" />
+    <input type="submit" class="button" value="Join!" />
 </form>

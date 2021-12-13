@@ -141,7 +141,7 @@ namespace OccamsRazor.Web.Controllers
             await _gameDataService.SetGameStateAsync(game);
             var result = await _gameDataService.SetCurrentQuestionAsync(game);
 
-            await _notificationService.SendPlayerMessage("NEW_QUESTION");
+            await _notificationService.SendPlayerMessage(game.GameId, "NEW_QUESTION");
             return Ok(result);
         }
 
@@ -179,7 +179,7 @@ namespace OccamsRazor.Web.Controllers
                 return Unauthorized();
             }
             var response = await _gameDataService.SetGameStateAsync(game);
-            await _notificationService.SendPlayerMessage("STATE_CHANGED");
+            await _notificationService.SendPlayerMessage(game.GameId, "STATE_CHANGED");
             return Ok(response);
         }
 

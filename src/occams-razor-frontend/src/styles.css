@@ -16,6 +16,8 @@
   --lightCyan: #98b9c1;
   --lightWhite: #ffe9d7;
   --darkGray: #252525;
+
+  --mobileWidth: 767px;
 }
 
 html {
@@ -26,8 +28,7 @@ html {
 }
 
 .cardLarge {
-  width: auto;
-  margin: 10px;
+  margin: 10px auto 10px;
   background-color: var(--darkGray);
   padding: 20px;
   box-shadow: 0px 30px 40px #00000073;
@@ -35,14 +36,13 @@ html {
 }
 
 .card {
-  margin-left: 0;
-  margin-right: 0;
-  margin-top: 25px;
-  margin-bottom: 25px;
+  margin: 10px auto 10px;
   background-color: var(--darkGray);
   padding: 20px;
   box-shadow: 0px 30px 40px #00000073;
   border-radius: 5px;
+  width: 90%;
+  max-width: 700px;
 }
 
 
@@ -53,23 +53,21 @@ html {
   color: var(--white);
   font-weight: 600;
   min-width: 30%;
-  position: relative;
   transition: all 0.2s ease-in-out;
   height: 40px;
   width: 200px;
-  margin: 0 8px 16px;
+  margin: 10px;
   padding: 16px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
   text-transform: uppercase;
+  display: inline-block;
 }
 
 .button:hover {
   opacity: 80%;
   cursor: pointer;
 }
+
 
 span.primary {
   color: var(--green);
@@ -85,9 +83,23 @@ span.secondary {
   display: block;
   max-width: 960px;
   align-items: center;
+  margin: auto;
   margin-top: 60px;
   padding: 10px;
 }
+
+input,select,option {
+    background-color: var(--black);
+    color: var(--white);
+    transition: all 0.2s ease-in-out;
+    margin: 0 8px 16px;
+    width: 400px;
+    justify-content: center;
+    align-items: center;
+    display: block;
+    font-size: 16px;
+}
+
 
 @media screen and (max-width: 767px) {
   .content {
@@ -99,5 +111,17 @@ span.secondary {
   }
   body{
     margin: 0px;
+  }
+  .button {
+    width: 90%;
+    margin: 10px auto 10px;
+    display: block;
+  }
+  input, select, option {
+    width: 90%;
+    margin: auto;
+  }
+  .card {
+    padding: 5px;
   }
 }

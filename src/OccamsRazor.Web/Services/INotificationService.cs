@@ -10,9 +10,9 @@ namespace OccamsRazor.Web.Service
 {
     public interface INotificationService
     {
-        Task HandleHostConnected(WebSocket socket, TaskCompletionSource<object> t);
-        Task HandleConnected(Player player, WebSocket socket, TaskCompletionSource<object> t);
-        Task<bool> SendPlayerMessage(string message);
-        Task<bool> UpdateHost(string message);
+        Task HandleHostConnected(int gameId, WebSocket socket, TaskCompletionSource<object> t);
+        Task HandleConnected(int gameId, Player player, WebSocket socket, TaskCompletionSource<object> t);
+        Task<bool> SendPlayerMessage(int gameId, string message);
+        Task<bool> UpdateHost(int gameId, string message);
     }
 }

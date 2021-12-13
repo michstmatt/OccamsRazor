@@ -71,6 +71,10 @@ namespace OccamsRazor.Web.Persistence.Service
         {
             AbstractGame abstractGame;
             var md = await gameDataRepository.GetGameMetadataAsync(gameId);
+            if(md == null)
+            {
+                return null;
+            }
             if (md.IsMultipleChoice)
             {
                 var game = new MultipleChoiceGame();

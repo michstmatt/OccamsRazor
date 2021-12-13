@@ -13,7 +13,7 @@ export class HostService {
   host: string;
   private cookieName: string = "host-key";
   constructor(private commonService: CommonService) {
-    this.host = environment.apiUrl;
+    this.host = `${environment.http}://${environment.apiUrl}`;
   }
 
   private getKey(): string {
@@ -67,5 +67,35 @@ export class HostService {
     };
     await fetch(`${this.host}/api/Host/SaveQuestions`, requestOptions);
   };
+
+  async updateQuestion(game: GameMetadata): Promise<Question> {
+
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'gameKey': this.getKey()},
+      body: JSON.stringify(game)
+    };
+    const response = await fetch(`${this.host}/api/Host/setCurrentQuestion`, requestOptions);
+
+    if (response.ok) {
+      return await response.json() as Question;
+    }
+    return Promise.reject();
+  }
+
+  async updateState(game: GameMetadata): Promise<GameMetadata> {
+
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'gameKey': this.getKey()},
+      body: JSON.stringify(game)
+    };
+    const response = await fetch(`${this.host}/api/Host/setState`, requestOptions);
+
+    if (response.ok) {
+      return await response.json() as GameMetadata;
+    }
+    return Promise.reject();
+  }
 
 }

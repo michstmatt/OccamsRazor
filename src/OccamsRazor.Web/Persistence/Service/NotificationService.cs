@@ -12,8 +12,15 @@ using OccamsRazor.Web.Service;
 
 namespace OccamsRazor.Web.Persistence.Service
 {
+
+    public class NotificationContext
+    {
+        public Dictionary<string, WebSocket> Sockets { get; set; }
+    }
+
     public class NotificationService : INotificationService
     {
+        private const string HostId = "Host";
         private static NotificationService _service;
         public static NotificationService singleton
         {
@@ -27,33 +34,48 @@ namespace OccamsRazor.Web.Persistence.Service
             }
         }
 
-        private WebSocket hostSocket;
-        private Dictionary<string, WebSocket> playerSockets;
+        private Dictionary<int, NotificationContext> servers;
+
+        private NotificationContext getContext(int gameId)
+        {
+            if (!servers.ContainsKey(gameId))
+            {
+                servers.Add(gameId, new NotificationContext
+                {
+                    Sockets = new Dictionary<string, WebSocket>()
+                });
+            }
+            return servers[gameId];
+        }
 
         public NotificationService()
         {
-            playerSockets = new Dictionary<string, WebSocket>();
+            servers = new Dictionary<int, NotificationContext>();
         }
 
-        public async Task HandleHostConnected(WebSocket socket, TaskCompletionSource<object> t)
+        public async Task HandleHostConnected(int gameId, WebSocket socket, TaskCompletionSource<object> t)
         {
-            hostSocket = socket;
-            await KeepAlive(socket, null, t);
+            var server = this.getContext(gameId);
+
+            server.Sockets.Add(HostId, socket);
+            
+            await KeepAlive(gameId, socket, new Player{Name = HostId}, t);
         }
 
 
-        public async Task HandleConnected(Player player, WebSocket socket, TaskCompletionSource<object> t)
+        public async Task HandleConnected(int gameId, Player player, WebSocket socket, TaskCompletionSource<object> t)
         {
-            if (playerSockets.ContainsKey(player.Name))
+            var server = this.getContext(gameId);
+            if (server.Sockets.ContainsKey(player.Name))
             {
                 //await playerSockets[player.Name].CloseAsync(closeStatus: WebSocketCloseStatus.PolicyViolation, "Duplicate connections", CancellationToken.None);
             }
-            playerSockets.Add(player.Name, socket);
+            server.Sockets.Add(player.Name, socket);
 
-            await KeepAlive(socket, player, t);
+            await KeepAlive(gameId, socket, player, t);
         }
 
-        private async Task KeepAlive(WebSocket socket, Player p, TaskCompletionSource<object> task)
+        private async Task KeepAlive(int gameId, WebSocket socket, Player p, TaskCompletionSource<object> task)
         {
 
             bool run = true;
@@ -71,9 +93,10 @@ namespace OccamsRazor.Web.Persistence.Service
                 }
                 finally
                 {
+                    var server = this.getContext(gameId);
                     if (p != null)
                     {
-                        playerSockets.Remove(p.Name);
+                        server.Sockets.Remove(p.Name);
                     }
                     task.SetResult(null);
                 }
@@ -81,11 +104,15 @@ namespace OccamsRazor.Web.Persistence.Service
 
         }
 
-        public async Task<bool> SendPlayerMessage(string message)
+        public async Task<bool> SendPlayerMessage(int gameId, string message)
         {
+            var server = this.getContext(gameId);
             var buffer = System.Text.Encoding.ASCII.GetBytes(message);
-            foreach (var pair in playerSockets)
+            foreach (var pair in server.Sockets)
             {
+                if(pair.Key == HostId)
+                    continue;
+
                 var socket = pair.Value;
                 lock (socket)
                 {
@@ -95,8 +122,13 @@ namespace OccamsRazor.Web.Persistence.Service
             return true;
         }
 
-        public async Task<bool> UpdateHost(string message)
+        public async Task<bool> UpdateHost(int gameId, string message)
         {
+            var server = this.getContext(gameId);
+            var hostSocket = server.Sockets.GetValueOrDefault(HostId);
+            if (hostSocket == null)
+                return false;
+
             var buffer = System.Text.Encoding.ASCII.GetBytes(message);
             lock(hostSocket)
             {

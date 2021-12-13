@@ -11,5 +11,6 @@ namespace OccamsRazor.Web.Service
     {
         Task<bool> AddAuthentication(int gameId, string key);
         Task<bool> IsAuthenticated(int gameId, string key);
+        Task<string> GenerateJwtToken(int gameId, string id);
     }
 }

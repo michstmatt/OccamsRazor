@@ -11,7 +11,7 @@ export class HostQuestionEditorComponent implements OnInit {
 
   game: Game;
   constructor(private hostService: HostService) {
-    this.game = {metadata : {gameId: 285715721}} as Game;
+    this.game = {metadata : {gameId: 1981169330}} as Game;
    }
 
   ngOnInit(): void {

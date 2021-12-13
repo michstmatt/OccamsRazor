@@ -1,17 +1,20 @@
-<h4> <span class="secondary"> Currently Showing </span>test</h4>
-<div class="card-container">
-    <button class="button">Show Pre Question</button>
-    <button class="button">Show Question</button>
-    <button class="button">Show Question</button>
-    <button class="button">Show Answer</button>
-    <button class="button" class="button">Show Results</button>
+<div class="card">
+    <h4> <span class="secondary"> Currently Showing </span>{{game.state | StateConvert}}</h4>
+    <button class="button" (click)="setState(3)">Show Pre Question</button>
+    <button class="button" (click)="setState(1)">Show Question</button>
+    <button class="button" (click)="setState(4)">Show Answer</button>
+    <button class="button" (click)="setState(2)">Show Results</button>
 </div>
-<app-question></app-question>
-<h4> <span class="primary"> Answer </span>test</h4>
-<select class="host-score-input" onChange="">
-    <option value="test">R Q
-    </option>
-    )}
-</select>
-<button class="button" onClick="">Update Current Question</button>
-This will set the state to Pre-Question
+<div class="card">
+    <app-question [question]="question"></app-question>
+    <h4> <span class="primary"> Answer </span>{{question.answerText}}</h4>
+</div>
+<div class="card">
+    <select class="host-score-input" onChange="">
+        <option value="test">R Q
+        </option>
+        )}
+    </select>
+    <button class="button" onClick="">Update Current Question</button>
+    This will set the state to Pre-Question
+</div>
