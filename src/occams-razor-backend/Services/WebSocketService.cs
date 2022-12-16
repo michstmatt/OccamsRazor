@@ -14,7 +14,7 @@ namespace OccamsRazor.Services
 
     public class WebSocketService
     {
-        public HandleAnswerMessage AnswerDelegate;
+        public PlayerAnswerCallback AnswerDelegate;
         public async Task KeepAlive(WebSocket socket, Player player, TaskCompletionSource task)
         {
             bool run = true;
@@ -52,7 +52,7 @@ namespace OccamsRazor.Services
             var message = await deserializeMessage(ms);
             if (message is AnswerMessage)
             {
-                AnswerDelegate(player, message as AnswerMessage);
+                await AnswerDelegate(player, message as AnswerMessage);
             }
         }
 

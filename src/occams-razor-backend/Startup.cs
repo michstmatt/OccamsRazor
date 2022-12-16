@@ -50,6 +50,7 @@ namespace OccamsRazor
             services.AddScoped<TokenService>((svc) => new TokenService(priKeyBytes, issuer, tokenParams));
             services.AddScoped<GameService>();
             services.AddSingleton<WebSocketService>();
+            services.AddScoped<GameOrchestrationService>();
 
 
             services.AddAuthentication(options =>

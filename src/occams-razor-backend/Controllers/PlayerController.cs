@@ -18,10 +18,10 @@ namespace OccamsRazor.Controllers
     public class PlayerController: ControllerBase
     {
         private readonly ILogger<PlayerController> logger;
-        private readonly GameService gameService;
+        private readonly GameOrchestrationService gameService;
         private readonly TokenService tokenService;
 
-        public PlayerController(ILogger<PlayerController> logger, GameService gameService, TokenService tokenService)
+        public PlayerController(ILogger<PlayerController> logger, GameOrchestrationService gameService, TokenService tokenService)
         {
             this.logger = logger;
             this.gameService = gameService;
